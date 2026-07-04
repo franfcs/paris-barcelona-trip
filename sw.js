@@ -1,4 +1,4 @@
-const CACHE = 'trip-v2';
+const CACHE = 'trip-v3';
 const ASSETS = ['./paris-barcelona-trip.html', './'];
 
 self.addEventListener('install', e => {
@@ -14,6 +14,11 @@ self.addEventListener('fetch', e => {
   // Never cache the sync API or non-GET requests — always hit the network so
   // cross-device state is live, not replayed from a stale cache.
   if (url.pathname.startsWith('/api/') || e.request.method !== 'GET') return;
+  // Page navigations: network-first so the HTML is never stale, fall back to cache offline.
+  if (e.request.mode === 'navigate') {
+    e.respondWith(fetch(e.request).catch(() => caches.match('./paris-barcelona-trip.html')));
+    return;
+  }
   e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(res => {
     if (res && res.status === 200) {
       const clone = res.clone();
