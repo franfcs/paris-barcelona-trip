@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Paris → Barcelona | July 2026</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Trip Planner">
+<meta name="theme-color" content="#1e3a5f">
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f3f0;color:#1a1a1a;line-height:1.5}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
+a{color:#4a90d9;text-decoration:none}a:hover{text-decoration:underline}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#1e3a5f 0%,#7b2252 25%,#0d6b5e 50%,#8b6914 75%,#922b21 100%);padding:40px 0 32px;color:#fff;text-align:center;position:relative}
+.hero::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,.3)}
+.hero>*{position:relative;z-index:1}
+.hero h1{font-size:2.5rem;font-weight:300;letter-spacing:.04em;margin-bottom:4px}
+.hero h1 b{font-weight:700}
+.hero .sub{font-size:1rem;opacity:.9;margin-bottom:20px}
+.route{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.route-city{display:flex;flex-direction:column;align-items:center;gap:4px}
+.route-dot{width:12px;height:12px;border-radius:50%;border:2px solid #fff}
+.route-name{font-size:.75rem;opacity:.85;font-weight:500}
+.route-line{width:50px;height:2px;background:rgba(255,255,255,.5);margin-bottom:18px}
+.c-paris{background:#4a90d9}.c-lyon{background:#c0396b}.c-montpellier{background:#1abc9c}.c-perpignan{background:#f0a500}.c-barcelona{background:#e74c3c}
+
+/* Sticky budget bar */
+.budget-bar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid #e8e6e3;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.budget-bar .label{font-size:.85rem;color:#777}
+.budget-bar .total{font-size:1.4rem;font-weight:700;color:#1e3a5f}
+.budget-bar .breakdown{display:flex;gap:16px;font-size:.8rem;color:#777}
+.budget-bar .breakdown span{display:flex;align-items:center;gap:4px}
+.budget-bar .breakdown .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;padding:20px 0 12px;flex-wrap:wrap}
+.tab-btn{padding:10px 20px;border-radius:10px;border:2px solid #e8e6e3;background:#fff;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s}
+.tab-btn:hover{border-color:#aaa}
+.tab-btn.active{border-color:#1e3a5f;background:#1e3a5f;color:#fff}
+.tab-btn .nights{font-size:1.1rem;font-weight:700}
+.tab-btn .cost{font-size:.75rem;color:#999;margin-top:2px}
+.tab-btn.active .cost{color:rgba(255,255,255,.7)}
+
+/* Filters */
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 16px;align-items:center}
+.filters .label{font-size:.8rem;color:#777;font-weight:600;margin-right:4px}
+.fbtn{padding:4px 14px;border-radius:16px;border:1.5px solid #e8e6e3;background:#fff;cursor:pointer;font-size:.8rem;font-weight:500;transition:all .2s}
+.fbtn:hover{border-color:#999}
+.fbtn.active{color:#fff;border-color:transparent}
+.fbtn.active[data-c="all"]{background:#1a1a1a}
+.fbtn.active[data-c="paris"]{background:#1e3a5f}
+.fbtn.active[data-c="lyon"]{background:#7b2252}
+.fbtn.active[data-c="montpellier"]{background:#0d6b5e}
+.fbtn.active[data-c="perpignan"]{background:#8b6914}
+.fbtn.active[data-c="barcelona"]{background:#922b21}
+
+/* Day cards */
+.days{display:flex;flex-direction:column;gap:16px;padding-bottom:24px}
+.day{background:#fff;border-radius:10px;border:1px solid #e8e6e3;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);transition:box-shadow .2s}
+.day:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.day.hidden{display:none}
+.day .bar{height:4px}
+.bar-paris{background:#1e3a5f}.bar-lyon{background:#7b2252}.bar-montpellier{background:#0d6b5e}.bar-perpignan{background:#8b6914}.bar-barcelona{background:#922b21}
+.day-body{padding:14px 18px}
+.day-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.day-date{font-size:.8rem;color:#777;font-weight:600}
+.day-num{font-size:.7rem;background:#f5f3f0;padding:2px 8px;border-radius:8px;color:#999}
+.day-title{font-size:1.1rem;font-weight:700;margin-bottom:2px}
+.city-label{display:inline-block;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:4px;color:#fff;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.cl-paris{background:#1e3a5f}.cl-lyon{background:#7b2252}.cl-montpellier{background:#0d6b5e}.cl-perpignan{background:#8b6914}.cl-barcelona{background:#922b21}
+
+/* Birthday */
+.day.birthday{border:2px solid #f0a500;background:linear-gradient(135deg,#fffdf5,#fff8e1)}
+.day.birthday .bar{background:linear-gradient(90deg,#f0a500,#ff6b6b,#f0a500);height:5px}
+.bday-badge{display:inline-block;background:linear-gradient(135deg,#f0a500,#ff6b6b);color:#fff;padding:2px 10px;border-radius:8px;font-size:.7rem;font-weight:700;margin-left:6px}
+
+/* Events */
+.events{list-style:none}
+.ev{padding:10px 0;border-top:1px solid #f0eeeb;display:flex;gap:10px;align-items:flex-start;font-size:.85rem}
+.ev:first-child{border-top:none}
+.ev-check{margin-top:3px;cursor:pointer;accent-color:#1e3a5f;flex-shrink:0;width:16px;height:16px}
+.ev-img{width:90px;height:65px;border-radius:6px;background-size:cover;background-position:center;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.ev-body{flex:1;min-width:0}
+.ev-name{font-weight:700;font-size:.9rem}
+.ev-time{display:inline-block;background:#1e3a5f;color:#fff;font-size:.7rem;padding:2px 7px;border-radius:10px;margin-right:6px;font-weight:600;letter-spacing:.3px;vertical-align:middle}
+.ev-desc{font-size:.8rem;color:#555;margin-top:3px;line-height:1.45}
+.ev-tags{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.tag{font-size:.65rem;padding:1px 6px;border-radius:3px;font-weight:600}
+.t-free{background:#e8f5e9;color:#2e7d32}.t-concert{background:#f3e5f5;color:#7b1fa2}.t-museum{background:#e8f0fe;color:#1565c0}
+.t-food{background:#fff3e0;color:#e65100}.t-cinema{background:#e0f2f1;color:#00695c}.t-festival{background:#fff8e1;color:#f57f17}.t-activity{background:#f5f5f5;color:#555}
+.t-transit{background:#e8eaf6;color:#283593}.ev-transit{background:#f0f2ff;border-left:3px solid #5c6bc0;padding-left:7px;margin-left:-10px;padding-right:10px}
+.t-pending{background:#fff8c5;color:#856404;font-weight:700}.t-booked{background:#d4edda;color:#155724;font-weight:700}
+.ev-pending{background:#fffdf0;border-left:3px solid #fbbf24;padding-left:7px;margin-left:-10px;padding-right:10px}
+.ev-booked{background:#f0fff4;border-left:3px solid #34d399;padding-left:7px;margin-left:-10px;padding-right:10px}
+.ev-icon{margin-right:4px;font-size:.95rem;flex-shrink:0;line-height:1.4}
+.ev-price{font-size:.8rem;color:#777;white-space:nowrap;margin-left:auto;flex-shrink:0;font-weight:700}
+.ev-price.checked{color:#2e7d32}
+
+/* Section headers */
+.sec{padding:28px 0 12px}
+.sec h2{font-size:1.5rem;font-weight:300}
+.sec p{color:#777;font-size:.9rem}
+
+/* Hotels / Transport tables */
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:8px 0 24px}
+.rec-card{background:#fff;border-radius:10px;border:1px solid #e8e6e3;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.rec-card h3{font-size:.95rem;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.rec-card h3 .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.rec-item{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #f5f3f0;font-size:.85rem}
+.rec-item:last-child{border-bottom:none}
+.rec-item .name{font-weight:500}
+.rec-item .meta{font-size:.75rem;color:#999}
+.rec-item .price{font-weight:700;color:#1e3a5f;white-space:nowrap}
+
+/* Vision board */
+.vision{padding:32px 0}
+.vision h2{font-size:1.5rem;font-weight:300;text-align:center;margin-bottom:4px}
+.vision .sub{text-align:center;color:#777;margin-bottom:20px;font-size:.9rem}
+.vgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:18px;padding:10px}
+.pol{background:#fff;padding:8px 8px 30px;box-shadow:0 3px 12px rgba(0,0,0,.12);width:200px;transition:all .3s;flex-shrink:0}
+.pol:nth-child(odd){transform:rotate(-2deg)}.pol:nth-child(even){transform:rotate(1.5deg)}
+.pol:nth-child(3n){transform:rotate(-1deg)}.pol:nth-child(4n){transform:rotate(2.5deg)}
+.pol:hover{transform:rotate(0) scale(1.06);z-index:10;box-shadow:0 10px 28px rgba(0,0,0,.18)}
+.pol .img{width:100%;aspect-ratio:4/3;background-size:cover;background-position:center;border-radius:1px;position:relative}
+.pol .img .ctag{position:absolute;top:6px;left:6px;padding:1px 6px;border-radius:3px;font-size:.6rem;font-weight:700;color:#fff;text-transform:uppercase}
+.pol .cap{text-align:center;margin-top:8px;font-size:.85rem;font-weight:600}
+.pol .capsub{text-align:center;font-size:.72rem;color:#777;margin-top:1px}
+.pol .stars{text-align:center;font-size:.8rem;margin-top:3px;letter-spacing:1px;line-height:1}
+.pol .stars .fs{color:#f0a500}
+.pol .stars .es{color:#ddd}
+.pol .rtag{position:absolute;top:6px;right:6px;padding:1px 5px;border-radius:3px;font-size:.58rem;font-weight:700;color:#fff;background:#f0a500;letter-spacing:.5px}
+.pol .rtag.r3{background:#e74c3c}.pol .rtag.r2{background:#f0a500}.pol .rtag.r1{background:#bbb}
+.pol .it-tag{position:absolute;bottom:6px;right:6px;padding:2px 7px;border-radius:10px;font-size:.58rem;font-weight:700;color:#fff;letter-spacing:.3px;backdrop-filter:blur(4px)}
+.pol .it-tag.it-in{background:rgba(46,125,50,.92)}
+.pol .it-tag.it-out{background:rgba(120,120,120,.85)}
+.pol.hidden{display:none}
+
+/* Prices */
+.price-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;padding:8px 0 40px}
+.pcard{background:#fff;border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.04);border:1px solid #e8e6e3}
+.pcard h3{font-size:.9rem;margin-bottom:2px}
+.pcard .ptotal{font-size:1.6rem;font-weight:700;color:#1e3a5f;margin-bottom:12px}
+.pcard .ptotal small{font-size:.7rem;color:#777;font-weight:400}
+.pbar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.pbar .plbl{font-size:.75rem;width:80px;color:#777;flex-shrink:0}
+.pbar .ptrack{flex:1;height:18px;background:#f5f3f0;border-radius:3px;overflow:hidden}
+.pbar .pfill{height:100%;border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px}
+.pbar .pfill span{font-size:.65rem;color:#fff;font-weight:600}
+.pfill.hotels{background:linear-gradient(90deg,#4a90d9,#1e3a5f)}
+.pfill.transport{background:linear-gradient(90deg,#1abc9c,#0d6b5e)}
+.pfill.activities{background:linear-gradient(90deg,#c0396b,#7b2252)}
+.pfill.food{background:linear-gradient(90deg,#f0a500,#8b6914)}
+.ppd{font-size:.75rem;color:#777;margin-top:10px;padding-top:10px;border-top:1px solid #f0eeeb}
+
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:10px 16px;background:#fff;border-radius:10px;margin:12px 0}
+.legend-item{display:flex;align-items:center;gap:3px;font-size:.75rem;color:#777}
+
+@media(max-width:768px){
+.hero h1{font-size:1.8rem}.route-line{width:25px}
+.budget-bar{flex-direction:column;align-items:flex-start}
+.pol{width:150px;padding:5px 5px 24px}
+.tabs{gap:4px}.tab-btn{padding:8px 12px;font-size:.8rem}
+}
+/* Lightbox */
+.lightbox{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);align-items:center;justify-content:center;cursor:pointer}
+.lightbox.open{display:flex}
+.lightbox img{max-width:90vw;max-height:85vh;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.lightbox .lb-caption{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:#fff;font-size:1rem;font-weight:600;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.lightbox .lb-close{position:absolute;top:20px;right:24px;color:#fff;font-size:2rem;cursor:pointer;opacity:.7}
+.lightbox .lb-close:hover{opacity:1}
+
+/* Links */
+.ev-link{font-size:.72rem;color:#4a90d9;text-decoration:none;margin-top:2px;display:inline-block}
+.ev-link:hover{text-decoration:underline}
+
+/* Clickable images */
+.ev-img{cursor:pointer}
+.ev-img:hover{opacity:.85;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+
+@media print{.budget-bar,.tabs,.filters,.lightbox{display:none}.day{break-inside:avoid;box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="hero">
+<h1>Paris <b>&rarr;</b> Barcelona</h1>
+<div class="sub">Birthday Trip &middot; July 2026</div>
+<div class="route">
+<div class="route-city"><div class="route-dot c-paris"></div><span class="route-name">Paris</span></div><div class="route-line"></div>
+<div class="route-city"><div class="route-dot c-lyon"></div><span class="route-name">Lyon</span></div><div class="route-line"></div>
+<div class="route-city"><div class="route-dot c-montpellier"></div><span class="route-name">Montpellier</span></div><div class="route-line"></div>
+<div class="route-city"><div class="route-dot c-barcelona"></div><span class="route-name">Barcelona</span></div>
+</div>
+</div>
+
+<div class="budget-bar" id="budgetBar">
+<div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap">
+  <div>
+    <div class="label">&#9989; Confirmed &amp; paid</div>
+    <div class="total" id="budgetPaid" style="color:#2e7d32">&pound;0</div>
+  </div>
+  <div style="color:#e0e0e0;font-size:1.6rem;line-height:1.4;align-self:center">|</div>
+  <div>
+    <div class="label">&#8987; Still to book / est.</div>
+    <div class="total" id="budgetEst" style="color:#e65100">~&pound;0</div>
+  </div>
+  <div style="color:#e0e0e0;font-size:1.6rem;line-height:1.4;align-self:center">|</div>
+  <div>
+    <div class="label">&#128202; Total trip est.</div>
+    <div class="total" id="budgetTotal">&pound;0</div>
+  </div>
+</div>
+<div class="breakdown" style="margin-top:6px">
+<span><span class="dot" style="background:#4a90d9"></span> Hotels: <b id="bHotels">&pound;0</b></span>
+<span><span class="dot" style="background:#1976d2"></span> Flights: <b id="bFlights">&pound;0</b></span>
+<span><span class="dot" style="background:#1abc9c"></span> Transport: <b id="bTransport">&pound;0</b></span>
+<span><span class="dot" style="background:#c0396b"></span> Activities: <b id="bActs">&pound;0</b></span>
+<span><span class="dot" style="background:#f0a500"></span> Food ~est: <b id="bFood">&pound;0</b></span>
+</div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLB()">
+<span class="lb-close">&times;</span>
+<img id="lbImg" src="" alt="">
+<div class="lb-caption" id="lbCap"></div>
+</div>
+
+<div class="container">
+
+<style>
+.main-tabs{display:flex;flex-wrap:wrap;gap:4px;background:#fff;padding:6px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:18px;position:sticky;top:0;z-index:100}
+.main-tabs button{background:transparent;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;color:#555;white-space:nowrap;transition:all .15s}
+.main-tabs button:hover{background:#f5f5f5}
+.main-tabs button.active{background:#1e3a5f;color:#fff}
+.main-tabs button .icn{margin-right:6px}
+.tab-block{display:none}
+body[data-tab="itinerary"] .tab-block[data-panel="itinerary"]{display:block}
+body[data-tab="checklist"] .tab-block[data-panel="checklist"]{display:block}
+body[data-tab="confirmed"] .tab-block[data-panel="confirmed"]{display:block}
+body[data-tab="bonus"] .tab-block[data-panel="bonus"]{display:block}
+body[data-tab="maps"] .tab-block[data-panel="maps"]{display:block}
+body[data-tab="vision"] .tab-block[data-panel="vision"]{display:block}
+body[data-tab="misc"] .tab-block[data-panel="misc"]{display:block}
+body[data-tab="predep"] .tab-block[data-panel="predep"]{display:block}
+</style>
+<div class="main-tabs">
+<button class="active" data-mt="itinerary" onclick="setTab('itinerary')"><span class="icn">&#128197;</span>Itinerary</button>
+<button data-mt="checklist" onclick="setTab('checklist')"><span class="icn">&#9989;</span>Bookings</button>
+<button data-mt="confirmed" onclick="setTab('confirmed')"><span class="icn">&#128179;</span>Confirmed &amp; Paid</button>
+<button data-mt="bonus" onclick="setTab('bonus')"><span class="icn">&#10024;</span>Bonus Sights</button>
+<button data-mt="maps" onclick="setTab('maps')"><span class="icn">&#128506;</span>Maps</button>
+<button data-mt="vision" onclick="setTab('vision')"><span class="icn">&#127912;</span>Vision Board</button>
+<button data-mt="misc" onclick="setTab('misc')"><span class="icn">&#128206;</span>Misc</button>
+<button data-mt="predep" onclick="setTab('predep')"><span class="icn">&#128668;</span>Before We Go</button>
+</div>
+<script>
+// Keep reloads snappy: this page uses lots of optional remote images.
+// If any decorative asset hangs, stop waiting once the usable page is rendered.
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    if(document.readyState!=='complete')window.stop();
+  },3500);
+});
+
+function setTab(t){
+  document.body.setAttribute('data-tab',t);
+  document.querySelectorAll('.main-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.mt===t));
+  localStorage.setItem('mainTab',t);
+  window.scrollTo({top:0,behavior:'smooth'});
+  // Re-render maps fresh when tab shown (fixes hidden-container sizing bug)
+  if(t==='maps'){setTimeout(renderMaps,50);}
+  if(t==='checklist'){setTimeout(renderBooking,50);}
+}
+document.body.setAttribute('data-tab',localStorage.getItem('mainTab')||'itinerary');
+document.querySelectorAll('.main-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.mt===document.body.getAttribute('data-tab')));
+</script>
+
+<div class="tab-block" data-panel="itinerary">
+
+<div class="legend">
+<div class="legend-item"><span class="dot" style="background:#1e3a5f;width:8px;height:8px;border-radius:50%;display:inline-block"></span> Paris</div>
+<div class="legend-item"><span class="dot" style="background:#7b2252;width:8px;height:8px;border-radius:50%;display:inline-block"></span> Lyon</div>
+<div class="legend-item"><span class="dot" style="background:#0d6b5e;width:8px;height:8px;border-radius:50%;display:inline-block"></span> Montpellier</div>
+<div class="legend-item"><span class="dot" style="background:#922b21;width:8px;height:8px;border-radius:50%;display:inline-block"></span> Barcelona</div>
+<div class="legend-item"><span class="tag t-free">FREE</span></div>
+<div class="legend-item"><span class="tag t-concert">MUSIC</span></div>
+<div class="legend-item"><span class="tag t-museum">CULTURE</span></div>
+<div class="legend-item"><span class="tag t-food">FOOD</span></div>
+<div class="legend-item"><span class="tag t-festival">FESTIVAL</span></div>
+<div class="legend-item"><span class="tag t-cinema">CINEMA</span></div>
+</div>
+
+<div class="filters" id="filters">
+<span class="label">Filter:</span>
+<button class="fbtn active" data-c="all" onclick="filt('all')">All</button>
+<button class="fbtn" data-c="paris" onclick="filt('paris')">Paris</button>
+<button class="fbtn" data-c="lyon" onclick="filt('lyon')">Lyon</button>
+<button class="fbtn" data-c="montpellier" onclick="filt('montpellier')">Montpellier</button>
+<button class="fbtn" data-c="barcelona" onclick="filt('barcelona')">Barcelona</button>
+</div>
+
+<div class="days" id="days"></div>
+</div><!-- /itinerary part 1 -->
+
+<div class="tab-block" data-panel="checklist">
+<!-- Booking Tracker -->
+<div class="sec"><h2>Booking Tracker</h2><p>Booked items, remaining actions, confirmation details &middot; saved to your browser</p></div>
+<style>
+.book-tabs{display:flex;gap:8px;margin:10px 0 12px;flex-wrap:wrap}
+.book-tabs button{background:#fff;border:1px solid #ddd;padding:8px 14px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500}
+.book-tabs button.active{background:#1e3a5f;color:#fff;border-color:#1e3a5f}
+.book-tabs .b-count{background:#f9a825;color:#fff;padding:2px 7px;border-radius:10px;font-size:11px;margin-left:6px}
+.book-summary{background:#fff;border-radius:10px;padding:14px 18px;box-shadow:0 2px 6px rgba(0,0,0,.06);margin-bottom:14px;font-size:14px;display:flex;gap:20px;flex-wrap:wrap}
+.book-summary .bs-item{display:flex;align-items:center;gap:8px}
+.book-summary .bs-num{font-weight:700;font-size:20px;color:#1e3a5f}
+.book-list{background:#fff;border-radius:10px;padding:12px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.pri-tabs{display:flex;gap:6px;margin:0 0 12px;flex-wrap:wrap;align-items:center}
+.pri-tabs .pri-label{font-size:12px;color:#888;font-weight:600;margin-right:4px}
+.pri-tabs button{background:#fff;border:1px solid #ddd;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600}
+.pri-tabs button.active{color:#fff;border-color:transparent}
+.pri-tabs button[data-pf="all"].active{background:#555}
+.pri-tabs button[data-pf="urgent"].active{background:#c62828}
+.pri-tabs button[data-pf="soon"].active{background:#e65100}
+.pri-tabs button[data-pf="booked"].active{background:#2e7d32}
+.pri-tabs button[data-pf="pending"].active{background:#1565c0}
+.no-items{padding:20px;text-align:center;color:#aaa;font-size:14px}
+.book-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f0f0}
+.book-item:last-child{border-bottom:none}
+.book-item.done{background:#e8f5e9;border-radius:6px;margin:2px 0}
+.book-item.done .bi-name{text-decoration:line-through;color:#666}
+.book-check{width:22px;height:22px;border:2px solid #bbb;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;background:#fff;font-weight:bold;margin-top:2px}
+.book-item.done .book-check{background:#2e7d32;border-color:#2e7d32;color:#fff}
+.bi-body{flex:1;min-width:0}
+.bi-name{font-weight:600;color:#1e3a5f;font-size:14px}
+.bi-meta{color:#666;font-size:12px;margin-top:2px}
+.bi-link{display:inline-block;margin-left:8px;font-size:12px;color:#1976d2;text-decoration:none}
+.bi-link:hover{text-decoration:underline}
+.bi-priority{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;letter-spacing:.3px;margin-left:6px;vertical-align:middle}
+.bi-priority.urgent{background:#c62828;color:#fff}
+.bi-priority.soon{background:#f9a825;color:#fff}
+.bi-priority.optional{background:#bbb;color:#fff}
+.bi-priority.pending{background:#6a1b9a;color:#fff}
+.bi-priority.booked{background:#2e7d32;color:#fff}
+.book-item.pending{background:#f3e5f5;border-left:4px solid #6a1b9a;border-radius:6px;margin:2px 0}
+.bi-expand-btn{background:transparent;border:none;color:#666;cursor:pointer;font-size:16px;padding:4px 8px;border-radius:4px;transition:all .1s}
+.bi-expand-btn:hover{background:#f0f0f0}
+.bi-details{padding:12px 14px 10px 44px;background:#fafafa;border-top:1px solid #eee;display:none;font-size:13px}
+.book-item.expanded .bi-details{display:block}
+.book-item.expanded .bi-expand-btn{transform:rotate(180deg)}
+.bi-details label{display:block;font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.bi-details input,.bi-details select,.bi-details textarea{width:100%;padding:7px 9px;border:1px solid #ddd;border-radius:5px;font-size:13px;font-family:inherit;margin-bottom:8px;box-sizing:border-box}
+.bi-details .bi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bi-details .bi-saved{background:#e8f5e9;color:#2e7d32;padding:6px 10px;border-radius:4px;font-size:12px;font-weight:600;margin-top:4px;display:inline-block}
+.bi-details button.bi-save{background:#1e3a5f;color:#fff;border:none;padding:7px 14px;border-radius:5px;cursor:pointer;font-size:13px;font-weight:600}
+.bi-details button.bi-save:hover{background:#2d4a6f}
+.bi-ref-chip{background:#1e3a5f;color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-family:monospace;margin-left:6px;vertical-align:middle}
+.bi-det-section{font-size:10px;color:#999;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin:10px 0 4px;border-bottom:1px solid #eee;padding-bottom:4px}
+.bi-det-section:first-child{margin-top:0}
+.book-item{flex-wrap:wrap}
+.book-item .bi-details{flex:1 0 100%}
+</style>
+<div class="book-summary">
+<div class="bs-item"><div class="bs-num" id="bs-done">0</div>done</div>
+<div class="bs-item"><div class="bs-num" id="bs-remain">0</div>remaining</div>
+<div class="bs-item"><div class="bs-num" id="bs-urgent" style="color:#c62828">0</div>urgent</div>
+<div class="bs-item"><div class="bs-num" id="bs-pending" style="color:#6a1b9a">0</div>pending</div>
+</div>
+<div class="book-tabs">
+<button class="active" data-bt="all" onclick="bookFilter('all')">All <span class="b-count" id="bc-all">0</span></button>
+<button data-bt="flight" onclick="bookFilter('flight')">Flights <span class="b-count" id="bc-flight">0</span></button>
+<button data-bt="train" onclick="bookFilter('train')">Trains <span class="b-count" id="bc-train">0</span></button>
+<button data-bt="hotel" onclick="bookFilter('hotel')">Hotels <span class="b-count" id="bc-hotel">0</span></button>
+<button data-bt="activity" onclick="bookFilter('activity')">Activities <span class="b-count" id="bc-activity">0</span></button>
+</div>
+<div class="pri-tabs">
+<span class="pri-label">Priority:</span>
+<button class="active" data-pf="all" onclick="priFilter('all')">All</button>
+<button data-pf="urgent" onclick="priFilter('urgent')">🔴 Urgent</button>
+<button data-pf="soon" onclick="priFilter('soon')">🟠 Soon</button>
+<button data-pf="pending" onclick="priFilter('pending')">🔵 Pending</button>
+<button data-pf="booked" onclick="priFilter('booked')">✅ Booked</button>
+</div>
+<div class="book-list" id="bookList"></div>
+<script>
+const BOOK=[
+// FLIGHTS
+{id:'f_out',cat:'flight',t:'FR718 BHX → Paris Beauvais (Jul 3, 15:50→18:00)',meta:'BOOKED by Fran &middot; Res #TSE6JL &middot; £92.48 &middot; Seats 29E (Fran) + 29F (Ed) &middot; Priority + 2 cabin bags',pri:'booked',done:true,link:'https://www.ryanair.com/gb/en/check-in'},
+{id:'f_ret',cat:'flight',t:'FR3792 BCN → BHX (Jul 14, 16:30→17:55)',meta:'BOOKED by Fran &middot; Res #Q2GDRW &middot; £103.62 &middot; Priority + 2 cabin bags + seats PURCHASED (numbers TBC via app)',pri:'booked',done:true,link:'https://www.ryanair.com/gb/en/check-in'},
+{id:'f_ci1',cat:'flight',t:'✅ Online check-in FR718 — completed for Jul 3 flight',meta:'DONE by Fran &middot; e-ticket / boarding pass completed for FR718 Birmingham → Paris Beauvais &middot; Save offline in Ryanair app and take a screenshot before travel.',pri:'booked',done:true,link:'https://www.ryanair.com/gb/en/check-in'},
+{id:'f_ci2',cat:'flight',t:'⏰ Online check-in FR3792 — opens Fri 15 May at 16:30 UK',meta:'Set a reminder. Check in as soon as window opens 60 days before. Ryanair app required for boarding pass.',pri:'soon',done:false,link:'https://www.ryanair.com/gb/en/check-in'},
+// TRAINS
+{id:'t_stroud_bhx',cat:'train',t:'Stonehouse → Birmingham International (Jul 3, dep 11:03)',meta:'BOOKED by Fran &middot; £26.21 &middot; Dep 11:03 Stonehouse &middot; Change Cheltenham Spa + Birmingham New Street &middot; Arr 12:45 BHX &middot; Ticket on Franciny\'s phone/email',pri:'booked',done:true,link:'https://www.nationalrail.co.uk'},
+{id:'t_bhx_stroud',cat:'train',t:'BHX International → Stonehouse (Jul 14, after 17:55 landing)',meta:'NOT YET BOOKED — flight lands 17:55, clear arrivals ~18:30–19:00 &middot; BHX station → Cross-City to New Street → GWR to Stonehouse &middot; Book on GWR app or National Rail &middot; Evening trains run regularly',pri:'soon',done:false,link:'https://www.gwr.com'},
+{id:'t_plyon',cat:'train',t:'OUIGO Paris Gare de Lyon → Lyon Part-Dieu (Jul 7, 12:26→14:22)',meta:'BOOKED by Franciny &middot; Ref UUTZ5J &middot; Train n°7803 &middot; 1h56 &middot; €76 total paid &middot; Exchangeable under conditions, non-refundable &middot; Tickets downloadable from 03 Jul 2026 &middot; Boarding from 11:46, closes 12:21',pri:'booked',done:true,link:'https://www.ouigo.com/'},
+{id:'t_lm',cat:'train',t:'OUIGO Lyon Part-Dieu → Montpellier Sud-de-France (Jul 8, 11:10→12:56)',meta:'BOOKED by Franciny &middot; Ref DZY82B &middot; Train n°7867 &middot; 1h46 &middot; €66 total paid &middot; OUIGO Essentiel &middot; Seats: Coach 7, 771 + 772 &middot; 2 hand bags + 2 cabin bags included &middot; Tickets downloadable from 04 Jul 2026 &middot; Non-refundable',pri:'booked',done:true,link:'https://www.ouigo.com/'},
+{id:'t_mb',cat:'train',t:'FlixBus Montpellier Sabines → Barcelona Nord (Jul 10, 11:40→16:30)',meta:'BOOKED by Franciny &middot; Booking #335 491 8981 &middot; Fri 10 Jul 2026 &middot; Montpellier (Sabines) 11:40 → Barcelona (Bus Terminal Nord) 16:30 &middot; £64.96 paid &middot; Email sent to franciny2210@gmail.com',pri:'booked',done:true,link:'https://www.flixbus.com/'},
+// HOTELS
+{id:'h_paris',cat:'hotel',t:'hotelF1 Paris Porte de Montreuil (Jul 3–7, 4nt)',meta:'BOOKED by Fran &middot; £268.12 &middot; Check-in 14:00 Jul 3 / out 12:00 Jul 7 &middot; PIN 5108',pri:'booked',done:true,link:'https://secure.booking.com'},
+{id:'h_lyon',cat:'hotel',t:'✅ Quadraverde Lyon — Budget Studio apartment (Jul 7–8)',meta:'BOOKED &middot; Confirmation #5856674449 &middot; PIN 0831 &middot; 6 rue Nicolas Sicard, 5th arr., Vieux-Lyon &middot; Check-in from 16:00 &middot; Check-out by 11:00 &middot; Contact property for door code &middot; Non-refundable &middot; £59.45 paid',pri:'booked',done:true,link:'https://www.booking.com'},
+{id:'h_mont',cat:'hotel',t:'\u2705 Premiere Classe Montpellier Ouest (Jul 8\u201310)',meta:'BOOKED \u2714 Conf. #5856649209 \u00b7 PIN 7615 \u00b7 All\u00e9e Jean-Monnet, Saint-Jean-de-V\u00e9das \u00b7 Check-in 15:00\u201321:00 \u00b7 Check-out by 11:00 \u00b7 Non-refundable \u00b7 \u00a384 paid',pri:'booked',done:true,link:'https://www.booking.com'},
+{id:'h_bcn',cat:'hotel',t:'\u2705 Hotel Sagrada Familia (Jul 10\u201314, 4nt)',meta:'BOOKED \u2714 Conf. #26051370464 \u00b7 PIN 8704986 \u00b7 Calle C\u00f2rsega 541, Eixample, Barcelona \u00b7 Check-in 14:00 / out 11:00 \u00b7 \u20ac623.11 total paid \u00b7 Non-refundable',pri:'booked',done:true,link:'https://www.hotelsagradafamilia.com/en/'},
+// ACTIVITIES
+{id:'a_eiffel',cat:'activity',t:'Eiffel Tower: Top Floor by Lifts (Jul 6, 17:30)',meta:'CONFIRMED &middot; £67.54 / €73.40 total (Franciny paid) &middot; QR: 341262010089686723 &amp; 341262010089686811',pri:'booked',done:true,link:'https://ticket.toureiffel.paris/en'},
+{id:'a_eiffel_conf',cat:'activity',t:'&#9989; Eiffel Tower: confirmation email received',meta:'PDF tickets saved &middot; Save QR codes to phone before travel &middot; Do not rely on wallet — show PDF',pri:'booked',done:true,link:'https://ticket.toureiffel.paris/en'},
+{id:'a_louvre',cat:'activity',t:'Louvre: Michelangelo &amp; Rodin (Jul 4, 09:00)',meta:'CONFIRMED &amp; PAID &middot; €54 total &middot; PDF ticket on Franciny\'s Louvre account &middot; Download before travel',pri:'booked',done:true,link:'https://www.louvre.fr/en/visit'},
+{id:'a_orsay',cat:'activity',t:'Musée d\'Orsay (Jul 5) — FULLY BOOKED → switched to Petit Palais',meta:'Free Sunday slots sold out. Replaced by Petit Palais (free, no booking ever needed)',pri:'booked',done:true,link:'https://billetterie.musee-orsay.fr/en-GB/'},
+{id:'a_picasso5',cat:'activity',t:'Musée Picasso (Jul 5) — FULLY BOOKED → switched to Carnavalet',meta:'Free Sunday slots sold out. Replaced by Musée Carnavalet (always free, walk-in)',pri:'booked',done:true,link:'https://www.museepicassoparis.fr/en'},
+{id:'a_orangerie',cat:'activity',t:'Musée de l\'Orangerie (Jul 5) — FULLY BOOKED → switched to Petit Palais',meta:'All slots sold out. Replaced by Petit Palais.',pri:'booked',done:true,link:'https://www.musee-orangerie.fr/en/'},
+{id:'a_cruise',cat:'activity',t:'✅ Seine Birthday Dinner Cruise (Jul 5, 20:30)',meta:'CONFIRMED \u2714 Bateaux Parisiens Privilege Service &middot; Booking #4570106 &middot; 2 adults &middot; \u20ac370 total / £314.50 🎁 PAID EXCLUSIVELY BY ED (birthday gift to Franciny) — Fran fronted the booking; Ed covers the full £314.50 &middot; Pier 5 or 7, Port de la Bourdonnais 75007 Paris &middot; Arrive by 20:15 &middot; Bring printout &middot; Smart attire required &middot; Non-refundable',pri:'booked',done:true,link:'https://www.bateauxparisiens.com'},
+{id:'a_notredame',cat:'activity',t:'Notre-Dame interior (Jul 4, ~14:00)',meta:'⚠️ Dates currently unavailable — checked 13 May 2026, all July dates fully booked &middot; Check again 1 Jul (slots may open last-minute) &middot; ⏰ BOOKING WINDOW: 2–3 days before only, midnight Paris time &middot; resa.notredamedeparis.fr &middot; Free entry, timed slot required',pri:'soon',done:false,link:'https://resa.notredamedeparis.fr/en/reservationindividuelle/tickets'},
+{id:'a_catacombs',cat:'activity',t:'Catacombs (Jul 7, 10:30) — book on 30 June',meta:'⏰ BOOKING WINDOW: exactly 7 days ahead — set alarm Tue 30 Jun &middot; billetterie.catacombes.paris.fr — sells out within hours &middot; €31pp w/ audioguide (€62 total) &middot; Reopened Apr 2026',pri:'urgent',done:false,link:'https://billetterie.catacombes.paris.fr/en-GB/'},
+{id:'a_sagrada',cat:'activity',t:'✅ Sagrada Família with Towers (Jul 11, 09:00)',meta:'BOOKED by Franciny &middot; Locator 99295241 &middot; 2 General tickets &middot; €72 total paid &middot; Basilica 09:00, Passion facade tower 09:30 &middot; Access: C/ Marina, 08013 Barcelona &middot; Download Sagrada Família Oficial app for tickets + audioguide &middot; Bring official photo ID',pri:'booked',done:true,link:'https://sagradafamilia.org/en/tickets'},
+{id:'a_batllo',cat:'activity',t:'✅ Casa Batlló Silver APP (Jul 11, 13:00)',meta:'BOOKED by Franciny &middot; Locator 99296724 &middot; 2 Adult Silver APP tickets &middot; €68 total paid &middot; Passeig de Gràcia 43 &middot; Download Gaudí App for tickets + audioguide &middot; Bring headphones and enough battery',pri:'booked',done:true,link:'https://www.casabatllo.es/en/online-tickets/'},
+{id:'a_pedrera',cat:'activity',t:'La Pedrera / Casa Milà (Jul 11, 17:00)',meta:'Book this week — summer sells out &middot; Evening/sunset rooftop slot &middot; lapedrera.com &middot; From €25pp',pri:'soon',done:false,link:'https://www.lapedrera.com/en'},
+{id:'a_guell',cat:'activity',t:'✅ Park Güell admission (Jul 12, 09:30)',meta:'BOOKED by Franciny &middot; Locator 700204231262 &middot; Order 326171434752 &middot; Authorisation 249699 &middot; 2 General tickets &middot; €36 total paid &middot; Tickets valid only until 10:00 (30 min after reserved time) &middot; Contact +34 934091831 / parkguell@bsmsa.cat',pri:'booked',done:true,link:'https://parkguell.barcelona/en/buy-tickets'},
+{id:'a_rodin5',cat:'activity',t:'Musée Rodin (optional — not in current plan)',meta:'€14pp in July &middot; Sculpture garden &middot; 10min walk from d\'Orsay',pri:'optional',done:false,link:'https://www.musee-rodin.fr/en'},
+{id:'a_cruilla',cat:'activity',t:'✅ Cruïlla Festival Saturday — 2 General tickets (Jul 11, 17:00)',meta:'BOOKED by Franciny &middot; Purchase code ZX96E1BB92D3 &middot; 2 General Dissabte tickets &middot; €191.40 total (€174 tickets + €17.40 fees) &middot; Email sent to franciny2210@gmail.com &middot; Download PDF or Passbook before travel',pri:'booked',done:true,link:'https://tickets.oneboxtds.com/cruilla/events?hl=en-US'},
+{id:'a_bcn_fri',cat:'activity',t:'Barcelona Friday evening open plan (Jul 10)',meta:'Leave open after hotel check-in. Possible easy options: Grec theatre/dance, short flamenco in the Gothic Quarter, beachside electronic open-air, or just dinner and an early night before Saturday Cruïlla.',pri:'soon',done:false,link:'https://www.barcelona.cat/grec/en'},
+{id:'a_flv',cat:'activity',t:'Fondation Louis Vuitton: Calder (optional)',meta:'Optional &middot; Frank Gehry building &middot; fondationlouisvuitton.fr',pri:'optional',done:false,link:'https://www.fondationlouisvuitton.fr/en'},
+{id:'a_flamenco',cat:'activity',t:'Flamenco at Palau de la Música (Jul 13, 15:00)',meta:'Optional &middot; Gran Gala Flamenco &middot; palaumusica.cat',pri:'optional',done:false,link:'https://www.palaumusica.cat/en'}
+]
+const bookKey='bookDone_v1';
+const bookDetailsKey='bookDetails_v2';
+const bookExpandKey='bookExpanded_v1';
+let bookDone=JSON.parse(localStorage.getItem(bookKey)||'{}');
+let bookDetails=JSON.parse(localStorage.getItem(bookDetailsKey)||'{}');
+let bookExpanded=JSON.parse(localStorage.getItem(bookExpandKey)||'{}');
+// Seed any item where BOOK has done:true
+BOOK.forEach(b=>{if(b.done)bookDone[b.id]=true});
+// Pre-seed confirmed bookings (hotel + flights)
+const _seedDetails={
+  h_paris:{
+    conf:'6751758443',pin:'5108',
+    price:'238.50',citytax:'18.00',totalpaid:'268.12',payer:'fran',
+    checkin:'14:00',checkout:'12:00',canceldate:'2026-07-02 23:59',
+    phone:'+33 1 41 58 60 80',addr:'290-302 Rue \u00c9tienne Marcel, 93170 Bagnolet, France',
+    notes:'hotelF1 Paris Porte de Montreuil \u2022 Cabrio Room with Private Bathroom \u2022 Non-smoking \u2022 City tax \u00a32.26\u00d72\u00d74 paid at property'
+  },
+  f_out:{
+    conf:'TSE6JL',
+    price:'92.48',totalpaid:'92.48',payer:'fran',
+    checkin:'15:50',checkout:'18:00',
+    phone:'Ryanair app only',addr:'BHX \u2192 Paris Beauvais (BVA)',
+    notes:'Ed seat 29F \u2022 Fran seat 29E \u2022 Priority + 2 cabin bags included \u2022 Early check-in opens 4 May at 15:50 \u2022 Must use Ryanair app for boarding pass'
+  },
+  f_ret:{
+    conf:'Q2GDRW',
+    price:'103.62',totalpaid:'103.62',payer:'fran',
+    checkin:'16:30',checkout:'17:55',
+    phone:'Ryanair app only',addr:'BCN \u2192 Birmingham (BHX)',
+    notes:'Priority + 2 cabin bags included \u2022 Seats PURCHASED but specific numbers not yet shown (will be assigned via Ryanair app) \u2022 Early check-in opens 15 May at 16:30 \u2022 Must use Ryanair app'
+  }
+};
+Object.keys(_seedDetails).forEach(k=>{if(!bookDetails[k]||Object.keys(bookDetails[k]).length===0)bookDetails[k]=_seedDetails[k];});
+localStorage.setItem(bookDetailsKey,JSON.stringify(bookDetails));
+let bookView='all';
+let priView='all';
+function renderBooking(){
+  const list=document.getElementById('bookList');
+  if(!list)return;
+  const items=BOOK.filter(b=>{
+    const done=bookDone[b.id]||b.done||false;
+    const catOk=bookView==='all'||b.cat===bookView;
+    const pri=done?'booked':b.pri;
+    const priOk=priView==='all'||pri===priView;
+    return catOk&&priOk;
+  });
+  if(!items.length){list.innerHTML='<div class="no-items">Nothing here — all done! 🎉</div>';updateBookCounts();return;}
+  list.innerHTML=items.map(b=>{
+    const done=bookDone[b.id]||false;
+    const pri=done?'booked':b.pri;
+    const priLabel=pri==='urgent'?'URGENT':pri==='soon'?'SOON':pri==='optional'?'OPTIONAL':pri==='pending'?'PENDING':'BOOKED';
+    const linkHtml=b.link?`<a class="bi-link" href="${b.link}" target="_blank" onclick="event.stopPropagation()">${done?'Open':'Book'} \u2192</a>`:'';
+    const details=bookDetails[b.id]||{};
+    const expanded=bookExpanded[b.id];
+    const refChip=details.conf?`<span class="bi-ref-chip">#${details.conf}</span>`:'';
+    const hasSaved=Object.keys(details).some(k=>details[k]);
+    const savedChip=hasSaved?'<span class="bi-saved">\u2713 details saved</span>':'';
+    const v=(k)=>(details[k]||'').replace(/"/g,'&quot;');
+    return `<div class="book-item ${done?'done':''} ${!done&&pri==='pending'?'pending':''} ${expanded?'expanded':''}">
+      <div class="book-check" onclick="event.stopPropagation();toggleBook('${b.id}')">${done?'\u2713':''}</div>
+      <div class="bi-body" onclick="toggleExpand('${b.id}')"><div class="bi-name">${b.t}${refChip}<span class="bi-priority ${pri}">${priLabel}</span></div>
+      <div class="bi-meta">${b.meta}${linkHtml}</div></div>
+      <button class="bi-expand-btn" onclick="toggleExpand('${b.id}')" title="Show details">&#9662;</button>
+      <div class="bi-details">
+        <div class="bi-det-section">CONFIRMATION</div>
+        <div class="bi-row">
+          <div><label>Confirmation / Ref #</label><input id="det-conf-${b.id}" value="${v('conf')}" placeholder="e.g. 6751758443"></div>
+          <div><label>PIN / Access code</label><input id="det-pin-${b.id}" value="${v('pin')}" placeholder="e.g. 5108"></div>
+        </div>
+        <div class="bi-det-section">TIMING</div>
+        <div class="bi-row">
+          <div><label>Check-in / departure time</label><input id="det-checkin-${b.id}" value="${v('checkin')}" placeholder="e.g. 14:00"></div>
+          <div><label>Check-out / arrival time</label><input id="det-checkout-${b.id}" value="${v('checkout')}" placeholder="e.g. 12:00"></div>
+        </div>
+        <div class="bi-row">
+          <div><label>Date booked</label><input type="date" id="det-bookdate-${b.id}" value="${v('bookdate')}"></div>
+          <div><label>Cancellation deadline</label><input id="det-canceldate-${b.id}" value="${v('canceldate')}" placeholder="YYYY-MM-DD HH:MM"></div>
+        </div>
+        <div class="bi-det-section">PRICE</div>
+        <div class="bi-row">
+          <div><label>Base price (\u00a3)</label><input type="number" step="0.01" id="det-price-${b.id}" value="${v('price')}" placeholder="e.g. 238.50"></div>
+          <div><label>Taxes / extras (\u00a3)</label><input type="number" step="0.01" id="det-citytax-${b.id}" value="${v('citytax')}" placeholder="e.g. 18.00"></div>
+        </div>
+        <div class="bi-row">
+          <div><label>Total paid (\u00a3)</label><input type="number" step="0.01" id="det-totalpaid-${b.id}" value="${v('totalpaid')}" placeholder="e.g. 268.12"></div>
+          <div><label>Paid by</label><select id="det-payer-${b.id}"><option value="">\u2014</option><option value="fran" ${details.payer==='fran'?'selected':''}>Fran</option><option value="ed" ${details.payer==='ed'?'selected':''}>Ed</option><option value="split" ${details.payer==='split'?'selected':''}>Split 50/50</option></select></div>
+        </div>
+        <div class="bi-det-section">CONTACT / VENUE</div>
+        <div class="bi-row">
+          <div><label>Address</label><input id="det-addr-${b.id}" value="${v('addr')}" placeholder="Full address"></div>
+          <div><label>Phone</label><input id="det-phone-${b.id}" value="${v('phone')}" placeholder="+33 1 ..."></div>
+        </div>
+        <div class="bi-det-section">NOTES</div>
+        <textarea id="det-notes-${b.id}" rows="2" placeholder="Room type, seat #, dress code, anything else\u2026">${v('notes')}</textarea>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+          <button class="bi-save" onclick="saveBookDetails('${b.id}')">Save details</button>
+          ${savedChip}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // Counts
+  const total=BOOK.length,done=BOOK.filter(b=>bookDone[b.id]).length,urgent=BOOK.filter(b=>b.pri==='urgent'&&!bookDone[b.id]).length,pending=BOOK.filter(b=>b.pri==='pending'&&!bookDone[b.id]).length;
+  document.getElementById('bs-done').textContent=done;
+  document.getElementById('bs-remain').textContent=total-done;
+  document.getElementById('bs-urgent').textContent=urgent;
+  const pEl=document.getElementById('bs-pending');if(pEl)pEl.textContent=pending;
+  ['all','flight','train','hotel','activity'].forEach(cat=>{
+    const n=cat==='all'?BOOK.length:BOOK.filter(b=>b.cat===cat).length;
+    const el=document.getElementById('bc-'+cat);
+    if(el)el.textContent=n;
+  });
+}
+function toggleBook(id){
+  bookDone[id]=!bookDone[id];
+  if(!bookDone[id])delete bookDone[id];
+  localStorage.setItem(bookKey,JSON.stringify(bookDone));
+  renderBooking();
+}
+function toggleExpand(id){
+  bookExpanded[id]=!bookExpanded[id];
+  if(!bookExpanded[id])delete bookExpanded[id];
+  localStorage.setItem(bookExpandKey,JSON.stringify(bookExpanded));
+  renderBooking();
+}
+function saveBookDetails(id){
+  const fields=['conf','pin','checkin','checkout','bookdate','canceldate','price','citytax','totalpaid','payer','addr','phone','notes'];
+  const d={};
+  fields.forEach(f=>{const el=document.getElementById(`det-${f}-${id}`);if(el&&el.value)d[f]=el.value;});
+  bookDetails[id]=d;
+  localStorage.setItem(bookDetailsKey,JSON.stringify(bookDetails));
+  renderBooking();
+}
+function bookFilter(f){
+  bookView=f;
+  document.querySelectorAll('.book-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.bt===f));
+  renderBooking();
+}
+function priFilter(f){
+  priView=f;
+  document.querySelectorAll('.pri-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.pf===f));
+  renderBooking();
+}
+renderBooking();
+</script>
+</div><!-- /checklist -->
+
+<div class="tab-block" data-panel="confirmed">
+<!-- Confirmed Bookings -->
+<div class="sec"><h2>Confirmed &amp; Paid</h2><p>Everything booked and paid for &middot; split tracker &middot; updated as you confirm bookings</p></div>
+<style>
+.paid-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:12px 0 18px}
+.paid-summary .ps-card{background:#fff;padding:14px 16px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.06);text-align:center}
+.paid-summary .ps-card h4{margin:0 0 4px;font-size:12px;color:#888;text-transform:uppercase;letter-spacing:1px}
+.paid-summary .ps-card .ps-num{font-size:24px;font-weight:700;color:#1e3a5f}
+.paid-summary .ps-card.fran{border-top:3px solid #c62828}
+.paid-summary .ps-card.ed{border-top:3px solid #1976d2}
+.paid-summary .ps-card.split{border-top:3px solid #2e7d32}
+.paid-table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.06);margin-bottom:14px}
+.paid-table th,.paid-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #eee;font-size:13px;vertical-align:top}
+.paid-table th{background:#1e3a5f;color:#fff;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+.paid-table .pt-cat{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;color:#fff;letter-spacing:.3px}
+.paid-table .pt-cat.flight{background:#1976d2}
+.paid-table .pt-cat.hotel{background:#f9a825}
+.paid-table .pt-cat.activity{background:#7b1fa2}
+.paid-table .pt-cat.train{background:#0d6b5e}
+.paid-table .pt-payer{display:inline-block;font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600}
+.paid-table .pt-payer.fran{background:#ffebee;color:#c62828}
+.paid-table .pt-payer.ed{background:#e3f2fd;color:#1976d2}
+.paid-table .pt-payer.split{background:#e8f5e9;color:#2e7d32}
+.paid-table .pt-price{font-weight:700;color:#1e3a5f;text-align:right;white-space:nowrap}
+.paid-table tfoot td{background:#f5f5f5;font-weight:700;font-size:14px}
+.paid-table .pt-sub{color:#666;font-size:11px;display:block;margin-top:2px}
+.pt-cat.transfer{background:#546e7a}.pt-row-transfer{background:#f0f7ff;font-style:italic;color:#1565c0}
+</style>
+<div class="paid-summary">
+<div class="ps-card fran"><h4>Fran paid</h4><div class="ps-num" id="pay-fran">&pound;0</div></div>
+<div class="ps-card ed"><h4>Ed paid</h4><div class="ps-num" id="pay-ed">&pound;0</div></div>
+<div class="ps-card split"><h4>Split 50/50</h4><div class="ps-num" id="pay-split">&pound;0</div></div>
+<div class="ps-card"><h4>Total paid so far</h4><div class="ps-num" id="pay-total">&pound;0</div></div>
+<div class="ps-card"><h4>Ed → Fran transfers</h4><div class="ps-num" id="pay-transfer">&pound;0</div></div>
+<div class="ps-card"><h4>Fran owes Ed</h4><div class="ps-num" id="pay-owe">&pound;0</div></div>
+</div>
+<table class="paid-table"><thead><tr><th>Item</th><th>Date</th><th>Ref</th><th>Paid by</th><th style="text-align:right">Amount</th></tr></thead>
+<tbody id="paidRows"></tbody>
+<tfoot><tr><td colspan="4">Grand total</td><td class="pt-price" id="pay-grand">&pound;0</td></tr></tfoot>
+</table>
+<p style="color:#666;font-size:12px;margin-top:10px">Categories: <span class="pt-cat flight">FLIGHT</span> <span class="pt-cat hotel">HOTEL</span> <span class="pt-cat train">TRAIN</span> <span class="pt-cat activity">ACTIVITY</span> <span class="pt-cat transfer">TRANSFER</span> &nbsp;·&nbsp; Transfer rows are settlement payments and are <em>not</em> included in the trip total.</p>
+<script>
+const PAID=[
+{cat:'flight',n:'Ryanair FR718 BHX \u2192 Paris Beauvais',sub:'Fri Jul 3, 15:50\u219218:00 &middot; Res #TSE6JL &middot; Seats 29E+29F &middot; Priority+2 cabin bags &middot; Check-in complete / e-ticket done',date:'Jul 3',ref:'TSE6JL',payer:'fran',amt:92.48},
+{cat:'flight',n:'Ryanair FR3792 BCN \u2192 BHX',sub:'Tue Jul 14, 16:30\u219217:55 &middot; Res #Q2GDRW &middot; Priority+2 cabin bags &middot; Seats purchased (numbers TBC) &middot; Check-in opens May 15 at 16:30',date:'Jul 14',ref:'Q2GDRW',payer:'fran',amt:103.62},
+{cat:'hotel',n:'hotelF1 Paris Porte de Montreuil',sub:'Cabrio Room w/ Private Bathroom &middot; 290-302 Rue \u00c9tienne Marcel, 93170 Bagnolet &middot; PIN 5108 &middot; \u260E +33 1 41 58 60 80 &middot; City tax \u00a318 paid at property',date:'Jul 3-7',ref:'6751758443',payer:'fran',amt:268.12},
+{cat:'activity',n:'Eiffel Tower: Top Floor by Lifts',sub:'2 Adult tickets &middot; Mon 6 Jul at 17:30 &middot; QR: 341262010089686723 &amp; 341262010089686811 &middot; Do not save to wallet &mdash; show PDF or print on A4',date:'Jul 6',ref:'262010275340',payer:'fran',amt:67.54},
+{cat:'activity',n:'Louvre Museum: Michelangelo &amp; Rodin combi ticket',sub:'2 tickets &middot; Sat 4 Jul at 09:00 &middot; Ed: €32 (non-EEA adult) &middot; Franciny: €22 (EEA adult) &middot; €54 total &middot; PDF on Franciny\'s Louvre account &middot; Download before travel',date:'Jul 4',ref:'louvre.fr',payer:'fran',amt:45.96},
+{cat:'train',n:'Train: Stonehouse → Birmingham International',sub:'Fri Jul 3 &middot; Dep 11:03 Stonehouse &middot; Change Cheltenham Spa &middot; Change Birmingham New Street &middot; Arr 12:45 Birmingham International &middot; Ticket on Franciny\'s phone / email',date:'Jul 3',ref:'GWR/WMR',payer:'fran',amt:26.21},
+  {cat:'train',n:'OUIGO Paris Gare de Lyon → Lyon Part-Dieu',sub:'Tue 7 Jul 2026 &middot; Train n°7803 &middot; Dep 12:26, arr 14:22 &middot; 1h56 &middot; Booking confirmed &middot; Tickets downloadable from 03 Jul 2026 &middot; Boarding opens 40 min before departure (11:46) and closes 5 min before departure (12:21) &middot; Exchangeable under conditions, non-refundable &middot; €76 total &middot; Paid by Franciny',date:'Jul 7',ref:'UUTZ5J',payer:'fran',amt:65.65},
+  {cat:'train',n:'OUIGO Lyon Part-Dieu → Montpellier Sud-de-France',sub:'Wed 8 Jul 2026 &middot; Train n°7867 &middot; Dep 11:10, arr 12:56 &middot; 1h46 &middot; Ref DZY82B &middot; OUIGO Essentiel &middot; 2 hand bags + 2 cabin bags included &middot; Standard seats: Coach 7, Places 771 + 772 &middot; Tickets downloadable from 04 Jul 2026 &middot; Boarding opens 30 min before departure and closes 5 min before departure &middot; Exchangeable under conditions, non-refundable &middot; €66 total &middot; Paid by Franciny',date:'Jul 8',ref:'DZY82B',payer:'fran',amt:57.01},
+  {cat:'activity',n:'Bateaux Parisiens: Birthday Dinner Cruise',sub:'Sun 5 Jul &middot; Privilege Service 8:30pm &middot; 2 adults &middot; Booking #4570106 &middot; Pier 5/7, Port de la Bourdonnais, 75007 Paris &middot; Arrive by 20:15 &middot; Bring printout &middot; Smart attire (no shorts/flip-flops) &middot; Non-refundable &middot; <strong>Paid by Fran (fronted) — Ed owes the full £314.50</strong> 🎁 Ed covers 100% of this as Franciny\'s birthday gift &mdash; not split 50/50',date:'Jul 5',ref:'4570106',payer:'fran',amt:314.50,edOwes100:true},
+  {cat:'hotel',n:'Quadraverde Lyon',sub:'Budget Studio · Entire apartment · 6 rue Nicolas Sicard, 5th arr., 69005 Lyon (Vieux-Lyon) &middot; Check-in Tue 7 Jul from 16:00 &middot; Check-out Wed 8 Jul by 11:00 &middot; Confirmation #5856674449 &middot; PIN 0831 &middot; Contact property for door code: +33 6 81 42 52 42 &middot; No meals included &middot; Non-refundable &middot; Paid by Franciny',date:'Jul 7-8',ref:'5856674449',payer:'fran',amt:59.45},
+  {cat:'hotel',n:'Premiere Classe Montpellier Ouest',sub:'Triple Room (1 double + 1 single) &middot; Parc d\'activit\'es de La Peyri\'ere, All\'ee Jean-Monnet, 34430 Saint-Jean-de-V\'edas &middot; Check-in Wed 8 Jul 15:00-21:00 &middot; Check-out Fri 10 Jul by 11:00 &middot; Conf. #5856649209 &middot; PIN 7615 &middot; Auto check-in outside hours (bring booking card) &middot; &#9742; +33 4 67 69 98 40 &middot; No meals &middot; Non-refundable &middot; Paid by Franciny',date:'Jul 8-10',ref:'5856649209',payer:'fran',amt:84},
+  {cat:'hotel',n:'Hotel Sagrada Familia',sub:'Double or Twin Room &middot; Calle C\u00f2rsega 541, 08025 Barcelona (Eixample, next to Sagrada Fam\u00edlia) &middot; Check-in Fri 10 Jul from 14:00 &middot; Check-out Tue 14 Jul by 11:00 &middot; Conf. #26051370464 &middot; PIN 8704986 &middot; \u20ac623.11 total incl. taxes &middot; Non-refundable &middot; Date change once allowed (10+ days before) &middot; \u260E +34 934 36 61 15 &middot; Paid by Franciny',date:'Jul 10-14',ref:'26051370464',payer:'fran',amt:527},
+  {cat:'activity',n:'Sagrada Fam\u00edlia with Towers',sub:'Sat 11 Jul 2026 &middot; Basilica 09:00 &middot; Passion facade tower 09:30 &middot; Access via C/ Marina, 08013 Barcelona &middot; 2 General tickets &middot; Total \u20ac72 &middot; Non-transferable &middot; Must show official photo ID &middot; Download Sagrada Fam\u00edlia Oficial app for tickets and audioguide &middot; Confirmation email from tickets@sagradafamilia.org &middot; Paid by Franciny',date:'Jul 11',ref:'99295241',payer:'fran',amt:62.20},
+  {cat:'activity',n:'Casa Batll\u00f3 Silver APP',sub:'Sat 11 Jul 2026 at 13:00 &middot; Passeig de Gr\u00e0cia 43, 08007 Barcelona &middot; 2 Adult Silver APP tickets &middot; Silver Upgrade included &middot; Total \u20ac68 &middot; Download Gaud\u00ed App before arrival for tickets and immersive audioguide &middot; Bring headphones and enough battery &middot; Confirmation email from info@casabatllo.cat &middot; Paid by Franciny',date:'Jul 11',ref:'99296724',payer:'fran',amt:58.75},
+  {cat:'activity',n:'Festival Cru\u00eflla 2026 — General Saturday tickets',sub:'Sat 11 Jul 2026 from 17:00 &middot; Parc del F\u00f2rum &middot; 2 General Dissabte tickets &middot; Total \u20ac191.40 (\u20ac174 tickets + \u20ac17.40 fees) &middot; Confirmation email sent to franciny2210@gmail.com &middot; Download PDF or Passbook before travel &middot; Paid by Franciny',date:'Jul 11',ref:'ZX96E1BB92D3',payer:'fran',amt:165.60},
+  {cat:'activity',n:'Park G\u00fcell admission',sub:'Sun 12 Jul 2026 at 09:30 &middot; 2 General tickets &middot; Total \u20ac36 &middot; Locator 700204231262 &middot; Order #326171434752 &middot; Authorisation 249699 &middot; Holder Cechinel De Souza, Franciny &middot; Tickets valid only until 10:00 (30 minutes after reserved time) &middot; Confirmation email/tickets sent automatically &middot; Visitor support +34 934091831 / parkguell@bsmsa.cat &middot; Paid by Franciny',date:'Jul 12',ref:'700204231262',payer:'fran',amt:31.10},
+  {cat:'train',n:'FlixBus Montpellier Sabines → Barcelona Nord',sub:'Fri 10 Jul 2026 &middot; Montpellier (Sabines) 11:40 → Barcelona (Bus Terminal Nord) 16:30 &middot; Booking #335 491 8981 &middot; Confirmation email sent to franciny2210@gmail.com &middot; Paid by Franciny',date:'Jul 10',ref:'335 491 8981',payer:'fran',amt:64.96}];
+const TRANSFERS=[
+  {from:'ed',to:'fran',amt:500,date:'9 May 2026',note:'Bank transfer — Ed to Fran, payment on account for trip expenses'},
+  {from:'ed',to:'fran',amt:1000,date:'30 Jun 2026',note:'Bank transfer — Ed to Fran, further payment on account for trip expenses'}
+];
+function renderPaid(){
+  const tbody=document.getElementById('paidRows');
+  // Render trip expense rows
+  const expenseRows=PAID.map(p=>`<tr>
+    <td><span class="pt-cat ${p.cat}">${p.cat.toUpperCase()}</span> <strong>${p.n}</strong>
+      ${p.sub?`<span class="pt-sub">${p.sub}</span>`:''}</td>
+    <td>${p.date}</td>
+    <td style="font-family:monospace;font-size:12px">${p.ref||'\u2014'}</td>
+    <td><span class="pt-payer ${p.payer}">${p.payer==='fran'?'Fran':p.payer==='ed'?'Ed':'Split'}</span></td>
+    <td class="pt-price">&pound;${p.amt.toFixed(2)}</td>
+  </tr>`).join('');
+  // Render transfer rows (styled differently \u2014 not counted in trip total)
+  const transferRows=TRANSFERS.map(t=>`<tr class="pt-row-transfer">
+    <td><span class="pt-cat transfer">TRANSFER</span> <strong>${t.note}</strong></td>
+    <td>${t.date}</td>
+    <td style="font-family:monospace;font-size:12px">\u2014</td>
+    <td><span class="pt-payer ed">Ed \u2192 Fran</span></td>
+    <td class="pt-price">&pound;${t.amt.toFixed(2)}</td>
+  </tr>`).join('');
+  tbody.innerHTML=expenseRows+transferRows;
+  // Totals from trip expenses only (transfers are settlements, not expenses)
+  const fran=PAID.filter(p=>p.payer==='fran').reduce((s,p)=>s+p.amt,0);
+  const ed=PAID.filter(p=>p.payer==='ed').reduce((s,p)=>s+p.amt,0);
+  const split=PAID.filter(p=>p.payer==='split').reduce((s,p)=>s+p.amt,0);
+  const total=fran+ed+split;
+  // Transfer totals (Ed\u2192Fran direction)
+  const edToFran=TRANSFERS.filter(t=>t.from==='ed'&&t.to==='fran').reduce((s,t)=>s+t.amt,0);
+  const franToEd=TRANSFERS.filter(t=>t.from==='fran'&&t.to==='ed').reduce((s,t)=>s+t.amt,0);
+  document.getElementById('pay-fran').textContent='\u00a3'+fran.toFixed(2);
+  document.getElementById('pay-ed').textContent='\u00a3'+ed.toFixed(2);
+  document.getElementById('pay-split').textContent='\u00a3'+split.toFixed(2);
+  document.getElementById('pay-total').textContent='\u00a3'+total.toFixed(2);
+  document.getElementById('pay-grand').textContent='\u00a3'+total.toFixed(2);
+  document.getElementById('pay-transfer').textContent='\u00a3'+edToFran.toFixed(2);
+  // Net settlement:
+  // The Seine cruise (ref 4570106) is 100% Ed's (birthday gift) — not split 50/50.
+  // Everything else is split equally. Fran fronted all payments.
+  const cruiseAmt=PAID.filter(p=>p.edOwes100).reduce((s,p)=>s+p.amt,0);
+  const sharedAmt=total-cruiseAmt;
+  // Ed owes: his 50% of shared costs + 100% of cruise, minus what he's already paid directly
+  const edTotalOwes=(sharedAmt/2)+cruiseAmt-ed;
+  const netOwed=edTotalOwes-edToFran+franToEd;
+  const oweEl=document.getElementById('pay-owe').parentElement;
+  if(netOwed>0.005){
+    oweEl.querySelector('h4').textContent='Ed owes Fran (net)';
+    document.getElementById('pay-owe').textContent='\u00a3'+netOwed.toFixed(2);
+    document.getElementById('pay-owe').title='Includes 50/50 split of shared costs + full \u00a3314.50 cruise (Ed\u2019s birthday gift to Franciny). Less \u00a3500 already transferred.';
+  } else if(netOwed<-0.005){
+    oweEl.querySelector('h4').textContent='Fran owes Ed';
+    document.getElementById('pay-owe').textContent='\u00a3'+Math.abs(netOwed).toFixed(2);
+  } else {
+    oweEl.querySelector('h4').textContent='All even';
+    document.getElementById('pay-owe').textContent='\u00a30';
+  }
+}
+renderPaid();
+</script>
+</div><!-- /confirmed -->
+
+<div class="tab-block" data-panel="itinerary">
+<!-- Accommodation Plan -->
+<div class="sec"><h2>Accommodation Plan</h2><p>Option B+ &middot; The Gaudi Edition &middot; 11 nights &middot; Jul 3-14 &middot; Live Jul 2026 pricing &middot; 2 adults</p></div>
+<style>
+.accom-table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.06);margin:12px 0 24px}
+.accom-table th,.accom-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #eee;font-size:14px;vertical-align:top}
+.accom-table th{background:#1e3a5f;color:#fff;font-weight:600}
+.accom-table tr.booked{background:#e8f5e9}
+.accom-table tr.locked{background:#fff8e1}
+.accom-table tr.total{background:#f5f5f5;font-weight:700}
+.accom-table .tag-booked{display:inline-block;background:#2e7d32;color:#fff;font-size:10px;padding:2px 6px;border-radius:3px;margin-right:6px;letter-spacing:.5px}
+.accom-table .tag-locked{display:inline-block;background:#f9a825;color:#fff;font-size:10px;padding:2px 6px;border-radius:3px;margin-right:6px;letter-spacing:.5px}
+.accom-table a{color:#1e3a5f;text-decoration:none;font-weight:500}
+.accom-table a:hover{text-decoration:underline}
+.accom-table .sub{color:#666;font-size:12px;display:block;margin-top:2px}
+</style>
+<table class="accom-table">
+<thead><tr><th>Stop</th><th>Dates</th><th>Nts</th><th>Property</th><th>Rate</th><th>Subtotal</th></tr></thead>
+<tbody>
+<tr class="booked"><td><span class="dot c-paris"></span>Paris</td><td>Jul 3-7</td><td>4</td>
+  <td><span class="tag-booked">BOOKED</span><strong>hotelF1 Paris Porte de Montreuil</strong><span class="sub">Cabrio Room with Private Bathroom &middot; 290-302 Rue &Eacute;tienne Marcel, 93170 Bagnolet &middot; Ref 6751758443 &middot; PIN 5108 &middot; &#9742; +33 1 41 58 60 80 &middot; Check-in 14:00 / out 12:00 &middot; Metro 3 Gallieni &middot; Paid by Fran (full details in Bookings tab)</span></td>
+  <td>&pound;67/nt</td><td>&pound;268.12</td></tr>
+<tr class="booked"><td><span class="dot c-lyon"></span>Lyon</td><td>Jul 7-8</td><td>1</td>
+  <td><span class="tag-booked">BOOKED</span><strong>Quadraverde Lyon</strong><span class="sub">Budget Studio apartment &middot; 6 rue Nicolas Sicard, 5th arr., Vieux-Lyon &middot; Conf. #5856674449 &middot; PIN 0831 &middot; Check-in from 16:00 / out by 11:00 &middot; Get door code from host before arrival &middot; Paid by Fran</span></td>
+  <td>&pound;59/nt</td><td>&pound;59.45</td></tr>
+<tr class="booked"><td><span class="dot c-montpellier"></span>Montpellier</td><td>Jul 8-10</td><td>2</td>
+  <td><span class="tag-booked">BOOKED</span><strong>Premiere Classe Montpellier Ouest</strong><span class="sub">Triple room &middot; All&eacute;e Jean-Monnet, Saint-Jean-de-V&eacute;das (Tram 1, ~25min to centre) &middot; Conf. #5856649209 &middot; PIN 7615 &middot; Check-in 15:00&ndash;21:00 / out by 11:00 &middot; Paid by Fran</span></td>
+  <td>&pound;42/nt</td><td>&pound;84</td></tr>
+<tr class="booked"><td><span class="dot c-barcelona"></span>Barcelona</td><td>Jul 10-14</td><td>4</td>
+  <td><span class="tag-booked">BOOKED</span><strong>Hotel Sagrada Familia</strong><span class="sub">Double/Twin room &middot; Calle C&ograve;rsega 541, Eixample (next to Sagrada Fam&iacute;lia) &middot; Conf. #26051370464 &middot; PIN 8704986 &middot; Check-in 14:00 / out 11:00 &middot; Paid by Fran</span></td>
+  <td>&pound;132/nt</td><td>&pound;527</td></tr>
+<tr class="total"><td colspan="5" style="text-align:right">Total accommodation (11 nights, 2 adults) &middot; all confirmed ✅</td><td>&pound;939</td></tr>
+</tbody></table>
+
+
+</div><!-- /itinerary part 2 -->
+
+<div class="tab-block" data-panel="bonus">
+<!-- Bonus Sights -->
+<div class="sec"><h2>Bonus Sights &amp; Pop Culture</h2><p>Tick the ones you want to visit &middot; saved to your browser &middot; tiles fetch live photos from Wikipedia</p></div>
+<style>
+.pop-filters{display:flex;gap:8px;justify-content:center;margin:10px 0 14px;flex-wrap:wrap}
+.pop-filters button{background:#fff;border:1px solid #ddd;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500}
+.pop-filters button.active{background:#1e3a5f;color:#fff;border-color:#1e3a5f}
+.pop-filters .count{background:#f9a825;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px}
+.pop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:4px 0 24px}
+.pop-tile{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.06);position:relative;transition:transform .15s,box-shadow .15s}
+.pop-tile:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.pop-tile.checked{box-shadow:0 0 0 3px #f9a825, 0 4px 12px rgba(0,0,0,.12)}
+.pop-tile .pimg{height:160px;background:#e0e0e0 center/cover no-repeat;position:relative}
+.pop-tile .ptag{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.7);color:#fff;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600;letter-spacing:.5px}
+.pop-tile.emily .ptag{background:#ec407a}
+.pop-tile.ladybug .ptag{background:#e53935}
+.pop-tile.both .ptag{background:linear-gradient(90deg,#ec407a 50%,#e53935 50%)}
+.pop-tile.bcn .ptag{background:#922b21}
+.pop-tile.lyon .ptag{background:#7b2252}
+.pop-tile .pcheck{position:absolute;top:8px;right:8px;width:30px;height:30px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:bold;color:#bbb;user-select:none;border:2px solid #fff;transition:all .15s}
+.pop-tile .pcheck:hover{background:#fff;color:#666}
+.pop-tile.checked .pcheck{background:#f9a825;color:#fff;border-color:#f9a825}
+.pop-tile .pbody{padding:12px 14px}
+.pop-tile .ptitle{font-weight:600;color:#1e3a5f;font-size:14px;line-height:1.2}
+.pop-tile .paddr{color:#666;font-size:11px;margin-top:3px}
+.pop-tile .pdesc{color:#333;font-size:12px;line-height:1.45;margin-top:6px}
+</style>
+<div class="pop-filters">
+<button class="active" data-pf="all" onclick="popFilter('all')">All</button>
+<button data-pf="emily" onclick="popFilter('emily')">Emily in Paris</button>
+<button data-pf="ladybug" onclick="popFilter('ladybug')">Ladybug</button>
+<button data-pf="bcn" onclick="popFilter('bcn')">Barcelona</button>
+<button data-pf="lyon" onclick="popFilter('lyon')">Lyon</button>
+<button data-pf="checked" onclick="popFilter('checked')">My List <span class="count" id="popCount">0</span></button>
+</div>
+<div class="pop-grid" id="popGrid"></div>
+<script>
+// w = Wikipedia article slug; images fetched live from REST API
+const POP=[
+// Emily in Paris
+{id:'estrapade',t:'Place de l\'Estrapade',a:'5th arr &middot; M10 Cardinal Lemoine',s:'emily',tag:'EMILY',w:'Place_de_l%27Estrapade',d:'Emily\'s apartment with the famous green door. Facade only, 10min from the Panth&eacute;on.'},
+{id:'terranera',t:'Terra Nera',a:'18 Rue des Foss&eacute;s Saint-Jacques',s:'emily',tag:'EMILY',w:'Place_de_l%27Estrapade',d:'The real Italian restaurant that plays Gabriel\'s "Les Deux Comp&egrave;res". Book dinner to eat inside the actual set.'},
+{id:'boulmod',t:'Boulangerie Moderne',a:'16 Rue des Foss&eacute;s Saint-Jacques',s:'emily',tag:'EMILY',w:'Panth%C3%A9on,_Paris',d:'"Best pain au chocolat in Paris" per Emily. Queue on weekends. Next door to Terra Nera.'},
+{id:'valois',t:'Place de Valois (Savoir)',a:'1st arr &middot; behind Palais Royal',s:'emily',tag:'EMILY',w:'Palais-Royal',d:'Emily\'s marketing firm exterior. Quiet leafy square one block from the Palais Royal columns.'},
+{id:'flore',t:'Caf&eacute; de Flore',a:'172 Bd Saint-Germain &middot; 6th arr',s:'emily',tag:'EMILY',w:'Caf%C3%A9_de_Flore',d:'Emily/Mindy brunch classic. Overpriced but the terrace is a vibe. Order a noisette.'},
+{id:'alex3',t:'Pont Alexandre III',a:'Between Invalides &amp; Champs-&Eacute;lys&eacute;es',s:'emily',tag:'EMILY',w:'Pont_Alexandre_III',d:'The ornate golden bridge &mdash; Emily\'s signature "I love Paris" moments. Sunset is magic.'},
+{id:'garnier',t:'Palais Garnier (Op&eacute;ra)',a:'Place de l\'Op&eacute;ra &middot; 9th arr',s:'emily',tag:'EMILY',w:'Palais_Garnier',d:'Ballet scene backdrop. Tour &euro;15 &mdash; the Grand Staircase and golden foyer.'},
+{id:'atelier',t:'Atelier des Lumi&egrave;res',a:'38 Rue Saint-Maur &middot; 11th arr',s:'emily',tag:'EMILY',w:'Atelier_des_Lumi%C3%A8res',d:'Immersive projection venue from S3. Great rainy-afternoon fix. &euro;16.'},
+{id:'shakespeare',t:'Shakespeare and Company',a:'37 Rue de la B&ucirc;cherie &middot; 5th arr',s:'emily',tag:'EMILY',w:'Shakespeare_and_Company_(bookshop)',d:'Legendary English bookshop across from Notre-Dame. Emily browsing scenes. Free.'},
+{id:'laduree',t:'Ladur&eacute;e Champs-&Eacute;lys&eacute;es',a:'75 Av. des Champs-&Eacute;lys&eacute;es',s:'emily',tag:'EMILY',w:'Ladur%C3%A9e',d:'Original macaron patisserie. Emily\'s pastel-box obsession.'},
+{id:'crazyhorse',t:'Le Crazy Horse',a:'12 Av. George V &middot; 8th arr',s:'emily',tag:'EMILY',w:'Crazy_Horse_(Paris)',d:'Legendary Parisian cabaret since 1951. Choreographed nude dance, light art, and show-stopping numbers. Tickets from &euro;95. Evening show.'},
+{id:'giverny',t:'Claude Monet House &amp; Gardens (Giverny)',a:'Giverny, Normandy &middot; 75min train from Paris',s:'emily',tag:'EMILY',w:'Fondation_Claude_Monet',d:'Monet\'s home + the actual water lily pond that inspired the paintings. Day trip: train to Vernon + shuttle bus. &euro;13. Open Apr-Nov.'},
+
+// Ladybug
+{id:'pontarts',t:'Pont des Arts',a:'Between Louvre &amp; Institut de France',s:'ladybug',tag:'LADYBUG',w:'Pont_des_Arts',d:'Pedestrian bridge Marinette runs across in the opening credits.'},
+{id:'painidees',t:'Du Pain et des Id&eacute;es',a:'34 Rue Yves Toudic &middot; 10th arr',s:'ladybug',tag:'LADYBUG',w:'Du_Pain_et_des_Id%C3%A9es',d:'The real bakery cited as the visual inspiration for the Dupain-Cheng bakery.'},
+{id:'vosges',t:'Place des Vosges',a:'Marais &middot; 4th arr',s:'ladybug',tag:'LADYBUG',w:'Place_des_Vosges',d:'Oldest planned square in Paris. Park/picnic episode backdrop.'},
+{id:'luxembourg',t:'Jardin du Luxembourg',a:'6th arr &middot; RER Luxembourg',s:'ladybug',tag:'LADYBUG',w:'Luxembourg_Gardens',d:'Where Marinette + Adrien meet. Green chairs, fountains, Senate palace. Free.'},
+{id:'grandpalais',t:'Le Grand Palais',a:'Av. Winston Churchill &middot; 8th arr',s:'ladybug',tag:'LADYBUG',w:'Grand_Palais',d:'Giant glass-dome palace featured in multiple episodes.'},
+{id:'arc',t:'Arc de Triomphe',a:'Place Charles de Gaulle &middot; 8th arr',s:'ladybug',tag:'LADYBUG',w:'Arc_de_Triomphe',d:'Several akuma battles. Climb (&euro;13) &mdash; 284 steps, unbeatable Champs view.'},
+{id:'tuileries',t:'Jardin des Tuileries',a:'1st arr &middot; M1 Tuileries',s:'ladybug',tag:'LADYBUG',w:'Tuileries_Garden',d:'Formal gardens between Louvre &amp; Concorde. Chase sequences. Summer funfair Jun-Aug.'},
+{id:'montparnasse',t:'Tour Montparnasse',a:'15th arr &middot; M4 Montparnasse',s:'ladybug',tag:'LADYBUG',w:'Tour_Montparnasse',d:'Paris\'s only skyscraper. Rooftop has best Eiffel view in the city (&euro;18).'},
+
+// Barcelona extras
+{id:'bunkers',t:'Bunkers del Carmel',a:'Turo de la Rovira &middot; hilltop',s:'bcn',tag:'BCN',w:'Tur%C3%B3_de_la_Rovira',d:'Old anti-aircraft bunkers with 360&deg; city panorama. Best free sunset spot in Barcelona.'},
+{id:'santpau',t:'Hospital de Sant Pau',a:'Modernista complex &middot; UNESCO',s:'bcn',tag:'BCN',w:'Hospital_de_Sant_Pau',d:'Stunning Art Nouveau ex-hospital with flower-tiled pavilions. Quieter than Gaud&iacute; crowds. &euro;17.'},
+{id:'tibidabo',t:'Tibidabo',a:'Collserola mountain &middot; funicular',s:'bcn',tag:'BCN',w:'Tibidabo',d:'Mountain with a Sacr&eacute;-Coeur-style basilica + vintage funfair. Best views across the whole city.'},
+{id:'palauguell',t:'Palau G&uuml;ell',a:'Carrer Nou de la Rambla &middot; Raval',s:'bcn',tag:'BCN',w:'Palau_G%C3%BCell',d:'Lesser-known Gaud&iacute; mansion (1888). Stunning rooftop chimneys, UNESCO. &euro;12. Right by your hotel area.'},
+{id:'poble',t:'Poble Espanyol',a:'Montju&iuml;c &middot; open-air museum',s:'bcn',tag:'BCN',w:'Poble_Espanyol',d:'Replicas of buildings from every Spanish region in one village. Artisan workshops, craft shops.'},
+{id:'boqueria',t:'La Boqueria Market',a:'Las Ramblas &middot; 1st arr',s:'bcn',tag:'BCN',w:'La_Boqueria',d:'Iconic food market. Jam&oacute;n, juices, tapas counters. Best at 10am before crowds. Free to browse.'},
+{id:'magicfountain',t:'Magic Fountain of Montju&iuml;c',a:'Pla&ccedil;a de Carles Buigas',s:'bcn',tag:'BCN',w:'Magic_Fountain_of_Montju%C3%AFc',d:'Free evening light/music/water show Fri-Sat. Already on your Jul 13 relaxed day.'},
+{id:'bogatell',t:'Platja de la Bogatell',a:'Poblenou beach',s:'bcn',tag:'BCN',w:'Bogatell_beach',d:'Cleaner + less crowded than Barceloneta. Wide sand, chiringuitos, 20min walk from Cruïlla venue.'},
+
+// Lyon extras
+{id:'confluences',t:'Mus&eacute;e des Confluences',a:'Confluence district',s:'lyon',tag:'LYON',w:'Mus%C3%A9e_des_Confluences',d:'Futuristic crystal-shaped museum at the meeting of Rh&ocirc;ne + Sa&ocirc;ne. Natural history + anthropology.'},
+{id:'croixrousse',t:'Croix-Rousse',a:'Silk weavers\' district &middot; hilltop',s:'lyon',tag:'LYON',w:'Croix-Rousse',d:'Bohemian hilltop neighbourhood. Silk ateliers, daily market, amazing viewpoints, street art.'},
+{id:'teteor',t:'Parc de la T&ecirc;te d\'Or',a:'6th arr &middot; huge park',s:'lyon',tag:'LYON',w:'Parc_de_la_T%C3%AAte_d%27Or',d:'117-hectare park with lake, free zoo, botanical gardens. Perfect relaxed morning before a Nuits show.'},
+{id:'murals',t:'Fresque des Lyonnais',a:'Trompe-l\'oeil mural &middot; 1st arr',s:'lyon',tag:'LYON',w:'Fresque_des_Lyonnais',d:'Giant painted mural of 30 famous people from Lyon on a full building wall. Free. 5min from Vieux Lyon.'},
+{id:'lumiere',t:'Institut Lumi&egrave;re',a:'25 Rue du Premier-Film &middot; 8th arr',s:'lyon',tag:'LYON',w:'Institut_Lumi%C3%A8re',d:'Where cinema was invented (1895 by the Lumi&egrave;re brothers). Museum + screenings. &euro;9.'}
+];
+const popKey='popChecked_v1';
+let popChecked=JSON.parse(localStorage.getItem(popKey)||'{}');
+const wikiCache={};
+let wikiObserver=null;
+let popView='all';
+function fetchWithTimeout(url,ms=3000){
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),ms);
+  return fetch(url,{signal:ctrl.signal}).finally(()=>clearTimeout(timer));
+}
+async function loadWiki(slug,tileEl){
+  if(!slug||!tileEl)return;
+  const imgEl=tileEl.querySelector('.pimg');
+  if(!imgEl)return;
+  if(wikiCache[slug]){
+    if(wikiCache[slug]!=='error'){imgEl.style.backgroundImage=`url('${wikiCache[slug]}')`;imgEl.style.backgroundSize='cover';}
+    return;
+  }
+  try{
+    const r=await fetchWithTimeout(`https://en.wikipedia.org/api/rest_v1/page/summary/${slug}`,3000);
+    if(!r.ok)throw 0;
+    const j=await r.json();
+    const url=(j.thumbnail&&j.thumbnail.source)||(j.originalimage&&j.originalimage.source);
+    if(url){wikiCache[slug]=url;imgEl.style.backgroundImage=`url('${url}')`;imgEl.style.backgroundSize='cover';}
+    else{wikiCache[slug]='error';}
+  }catch(e){wikiCache[slug]='error';}
+}
+function queueWikiImages(grid){
+  if(!('IntersectionObserver' in window)){
+    grid.querySelectorAll('.pop-tile').forEach(el=>loadWiki(el.dataset.w,el));
+    return;
+  }
+  if(!wikiObserver){
+    wikiObserver=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting)return;
+        const el=entry.target;
+        wikiObserver.unobserve(el);
+        loadWiki(el.dataset.w,el);
+      });
+    },{rootMargin:'200px 0px'});
+  }
+  grid.querySelectorAll('.pop-tile').forEach(el=>wikiObserver.observe(el));
+}
+function renderPop(){
+  const grid=document.getElementById('popGrid');
+  const items=POP.filter(p=>popView==='all'?true:popView==='checked'?popChecked[p.id]:p.s===popView);
+  grid.innerHTML=items.map(p=>{
+    const on=!!popChecked[p.id];
+    return `<div class="pop-tile ${p.s} ${on?'checked':''}" data-pid="${p.id}" data-w="${p.w||''}" onclick="togglePop('${p.id}')">
+      <div class="pimg"><span class="ptag">${p.tag}</span><span class="pcheck">${on?'\u2713':''}</span></div>
+      <div class="pbody"><div class="ptitle">${p.t}</div><div class="paddr">${p.a}</div><div class="pdesc">${p.d}</div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('popCount').textContent=Object.values(popChecked).filter(v=>v).length;
+  queueWikiImages(grid);
+}
+function togglePop(id){
+  popChecked[id]=!popChecked[id];
+  if(!popChecked[id])delete popChecked[id];
+  localStorage.setItem(popKey,JSON.stringify(popChecked));
+  renderPop();
+}
+function popFilter(f){
+  popView=f;
+  document.querySelectorAll('.pop-filters button').forEach(b=>b.classList.toggle('active',b.dataset.pf===f));
+  renderPop();
+}
+renderPop();
+
+// ===== Confirmed Plan by City =====
+function renderConfirmedPlan(){
+  if(typeof OPT==='undefined'||!OPT['B+'])return;
+  const opt=OPT['B+'];
+  const order=['paris','lyon','montpellier','barcelona'];
+  const nm={paris:'Paris',lyon:'Lyon',montpellier:'Montpellier',barcelona:'Barcelona'};
+  const sToC={emily:'paris',ladybug:'paris',bcn:'barcelona',lyon:'lyon'};
+  const hotels={
+    paris:{n:'Paris hotel, Bagnolet (BOOKED)',d:'Jul 3-7 &middot; 4nt &middot; &pound;268.12 &middot; Ref 6751758443',u:'#'},
+    lyon:{n:'Quadraverde Lyon',d:'Jul 7-8 &middot; 1nt &middot; &pound;59 &middot; Conf. #5856674449',u:'https://www.booking.com'},
+    montpellier:{n:'Premiere Classe Montpellier Ouest',d:'Jul 8-10 &middot; 2nt &middot; &pound;84 &middot; Conf. #5856649209',u:'https://www.booking.com'},
+    barcelona:{n:'Hotel Sagrada Familia',d:'Jul 10-14 &middot; 4nt &middot; &euro;623 &middot; Conf. #26051370464',u:'https://www.hotelsagradafamilia.com/en/'}
+  };
+  const byCity={};
+  order.forEach(c=>byCity[c]={events:[],ticked:[]});
+  opt.days.forEach(d=>{
+    if(!byCity[d.c])return;
+    d.evs.forEach(e=>{
+      if(e.n==='Settle in, neighbourhood walk'||/^Morning /.test(e.n)||/train/i.test(e.n)||/Flight /.test(e.n)||/Last morning/.test(e.n))return;
+      byCity[d.c].events.push({day:d.dt,wd:d.wd,name:e.n,type:e.ty,opt:!!e.opt,bday:d.bday});
+    });
+  });
+  POP.forEach(p=>{
+    const c=sToC[p.s];
+    if(popChecked[p.id]&&byCity[c])byCity[c].ticked.push(p);
+  });
+  const typeIcon={concert:'&#127925;',festival:'&#127925;',museum:'&#127963;',food:'&#127869;',free:'&#127881;',activity:'&#128205;'};
+  const html=order.map(c=>{
+    const data=byCity[c];
+    const h=hotels[c];
+    return `<div class="plan-city plan-${c}">
+      <h3>${nm[c]} <span class="plan-count">${data.events.length} planned &middot; ${data.ticked.length} ticked</span></h3>
+      <div class="plan-hotel">&#127968; <a href="${h.u}" target="_blank">${h.n}</a> <span class="plan-meta">${h.d}</span></div>
+      <div class="plan-sub"><div class="plan-subhdr">Already in the itinerary</div>
+        <ul class="plan-list">${data.events.map(e=>`<li><span class="plan-day">${e.wd} ${e.day}${e.bday?' &#127874;':''}</span> ${typeIcon[e.type]||'&#128205;'} ${e.name}${e.opt?' <span class="opt-tag">opt</span>':''}</li>`).join('')}</ul>
+      </div>
+      ${data.ticked.length?`<div class="plan-sub"><div class="plan-subhdr">Your ticked bonus sights</div>
+        <ul class="plan-list plan-ticked">${data.ticked.map(t=>`<li>&#9989; <strong>${t.t}</strong> <span class="plan-addr">${t.a}</span></li>`).join('')}</ul>
+      </div>`:'<div class="plan-sub plan-empty">No bonus sights ticked yet &mdash; tick tiles above to add them here.</div>'}
+    </div>`;
+  }).join('');
+  document.getElementById('confirmedPlan').innerHTML=html;
+}
+// Re-render plan after ticking
+const _origToggle=togglePop;
+togglePop=function(id){_origToggle(id);renderConfirmedPlan();}
+renderConfirmedPlan();
+</script>
+</div><!-- /bonus -->
+
+<div class="tab-block" data-panel="itinerary">
+<!-- Confirmed Plan by City -->
+<div class="sec"><h2>Confirmed Plan by City</h2><p>Option B+ Gaudi Edition &middot; hotel + itinerary + your ticked bonus sights, per stop</p></div>
+<style>
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin:12px 0 24px}
+.plan-city{background:#fff;border-radius:10px;padding:18px 20px;box-shadow:0 2px 6px rgba(0,0,0,.06);border-top:4px solid #1e3a5f}
+.plan-city.plan-lyon{border-top-color:#7b2252}
+.plan-city.plan-montpellier{border-top-color:#0d6b5e}
+.plan-city.plan-barcelona{border-top-color:#922b21}
+.plan-city h3{margin:0 0 10px;font-size:18px;color:#1e3a5f;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px}
+.plan-count{font-size:11px;color:#666;font-weight:400;letter-spacing:.5px}
+.plan-hotel{background:#fff8e1;padding:8px 12px;border-radius:6px;margin-bottom:12px;font-size:13px}
+.plan-hotel a{color:#1e3a5f;text-decoration:none;font-weight:600}
+.plan-hotel a:hover{text-decoration:underline}
+.plan-meta{color:#666;font-size:12px;margin-left:4px}
+.plan-sub{margin-top:10px}
+.plan-subhdr{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:4px}
+.plan-list{list-style:none;padding:0;margin:0;font-size:13px;line-height:1.6}
+.plan-list li{padding:2px 0;border-bottom:1px dashed #f0f0f0}
+.plan-list li:last-child{border-bottom:none}
+.plan-list.plan-ticked li{background:#e8f5e9;padding:4px 8px;margin:2px 0;border-radius:4px;border:none}
+.plan-day{display:inline-block;color:#999;font-size:11px;font-weight:600;margin-right:4px}
+.plan-addr{color:#666;font-size:11px;display:block;margin-left:20px}
+.plan-empty{color:#999;font-style:italic;font-size:12px;margin-top:10px}
+.opt-tag{background:#f9a825;color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:4px;vertical-align:middle}
+</style>
+<div class="plan-grid" id="confirmedPlan"></div>
+<script>renderConfirmedPlan();</script>
+</div><!-- /itinerary part 3 -->
+
+<div class="tab-block" data-panel="maps">
+<!-- Maps by City -->
+<div class="sec"><h2>Maps by City</h2><p>All confirmed stops plotted &middot; click any pin for details &middot; tick bonus tiles above to add their pins</p></div>
+<style>
+.maps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px;margin:12px 0 24px}
+.map-card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.map-card h3{margin:0;padding:12px 16px;background:#1e3a5f;color:#fff;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+.map-card.c-lyon h3{background:#7b2252}
+.map-card.c-montpellier h3{background:#0d6b5e}
+.map-card.c-barcelona h3{background:#922b21}
+.map-card h3 .pin-count{font-size:11px;font-weight:400;opacity:.85}
+.map-canvas{height:380px;width:100%;z-index:0}
+.map-legend{padding:8px 16px;font-size:11px;color:#666;display:flex;gap:12px;flex-wrap:wrap;background:#f9f9f9;border-top:1px solid #eee}
+.map-legend span{display:inline-flex;align-items:center;gap:4px}
+.map-legend .dot-m{width:10px;height:10px;border-radius:50%;display:inline-block}
+.leaflet-popup-content{font-family:'Inter',sans-serif;font-size:13px;line-height:1.4}
+.leaflet-popup-content b{color:#1e3a5f}
+.leaflet-popup-content .pop-time{background:#1e3a5f;color:#fff;font-size:10px;padding:2px 6px;border-radius:8px;margin-right:4px}
+</style>
+<div class="maps-grid">
+<div class="map-card c-paris"><h3>&#127467;&#127479; Paris <span class="pin-count" id="pc-paris"></span></h3><div id="map-paris" class="map-canvas"></div>
+<div class="map-legend"><span><span class="dot-m" style="background:#2e7d32"></span>Hotel</span><span><span class="dot-m" style="background:#1976d2"></span>Activity</span><span><span class="dot-m" style="background:#7b1fa2"></span>Museum</span><span><span class="dot-m" style="background:#e65100"></span>Food</span><span><span class="dot-m" style="background:#c62828"></span>Music</span><span><span class="dot-m" style="background:#f9a825"></span>Ticked bonus</span></div>
+</div>
+<div class="map-card c-lyon"><h3>&#127467;&#127479; Lyon <span class="pin-count" id="pc-lyon"></span></h3><div id="map-lyon" class="map-canvas"></div></div>
+<div class="map-card c-montpellier"><h3>&#127467;&#127479; Montpellier <span class="pin-count" id="pc-montpellier"></span></h3><div id="map-montpellier" class="map-canvas"></div></div>
+<div class="map-card c-barcelona"><h3>&#127466;&#127480; Barcelona <span class="pin-count" id="pc-barcelona"></span></h3><div id="map-barcelona" class="map-canvas"></div></div>
+</div>
+
+<script>
+// Coordinates lookup: matches event name (partial) or POP id -> [lat,lng]
+const COORDS={
+// Paris - hotel
+'Bagnolet':[48.8667,2.4200],
+'Ivry-sur-Seine':[48.8170,2.3820],
+// Paris itinerary
+'Fnac Live Festival':[48.8566,2.3522],'Orangerie':[48.8639,2.3226],'Paris Plages':[48.8584,2.3528],
+'Seine bookstalls':[48.8534,2.3488],'Eiffel Tower':[48.8584,2.2945],'Paris Jazz Festival':[48.8332,2.4400],
+'Louvre':[48.8606,2.3376],'Carnaval Tropical':[48.8698,2.3074],'Musee d\u0027Orsay':[48.8599,2.3266],'Mus\u00e9e d\u0027Orsay':[48.8599,2.3266],'Renoir':[48.8599,2.3266],
+'Seine dinner cruise':[48.8630,2.3015],'Bateaux Parisiens':[48.8615,2.2953],'Petit Palais':[48.8661,2.3125],'Carnavalet':[48.8576,2.3620],'Sacre-Coeur':[48.8867,2.3431],'Canal Saint-Martin':[48.8722,2.3650],
+'Fondation Louis Vuitton':[48.8767,2.2636],
+// Paris POP
+estrapade:[48.8453,2.3473],terranera:[48.8456,2.3472],boulmod:[48.8456,2.3473],valois:[48.8660,2.3375],
+flore:[48.8540,2.3322],alex3:[48.8639,2.3137],garnier:[48.8720,2.3316],atelier:[48.8674,2.3776],
+shakespeare:[48.8526,2.3470],laduree:[48.8718,2.3015],crazyhorse:[48.8669,2.3002],giverny:[49.0761,1.5336],
+pontarts:[48.8583,2.3375],painidees:[48.8702,2.3622],vosges:[48.8555,2.3661],luxembourg:[48.8462,2.3371],
+grandpalais:[48.8661,2.3125],arc:[48.8738,2.2950],tuileries:[48.8635,2.3275],montparnasse:[48.8421,2.3220],
+// Lyon
+'Oceania':[45.7605,4.8276],'Quadraverde':[45.7538,4.8222],'Fourviere':[45.7622,4.8222],'Halles de Lyon':[45.7609,4.8504],
+'Vieux Lyon':[45.7620,4.8270],'Traboules':[45.7715,4.8283],'bouchon':[45.7618,4.8272],
+confluences:[45.7326,4.8186],croixrousse:[45.7769,4.8318],teteor:[45.7767,4.8530],murals:[45.7691,4.8276],lumiere:[45.7456,4.8636],
+// Montpellier
+'Premiere Classe':[43.5784,3.8198],'Com\u00e9die':[43.6083,3.8788],'Comedie':[43.6083,3.8788],'Jardin des Plantes':[43.6152,3.8735],
+'Rue du Bras de Fer':[43.6095,3.8785],'Bras de Fer':[43.6095,3.8785],'Arc de Triomphe':[43.6112,3.8737],
+'Promenade du Peyrou':[43.6115,3.8726],'Antigone':[43.6086,3.8869],'Palavas':[43.5293,3.9293],
+'Festival Radio France':[43.6086,3.8794],'Tohu-Bohu':[43.6211,3.8833],
+// Barcelona
+'Alogar':[41.3900,2.1430],'Sagrada Familia hotel':[41.4010,2.1755],'Cruilla':[41.4107,2.2229],'Sagrada Familia':[41.4036,2.1744],
+'Casa Batllo':[41.3916,2.1649],'Casa Mila':[41.3953,2.1618],'Pedrera':[41.3953,2.1618],
+'Park Guell':[41.4145,2.1527],'Park G\u00fcell':[41.4145,2.1527],'Boqueria':[41.3817,2.1718],
+'Gothic Quarter':[41.3829,2.1765],'Barceloneta':[41.3780,2.1933],'Palau de la Musica':[41.3876,2.1753],
+'Magic Fountain':[41.3711,2.1530],'El Born':[41.3849,2.1827],'Museum of Contemporary':[41.3832,2.1667],
+bunkers:[41.4176,2.1665],santpau:[41.4122,2.1749],tibidabo:[41.4225,2.1189],palauguell:[41.3793,2.1744],
+poble:[41.3687,2.1478],boqueria:[41.3817,2.1718],magicfountain:[41.3711,2.1530],bogatell:[41.3918,2.2021]
+};
+
+function findCoord(name){
+  for(const k in COORDS){
+    if(name.toLowerCase().includes(k.toLowerCase()))return COORDS[k];
+  }
+  return null;
+}
+
+const TY_COLOR={hotel:'#2e7d32',activity:'#1976d2',museum:'#7b1fa2',food:'#e65100',concert:'#c62828',festival:'#c62828',free:'#00838f',ticked:'#f9a825'};
+
+const CITY_CENTER={paris:[48.8566,2.3522],lyon:[45.7640,4.8357],montpellier:[43.6108,3.8767],barcelona:[41.3851,2.1734]};
+const CITY_ZOOM={paris:12,lyon:13,montpellier:13,barcelona:13};
+const S_TO_CITY={emily:'paris',ladybug:'paris',bcn:'barcelona',lyon:'lyon'};
+
+const CITY_BOUNDS={
+  paris:{minLat:48.70,maxLat:49.05,minLng:2.10,maxLng:2.70},
+  lyon:{minLat:45.60,maxLat:45.90,minLng:4.60,maxLng:5.10},
+  montpellier:{minLat:43.40,maxLat:43.75,minLng:3.70,maxLng:4.05},
+  barcelona:{minLat:41.20,maxLat:41.60,minLng:1.90,maxLng:2.45}
+};
+function buildMapPins(){
+  const pins={paris:[],lyon:[],montpellier:[],barcelona:[]};
+  // Hotel pins
+  const hotels={paris:{n:'Paris hotel, Bagnolet',k:'Bagnolet'},lyon:{n:'Quadraverde Lyon (apartment)',k:'Quadraverde'},montpellier:{n:'Premiere Classe Montpellier Ouest',k:'Premiere Classe'},barcelona:{n:'Hotel Sagrada Familia',k:'Sagrada Familia hotel'}};
+  Object.keys(hotels).forEach(c=>{
+    const co=findCoord(hotels[c].k);
+    if(co)pins[c].push({n:hotels[c].n,ty:'hotel',lat:co[0],lng:co[1],info:'Your hotel for this stop'});
+  });
+  // Itinerary events
+  OPT['B+'].days.forEach(d=>{
+    if(!pins[d.c])return;
+    d.evs.forEach(e=>{
+      if(/train|flight|settle|check in|collect bags|last morning|arrive \+/i.test(e.n))return;
+      const co=findCoord(e.n);
+      if(co){
+        const b=CITY_BOUNDS[d.c];
+        if(b&&(co[0]<b.minLat||co[0]>b.maxLat||co[1]<b.minLng||co[1]>b.maxLng))return;
+        pins[d.c].push({n:e.n,ty:e.ty,lat:co[0],lng:co[1],day:d.wd+' '+d.dt,tm:e.tm||''});
+      }
+    });
+  });
+  // Ticked bonus sights
+  POP.forEach(p=>{
+    if(!popChecked[p.id])return;
+    const c=S_TO_CITY[p.s];
+    if(!pins[c])return;
+    const co=COORDS[p.id];
+    if(co)pins[c].push({n:p.t,ty:'ticked',lat:co[0],lng:co[1],info:'Bonus sight (ticked) &middot; '+p.a});
+  });
+  return pins;
+}
+
+const MAPS={};
+let leafletReady=null;
+function loadLeaflet(){
+  if(window.L)return Promise.resolve();
+  if(leafletReady)return leafletReady;
+  leafletReady=new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>reject(new Error('Leaflet timed out')),6000);
+    const css=document.createElement('link');
+    css.rel='stylesheet';
+    css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(css);
+    const script=document.createElement('script');
+    script.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.async=true;
+    script.onload=()=>{clearTimeout(timer);resolve();};
+    script.onerror=()=>{clearTimeout(timer);reject(new Error('Leaflet failed to load'));};
+    document.head.appendChild(script);
+  });
+  return leafletReady;
+}
+async function renderMaps(){
+  const mapGrid=document.querySelector('.maps-grid');
+  if(mapGrid)mapGrid.classList.add('loading');
+  try{await loadLeaflet();}catch(e){if(mapGrid)mapGrid.innerHTML='<p style="padding:16px;color:#666">Maps could not load. Check your internet connection and try again.</p>';return;}
+  const pins=buildMapPins();
+  Object.keys(pins).forEach(city=>{
+    const elId='map-'+city;
+    const el=document.getElementById(elId);
+    if(!el)return;
+    if(MAPS[city]){MAPS[city].remove();}
+    const m=L.map(elId,{scrollWheelZoom:false}).setView(CITY_CENTER[city],CITY_ZOOM[city]);
+    MAPS[city]=m;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap',maxZoom:19}).addTo(m);
+    const bounds=[];
+    pins[city].forEach(p=>{
+      const color=TY_COLOR[p.ty]||'#555';
+      const isHotel=p.ty==='hotel';
+      const radius=isHotel?11:(p.ty==='ticked'?9:8);
+      const marker=L.circleMarker([p.lat,p.lng],{color:'#fff',weight:2,fillColor:color,fillOpacity:.95,radius:radius}).addTo(m);
+      const popup=`<b>${p.n}</b><br>${p.tm?`<span class="pop-time">${p.tm}</span>`:''}${p.day||p.info||''}`;
+      marker.bindPopup(popup);
+      bounds.push([p.lat,p.lng]);
+    });
+    if(bounds.length>1){setTimeout(()=>{m.invalidateSize();m.fitBounds(bounds,{padding:[30,30]});},400);}
+    document.getElementById('pc-'+city).textContent=pins[city].length+' pins';
+  });
+  if(mapGrid)mapGrid.classList.remove('loading');
+}
+// Rebuild map pins when a pop sight is ticked
+const _prevToggle2=togglePop;
+togglePop=function(id){_prevToggle2(id);setTimeout(renderMaps,50);}
+</script>
+</div><!-- /maps -->
+
+<div class="tab-block" data-panel="itinerary">
+<!-- Transport -->
+<div class="sec"><h2>Transport</h2><p>Flights confirmed &amp; paid &middot; All intercity travel to Barcelona now booked &middot; only return-side local trains/check-in remain</p></div>
+<div class="rec-grid" id="transport">
+<div class="rec-card"><h3>✅ Outbound: Stroud &rarr; Paris <span style="font-size:.7rem;background:#d4edda;color:#155724;border-radius:3px;padding:1px 6px;font-weight:700;margin-left:4px">BOOKED</span></h3>
+<div class="rec-item"><div><span class="name">Ryanair FR718 &middot; BHX &rarr; Paris Beauvais</span><br><span class="meta">Fri 3 Jul &middot; 15:50&rarr;18:00 &middot; Res #TSE6JL &middot; Seats 29E (Fran) + 29F (Ed) &middot; Priority + 2 cabin bags &middot; Fran paid</span></div><span class="price">&pound;92.48</span></div>
+</div>
+<div class="rec-card"><h3>France/Spain Trains + Bus &mdash; <span style="font-size:.7rem;background:#d4edda;color:#155724;border-radius:3px;padding:1px 6px;font-weight:700">ALL BOOKED</span></h3>
+<div class="rec-item"><div><span class="name">✅ OUIGO Paris Gare de Lyon &rarr; Lyon Part-Dieu</span><br><span class="meta">Tue 7 Jul &middot; 12:26&rarr;14:22 &middot; Train n°7803 &middot; Ref UUTZ5J &middot; Boarding 11:46, closes 12:21 &middot; Franciny paid &middot; Non-refundable</span></div><span class="price">€76</span></div>
+<div class="rec-item"><div><span class="name">✅ OUIGO Lyon Part-Dieu &rarr; Montpellier Sud-de-France</span><br><span class="meta">Wed 8 Jul &middot; 11:10&rarr;12:56 &middot; Train n°7867 &middot; Ref DZY82B &middot; Seats coach 7, 771 + 772 &middot; Bags included &middot; Franciny paid</span></div><span class="price">€66</span></div>
+<div class="rec-item"><div><span class="name">✅ FlixBus Montpellier Sabines &rarr; Barcelona Nord</span><br><span class="meta">Fri 10 Jul &middot; 11:40&rarr;16:30 &middot; Booking #335 491 8981 &middot; Email to franciny2210@gmail.com &middot; Franciny paid</span></div><span class="price">&pound;64.96</span></div>
+</div>
+<div class="rec-card"><h3>✅ Return: Barcelona &rarr; Birmingham <span style="font-size:.7rem;background:#d4edda;color:#155724;border-radius:3px;padding:1px 6px;font-weight:700;margin-left:4px">BOOKED</span></h3>
+<div class="rec-item"><div><span class="name">Ryanair FR3792 &middot; BCN &rarr; BHX</span><br><span class="meta">Tue 14 Jul &middot; 16:30&rarr;17:55 &middot; Res #Q2GDRW &middot; Priority + 2 cabin bags &middot; Seats TBC via app &middot; Fran paid</span></div><span class="price">&pound;103.62</span></div>
+</div>
+</div>
+</div><!-- /itinerary part 4 -->
+
+<div class="tab-block" data-panel="vision">
+<!-- Vision Board -->
+<div class="vision">
+<h2>Vision Board</h2>
+<p class="sub">What's waiting at each stop</p>
+<div class="filters" style="justify-content:center">
+<button class="fbtn active" data-vc="all" onclick="filtV('all')">All</button>
+<button class="fbtn" data-vc="paris" onclick="filtV('paris')">Paris</button>
+<button class="fbtn" data-vc="lyon" onclick="filtV('lyon')">Lyon</button>
+<button class="fbtn" data-vc="montpellier" onclick="filtV('montpellier')">Montpellier</button>
+<button class="fbtn" data-vc="barcelona" onclick="filtV('barcelona')">Barcelona</button>
+</div>
+<div class="vgrid" id="vgrid"></div>
+</div>
+</div><!-- /vision -->
+
+<div class="tab-block" data-panel="misc">
+<div class="sec"><h2>Misc &middot; Saved bookings & notes</h2><p>Unrelated-to-trip bookings, future ideas, deals worth keeping.</p></div>
+
+<style>
+.misc-card{background:#fff;border-radius:12px;padding:18px 22px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:18px}
+.misc-card h3{margin:0 0 4px;font-size:1.15rem}
+.misc-card .badge{display:inline-block;background:#1e3a5f;color:#fff;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;margin-left:8px;vertical-align:middle;letter-spacing:.5px}
+.misc-card .meta{color:#777;font-size:.85rem;margin-bottom:12px}
+.misc-card table{width:100%;border-collapse:collapse;font-size:.9rem;margin:8px 0}
+.misc-card table th{text-align:left;font-weight:600;color:#555;padding:6px 8px;background:#f7f7f5;width:35%}
+.misc-card table td{padding:6px 8px;border-bottom:1px solid #f0f0ee}
+.misc-card ul{margin:8px 0;padding-left:18px}
+.misc-card li{margin-bottom:4px;font-size:.88rem}
+.checklist li{list-style:none;padding-left:22px;position:relative}
+.checklist li::before{content:"\2610";position:absolute;left:0;font-size:1rem;color:#999}
+.misc-note{background:#fff9e6;border-left:4px solid #f0a500;padding:10px 14px;border-radius:4px;font-size:.88rem;margin-top:10px}
+</style>
+
+<div class="misc-card">
+<h3>Ryanair FR3792 &middot; Barcelona &rarr; Birmingham <span class="badge">BOOKED &amp; PAID</span></h3>
+<p class="meta">This is your scheduled return flight for the Paris-Barcelona trip (Jul 14) &mdash; saved here as a booking record.</p>
+<table>
+<tr><th>Confirmation</th><td><b>Q2GDRW</b></td></tr>
+<tr><th>Flight</th><td>Ryanair FR3792</td></tr>
+<tr><th>Route</th><td>Barcelona (BCN) &rarr; Birmingham (BHX)</td></tr>
+<tr><th>Date</th><td>Tue 14 Jul 2026</td></tr>
+<tr><th>Depart &rarr; Arrive</th><td>16:30 &rarr; 17:55 (2h 25m)</td></tr>
+<tr><th>Passengers</th><td>Edward William O'Hara &middot; Franciny Cechinel De Souza</td></tr>
+<tr><th>Extras purchased</th><td>Priority + 2 Cabin Bags &middot; Seats selected</td></tr>
+<tr><th>Check-in</th><td>Opens <b>13 Jul 16:30</b> &middot; Ryanair App only (no paper)</td></tr>
+</table>
+
+<div class="misc-note">
+<b>Pre-flight checklist &mdash; things to verify:</b>
+<ul class="checklist">
+<li>Name on ticket <b>exactly</b> matches passport (middle names included). Ryanair charges a fee for any mismatch at the airport.</li>
+<li>Download the Ryanair app before travel &mdash; boarding passes are <b>digital only</b>, paper not accepted.</li>
+<li>You have <b>no checked bag</b> booked (only priority + cabin bags). For 11 nights + 2 people that's tight. If you want a 10kg check-in bag, it's cheaper to add it now (~&euro;36) than at the airport.</li>
+<li>Birmingham-to-Stroud transfer: plan train/coach from BHX. Arriving 17:55, last direct trains from Birmingham New Street to Stroud run late evening.</li>
+<li>Book seats together (you already have seats, but double-check they're adjacent).</li>
+</ul>
+</div>
+
+<div class="misc-note" style="background:#eaf6ea;border-left-color:#2ecc71">
+<b>Is it too good to be true?</b> No &mdash; nothing suspicious. Ryanair BCN&rarr;BHX is their bread-and-butter cheap route (typically &pound;30&ndash;80 one-way). The page is genuine Ryanair. The only "gotcha" to watch is that <i>Ryanair charges for everything</i> at the airport (bag drop, boarding pass reprint, over-sized cabin bag) &mdash; so pre-pay anything you might need and check-in via app. Your quoted flight matches the trip plan in the itinerary exactly.
+</div>
+</div>
+
+<div class="misc-card">
+<h3>Future trip: UK &rarr; Florianopolis (Brazil) <span class="badge" style="background:#f0a500">IDEA</span></h3>
+<p class="meta">Target: January 2027. Break up the long flight with 1-night stopovers to save money and see cities on the way.</p>
+<ul>
+<li><b>TAP Portugal Stopover</b> &mdash; free 1&ndash;10 nights in Lisbon/Porto. TAP has strong UK&rarr;Brazil routes. <i>Probably best option.</i></li>
+<li><b>Iberia Stopover Hola Madrid</b> &mdash; 1&ndash;6 nights free in Madrid. UK&rarr;MAD&rarr;GRU&rarr;FLN.</li>
+<li><b>Royal Air Maroc</b> &mdash; Casablanca stopover possible.</li>
+<li>Compare with <b>Kiwi.com Nomad</b> multi-city search + <b>Google Flights multi-city</b> for sanity check.</li>
+</ul>
+</div>
+
+</div><!-- /misc -->
+
+<!-- ════════════════════════════════════════════
+     BEFORE WE GO TAB
+     ════════════════════════════════════════════ -->
+<div class="tab-block" data-panel="predep">
+<style>
+.pd-sec{max-width:1100px;margin:0 auto 18px;padding:0 18px}
+.pd-sec h2{margin:0 0 3px;font-size:1.25rem;color:#1e3a5f}
+.pd-sec p{margin:0;color:#777;font-size:.87rem}
+.pd-layout{display:grid;grid-template-columns:250px 1fr;gap:14px;max-width:1100px;margin:0 auto;padding:0 18px 28px}
+/* Pool */
+.pd-pool{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:12px;position:sticky;top:10px;max-height:82vh;overflow-y:auto}
+.pd-pool-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.pd-pool-hdr h3{margin:0;font-size:.9rem;color:#1e3a5f;font-weight:700}
+.pd-pool-hdr button{font-size:.7rem;background:#f0f0ee;border:none;border-radius:6px;padding:3px 8px;cursor:pointer;color:#666}
+.pd-pool-hdr button:hover{background:#ddd}
+.pd-cat-lbl{font-size:.67rem;font-weight:700;letter-spacing:.7px;color:#aaa;text-transform:uppercase;margin:9px 0 3px;padding:0 2px}
+/* Chips */
+.pd-chip{background:#f7f7f5;border:1px solid #e5e5e2;border-radius:7px;padding:5px 7px 5px 8px;margin:3px 0;font-size:.79rem;cursor:grab;display:flex;align-items:flex-start;gap:6px;transition:opacity .15s;line-height:1.35;user-select:none}
+.pd-chip:active{cursor:grabbing}
+.pd-chip.done{opacity:.38;text-decoration:line-through}
+.pd-chip .chip-txt{flex:1}
+.pd-chip .chip-cb{background:none;border:none;cursor:pointer;font-size:.95rem;padding:0;line-height:1;flex-shrink:0;color:#bbb;margin-top:1px}
+.pd-chip .chip-cb:hover{color:#27ae60}
+.pd-chip.done .chip-cb{color:#27ae60}
+/* 2×2 Grid */
+.pd-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pd-quad{border-radius:12px;padding:12px;min-height:200px;border:2px dashed transparent;transition:border-color .15s,background .15s}
+.pd-quad.drag-over{border-style:solid}
+.q-now{background:#fff0f0}.q-now.drag-over{border-color:#e74c3c;background:#fde8e8}
+.q-week{background:#fff9e6}.q-week.drag-over{border-color:#f0a500;background:#fdf0c0}
+.q-day{background:#edfaf1}.q-day.drag-over{border-color:#27ae60;background:#d5f5e3}
+.q-morn{background:#eaf0fb}.q-morn.drag-over{border-color:#2980b9;background:#d6eaf8}
+.pd-quad .qhdr{font-size:.78rem;font-weight:700;letter-spacing:.3px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.q-now .qhdr{color:#c0392b}.q-week .qhdr{color:#b7750a}.q-day .qhdr{color:#1e8449}.q-morn .qhdr{color:#1a5276}
+.qhdr .qcnt{font-size:.68rem;background:rgba(0,0,0,.1);border-radius:9px;padding:1px 6px;font-weight:400}
+.pd-quad .pd-chip{background:rgba(255,255,255,.85);border-color:rgba(0,0,0,.06)}
+.qitems{min-height:140px;display:flex;flex-direction:column;gap:3px}
+/* Trends */
+.tr-wrap{max-width:1100px;margin:0 auto;padding:0 18px 40px}
+.tr-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.tr-hdr h2{margin:0;font-size:1.2rem;color:#1e3a5f}
+.tr-add{background:#e91e8c;color:#fff;border:none;border-radius:8px;padding:7px 15px;font-size:.82rem;cursor:pointer;font-weight:600}
+.tr-add:hover{background:#c2177a}
+.tr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-top:14px}
+.tr-card{background:#fff;border-radius:11px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:13px;border-left:4px solid #e91e8c}
+.tr-card.s-planned{border-left-color:#f0a500}
+.tr-card.s-done{border-left-color:#27ae60;opacity:.7}
+.tr-inp{width:100%;border:1px solid #e8e8e5;border-radius:6px;padding:5px 8px;font-size:.79rem;font-family:inherit;margin-bottom:5px;box-sizing:border-box;color:#333}
+.tr-inp:focus{outline:none;border-color:#e91e8c}
+.tr-row{display:flex;gap:6px;align-items:center;margin-top:4px}
+.tr-sel{font-size:.73rem;border:1px solid #ddd;border-radius:6px;padding:3px 6px;background:#f7f7f5;cursor:pointer;font-family:inherit}
+.tr-del{background:none;border:none;color:#ccc;cursor:pointer;font-size:1rem;margin-left:auto;padding:0;line-height:1}
+.tr-del:hover{color:#e74c3c}
+.tr-empty{color:#ccc;font-size:.88rem;font-style:italic;text-align:center;padding:28px 0}
+</style>
+
+<div class="pd-sec" style="margin-top:4px">
+  <h2>🏠 Before We Go — Stonehouse</h2>
+  <p>Drag each task into the priority grid &middot; tick ✅ when done &middot; Jul 3 departure</p>
+</div>
+
+<div class="pd-layout">
+
+  <!-- Left: pool -->
+  <div class="pd-pool" id="pdPool" ondragover="pdOver(event)" ondrop="pdDrop(event,'pool')" ondragenter="pdEnter(event)" ondragleave="pdLeave(event)">
+    <div class="pd-pool-hdr">
+      <h3>📋 To Sort</h3>
+      <button onclick="pdReset()">↺ Reset</button>
+    </div>
+    <div id="pdPoolItems"></div>
+  </div>
+
+  <!-- Right: 2×2 -->
+  <div class="pd-grid">
+    <div class="pd-quad q-now" ondragover="pdOver(event)" ondrop="pdDrop(event,'now')" ondragenter="pdEnter(event)" ondragleave="pdLeave(event)">
+      <div class="qhdr">🔴 Do First <span class="qcnt" id="cnt-now">0</span></div>
+      <div class="qitems" id="qi-now"></div>
+    </div>
+    <div class="pd-quad q-week" ondragover="pdOver(event)" ondrop="pdDrop(event,'week')" ondragenter="pdEnter(event)" ondragleave="pdLeave(event)">
+      <div class="qhdr">🟡 This Week <span class="qcnt" id="cnt-week">0</span></div>
+      <div class="qitems" id="qi-week"></div>
+    </div>
+    <div class="pd-quad q-day" ondragover="pdOver(event)" ondrop="pdDrop(event,'day')" ondragenter="pdEnter(event)" ondragleave="pdLeave(event)">
+      <div class="qhdr">🟢 Day Before <span class="qcnt" id="cnt-day">0</span></div>
+      <div class="qitems" id="qi-day"></div>
+    </div>
+    <div class="pd-quad q-morn" ondragover="pdOver(event)" ondrop="pdDrop(event,'morn')" ondragenter="pdEnter(event)" ondragleave="pdLeave(event)">
+      <div class="qhdr">💙 Morning of Jul 3 <span class="qcnt" id="cnt-morn">0</span></div>
+      <div class="qitems" id="qi-morn"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Content trends -->
+<div class="tr-wrap">
+  <div class="tr-hdr">
+    <div>
+      <h2>📸 Content &amp; Video Trends to Recreate</h2>
+      <p style="color:#888;font-size:.84rem;margin:2px 0 0">Paste a link, describe the vibe, note what you need. Sorted before you film ✨</p>
+    </div>
+    <button class="tr-add" onclick="pdAddTrend()">+ Add inspo</button>
+  </div>
+  <div class="tr-grid" id="trGrid"></div>
+</div>
+
+<script>
+(function(){
+const PD_TASKS=[
+ {id:'cat1',cat:'🐱 Cat',text:'Stock up on cat food (enough for 11 nights)'},
+ {id:'cat2',cat:'🐱 Cat',text:'Worm treatment'},
+ {id:'cat3',cat:'🐱 Cat',text:'Check / set up Apple AirTag on cat'},
+ {id:'cat4',cat:'🐱 Cat',text:'Cut cat\'s nails'},
+ {id:'cat5',cat:'🐱 Cat',text:'Clean & scoop litter box before leaving'},
+ {id:'cat6',cat:'🐱 Cat',text:'Tidy scratch post area'},
+ {id:'cat7',cat:'🐱 Cat',text:'Arrange cat sitter + leave spare key'},
+ {id:'cat8',cat:'🐱 Cat',text:'Leave vet emergency number visible'},
+ {id:'hse1',cat:'🏠 House',text:'Tidy kitchen'},
+ {id:'hse2',cat:'🏠 House',text:'Tidy bedroom'},
+ {id:'hse3',cat:'🏠 House',text:'Tidy office room'},
+ {id:'hse4',cat:'🏠 House',text:'Put bins out / empty all bins'},
+ {id:'hse5',cat:'🏠 House',text:'Hide valuables & secure the house'},
+ {id:'hse6',cat:'🏠 House',text:'Water plants before leaving'},
+ {id:'hse7',cat:'🏠 House',text:'Lock all windows & doors'},
+ {id:'hse8',cat:'🏠 House',text:'Turn off appliances (kettle, toaster, iron)'},
+ {id:'hse9',cat:'🏠 House',text:'Set timer lights (looks like someone\'s home)'},
+ {id:'hse10',cat:'🏠 House',text:'Ask someone to collect post'},
+ {id:'lnd1',cat:'🧺 Laundry',text:'Run all washes before packing'},
+ {id:'lnd2',cat:'🧺 Laundry',text:'Dry & fold clothes ready to pack'},
+ {id:'pck1',cat:'🧳 Packing',text:'Ed — pack clothes (incl. 1 smart outfit)'},
+ {id:'pck2',cat:'🧳 Packing',text:'Fran — pack clothes (incl. 1 smart outfit)'},
+ {id:'pck3',cat:'🧳 Packing',text:'Sort all charging wires & cables'},
+ {id:'pck4',cat:'🧳 Packing',text:'EU plug adaptors packed'},
+ {id:'pck5',cat:'🧳 Packing',text:'Download boarding passes to Ryanair app'},
+ {id:'pck6',cat:'🧳 Packing',text:'Check passport expiry dates'},
+ {id:'pck7',cat:'🧳 Packing',text:'Notify bank of travel abroad'},
+ {id:'pck8',cat:'🧳 Packing',text:'Medications & prescriptions packed'},
+ {id:'fod1',cat:'🥗 Food',text:'Clean fridge & remove perishables'},
+ {id:'fod2',cat:'🥗 Food',text:'Use up or bin anything that will go off'},
+ {id:'fod3',cat:'🥗 Food',text:'Empty food bins / compost'},
+ {id:'saf1',cat:'🛡️ Safety',text:'Leave trip itinerary with trusted contact'},
+ {id:'saf2',cat:'🛡️ Safety',text:'Travel insurance docs on both phones'},
+ {id:'saf3',cat:'🛡️ Safety',text:'Check smoke alarm batteries'},
+ {id:'saf4',cat:'🛡️ Safety',text:'Download offline maps & entertainment'},
+];
+const SK='pdState_v2',TK='pdTrends_v1';
+let st={locs:{},done:{}},trends=[];
+let dragging=null;
+
+function load(){
+  try{st=JSON.parse(localStorage.getItem(SK))||{locs:{},done:{}};}catch(e){st={locs:{},done:{}};}
+  st.locs=st.locs||{};st.done=st.done||{};
+  try{trends=JSON.parse(localStorage.getItem(TK))||[];}catch(e){trends=[];}
+}
+function save(){localStorage.setItem(SK,JSON.stringify(st));}
+function saveTr(){localStorage.setItem(TK,JSON.stringify(trends));}
+function getLoc(id){return st.locs[id]||'pool';}
+function isDone(id){return!!st.done[id];}
+
+function chip(t){
+  const d=document.createElement('div');
+  d.className='pd-chip'+(isDone(t.id)?' done':'');
+  d.draggable=true;d.dataset.id=t.id;
+  d.innerHTML=`<span class="chip-txt">${t.text}</span><button class="chip-cb" onclick="pdCb('${t.id}')">${isDone(t.id)?'✅':'⬜'}</button>`;
+  d.addEventListener('dragstart',e=>{dragging=t.id;e.dataTransfer.setData('text/plain',t.id);e.dataTransfer.effectAllowed='move';});
+  d.addEventListener('dragend',()=>{dragging=null;});
+  return d;
+}
+
+function renderPool(){
+  const el=document.getElementById('pdPoolItems');if(!el)return;
+  el.innerHTML='';
+  const bycat={};
+  PD_TASKS.forEach(t=>{if(getLoc(t.id)==='pool'){(bycat[t.cat]=bycat[t.cat]||[]).push(t);}});
+  if(!Object.keys(bycat).length){el.innerHTML='<p style="color:#bbb;font-size:.8rem;text-align:center;padding:14px 0">All tasks sorted! ✨</p>';return;}
+  Object.entries(bycat).forEach(([cat,tasks])=>{
+    const l=document.createElement('div');l.className='pd-cat-lbl';l.textContent=cat;el.appendChild(l);
+    tasks.forEach(t=>el.appendChild(chip(t)));
+  });
+}
+function renderQ(loc){
+  const el=document.getElementById('qi-'+loc),cnt=document.getElementById('cnt-'+loc);if(!el)return;
+  el.innerHTML='';
+  const tasks=PD_TASKS.filter(t=>getLoc(t.id)===loc);
+  tasks.forEach(t=>el.appendChild(chip(t)));
+  if(cnt)cnt.textContent=tasks.filter(t=>!isDone(t.id)).length;
+}
+function renderAll(){renderPool();['now','week','day','morn'].forEach(renderQ);}
+
+window.pdOver=function(e){e.preventDefault();e.dataTransfer.dropEffect='move';};
+window.pdEnter=function(e){e.currentTarget.classList.add('drag-over');};
+window.pdLeave=function(e){if(!e.currentTarget.contains(e.relatedTarget))e.currentTarget.classList.remove('drag-over');};
+window.pdDrop=function(e,loc){
+  e.preventDefault();e.currentTarget.classList.remove('drag-over');
+  const id=e.dataTransfer.getData('text/plain')||dragging;if(!id)return;
+  st.locs[id]=loc;save();renderAll();
+};
+window.pdCb=function(id){st.done[id]=!st.done[id];save();renderAll();};
+window.pdReset=function(){if(!confirm('Reset all tasks to pool?'))return;st={locs:{},done:{}};save();renderAll();};
+
+// Trends
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function renderTr(){
+  const g=document.getElementById('trGrid');if(!g)return;
+  if(!trends.length){g.innerHTML='<p class="tr-empty">No inspo saved yet — hit "+ Add inspo" ✨</p>';return;}
+  g.innerHTML='';
+  trends.forEach((tr,i)=>{
+    const c=document.createElement('div');
+    c.className='tr-card s-'+(tr.status||'want');
+    c.innerHTML=`
+      <input class="tr-inp" placeholder="🔗 Instagram / TikTok link" value="${escH(tr.url||'')}" oninput="pdTrUpd(${i},'url',this.value)">
+      <input class="tr-inp" placeholder="✨ Describe the vibe / style..." value="${escH(tr.note||'')}" oninput="pdTrUpd(${i},'note',this.value)">
+      <input class="tr-inp" placeholder="🎬 What we need (outfit, location, prop...)" value="${escH(tr.what||'')}" oninput="pdTrUpd(${i},'what',this.value)">
+      <div class="tr-row">
+        <select class="tr-sel" onchange="pdTrUpd(${i},'status',this.value)">
+          <option value="want"${tr.status==='want'?' selected':''}>💭 Want to try</option>
+          <option value="planned"${tr.status==='planned'?' selected':''}>📌 Planned</option>
+          <option value="done"${tr.status==='done'?' selected':''}>✅ Done</option>
+        </select>
+        <button class="tr-del" onclick="pdTrDel(${i})">✕</button>
+      </div>`;
+    g.appendChild(c);
+  });
+}
+window.pdAddTrend=function(){trends.push({url:'',note:'',what:'',status:'want'});saveTr();renderTr();};
+window.pdTrUpd=function(i,k,v){if(trends[i]){trends[i][k]=v;saveTr();if(k==='status')renderTr();}};
+window.pdTrDel=function(i){if(!confirm('Remove this trend?'))return;trends.splice(i,1);saveTr();renderTr();};
+
+load();renderAll();renderTr();
+})();
+</script>
+
+</div><!-- /predep -->
+
+</div>
+
+<script>
+const R=0.85; // EUR to GBP rate
+
+// Image URLs (Wikimedia Commons 500px thumbnails)
+const IMG={
+eiffel:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg/500px-Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg',
+louvre:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Louvre_Museum_Wikimedia_Commons.jpg/500px-Louvre_Museum_Wikimedia_Commons.jpg',
+sacrecoeur:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Le_sacre_coeur.jpg/500px-Le_sacre_coeur.jpg',
+seine:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Bercy%2C_Paris_01.jpg/500px-Bercy%2C_Paris_01.jpg',
+orsay:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Mus%C3%A9e_d%27Orsay_in_July_2022.jpg/500px-Mus%C3%A9e_d%27Orsay_in_July_2022.jpg',
+orangerie:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Mus%C3%A9e_de_l%27Orangerie_-_panoramio.jpg/500px-Mus%C3%A9e_de_l%27Orangerie_-_panoramio.jpg',
+carnavalet:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Facade_musee_Carnavalet.jpg/500px-Facade_musee_Carnavalet.jpg',
+petitpalais:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Petit_Palais_museum_exterior%2C_Paris_8e_140.jpg/500px-Petit_Palais_museum_exterior%2C_Paris_8e_140.jpg',
+champs:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Avenue_des_Champs-%C3%89lys%C3%A9es_July_24%2C_2009_N1.jpg/500px-Avenue_des_Champs-%C3%89lys%C3%A9es_July_24%2C_2009_N1.jpg',
+montmartre:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/View_from_Notre-Dame_de_Paris%2C_24_June_2014_004.jpg/500px-View_from_Notre-Dame_de_Paris%2C_24_June_2014_004.jpg',
+canal:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/People%2C_Canal_Saint-Martin%2C_Paris_July_2014.jpg/500px-People%2C_Canal_Saint-Martin%2C_Paris_July_2014.jpg',
+fourviere:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Fourviere_Lyon.jpg/500px-Fourviere_Lyon.jpg',
+romanTheatre:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Lyon_-_Lugdunum_-_Th%C3%A9atre_Romain.jpg/500px-Lyon_-_Lugdunum_-_Th%C3%A9atre_Romain.jpg',
+vieuxLyon:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Vieuxlyon_saintjean_toits.jpg/500px-Vieuxlyon_saintjean_toits.jpg',
+halles:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Lyon_3e_-_Halles_de_Lyon-Paul_Bocuse_-_Entr%C3%A9e_livraisons_%28f%C3%A9v_2019%29.jpg/500px-Lyon_3e_-_Halles_de_Lyon-Paul_Bocuse_-_Entr%C3%A9e_livraisons_%28f%C3%A9v_2019%29.jpg',
+montpellier:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Montpellier_fg02.jpg/500px-Montpellier_fg02.jpg',
+jardin:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Montpellier_jardin_plantes3.jpg/500px-Montpellier_jardin_plantes3.jpg',
+castillet:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Perpignan_Castillet_1.jpg/500px-Perpignan_Castillet_1.jpg',
+palace:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Palaisdesrois.jpg/500px-Palaisdesrois.jpg',
+sagrada:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/%CE%A3%CE%B1%CE%B3%CF%81%CE%AC%CE%B4%CE%B1_%CE%A6%CE%B1%CE%BC%CE%AF%CE%BB%CE%B9%CE%B1_2941.jpg/500px-%CE%A3%CE%B1%CE%B3%CF%81%CE%AC%CE%B4%CE%B1_%CE%A6%CE%B1%CE%BC%CE%AF%CE%BB%CE%B9%CE%B1_2941.jpg',
+parkGuell:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Parc_guell_-_panoramio.jpg/500px-Parc_guell_-_panoramio.jpg',
+casaBatllo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Casa_Batllo_Overview_Barcelona_Spain_cut.jpg/500px-Casa_Batllo_Overview_Barcelona_Spain_cut.jpg',
+casaMila:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Casa_Mil%C3%A0%2C_general_view.jpg/500px-Casa_Mil%C3%A0%2C_general_view.jpg',
+gothic:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Barcelona_-_Carrer_del_Bisbe.jpg/500px-Barcelona_-_Carrer_del_Bisbe.jpg',
+palau:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/22_11_01_Palau_DSCF2611_52502512616_cc1e7db845_k.jpg/500px-22_11_01_Palau_DSCF2611_52502512616_cc1e7db845_k.jpg',
+rambla:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/15-10-27-Vista_des_de_l%27est%C3%A0tua_de_Colom_a_Barcelona-WMA_2791.jpg/500px-15-10-27-Vista_des_de_l%27est%C3%A0tua_de_Colom_a_Barcelona-WMA_2791.jpg',
+beach:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Barcelona_Beach.jpg/500px-Barcelona_Beach.jpg',
+gnr:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/GNR_Belgrade_2025_05_%28cropped%29.jpg/500px-GNR_Belgrade_2025_05_%28cropped%29.jpg',
+pulp:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/PulpEventim290723_%28110_of_130%29_%2853082647673%29.jpg/500px-PulpEventim290723_%28110_of_130%29_%2853082647673%29.jpg',
+faithless:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Faithless_-_The_Dance_Never_Ends_at_Budapest_02.jpg/500px-Faithless_-_The_Dance_Never_Ends_at_Budapest_02.jpg',
+tdcc:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Two_Door_Cinema_Club%2C_Bonnaroo_2012_%287188380925%29.jpg/500px-Two_Door_Cinema_Club%2C_Bonnaroo_2012_%287188380925%29.jpg',
+byrne:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/David_Byrne_San_Diego.jpg/500px-David_Byrne_San_Diego.jpg',
+flamenco:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Belen_maya.jpg/500px-Belen_maya.jpg',
+plages:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Paris_Plages_2009%2C_16_Ao%C3%BBt_%285%29.jpg/500px-Paris_Plages_2009%2C_16_Ao%C3%BBt_%285%29.jpg',
+};
+const C={
+paris:{n:'Paris',cl:'#1e3a5f'},lyon:{n:'Lyon',cl:'#7b2252'},
+montpellier:{n:'Montpellier',cl:'#0d6b5e'},perpignan:{n:'Perpignan',cl:'#8b6914'},
+barcelona:{n:'Barcelona',cl:'#922b21'}
+};
+
+// price helper: stores numeric GBP for budget calc
+function ep(eur){return Math.round(eur*R)} // eur to gbp
+
+const OPT={
+'B+':{nm:'Option B+',lab:'The Gaudi Edition',nights:11,dates:'Jul 3-14',
+estLow:1126,estHigh:1920,tag:'Chosen option',
+cities:['paris','lyon','montpellier','barcelona'],
+pr:{hotels:943,transport:183,activities:264,food:357},
+days:[
+// PARIS (Jul 3-7 · 4 nights)
+{dt:'Jul 3',wd:'Fri',c:'paris',t:'Stroud \u2192 BHX \u2192 Arrive Paris-Beauvais (18:00 landing)',evs:[
+{tm:'11:03',n:'\u27a4 Train: Stonehouse \u2192 Birmingham International',ty:'transit',st:'booked',desc:'GWR / West Midlands Railway \u00b7 Change at Cheltenham Spa, then Birmingham New Street \u00b7 Arrives Birmingham International 12:45 \u00b7 Short covered walkway from station to airport terminal \u00b7 Ticket on Franciny\'s phone / email \u00b7 £26.21 total paid',pr:13.105},
+{tm:'13:30',n:'Arrive BHX International \u2014 2hrs 20min before flight',ty:'transit',desc:'Ryanair recommend arriving 2hrs before departure. Go straight to bag drop (Priority boarding). Then security. This window is comfortable but do not linger \u2014 Ryanair closes the gate 30min before.',pr:0},
+{tm:'15:50',n:'Ryanair FR718 Birmingham \u2192 Beauvais',ty:'activity',st:'booked',desc:'BOOKED + CHECKED IN. Res #TSE6JL. Seats 29E (Fran) + 29F (Ed). Priority + 2 cabin bags. E-ticket / boarding pass completed for Jul 3 flight — save offline in Ryanair app and take a screenshot before travel.',pr:0},
+{tm:'18:00',n:'Land Paris-Beauvais (BVA)',ty:'activity',desc:'Small airport 85km NORTH of Paris \u2014 NOT CDG. Passport + bags ~30-45min.',pr:0},
+{tm:'18:45',n:'Beauvais shuttle bus to Porte Maillot',ty:'activity',st:'pending',desc:'Flibco/Aeroport Beauvais coach from right outside the terminal. \u20ac16.90pp one-way. Departs ~20-30min after flight arrival. ~1h15 journey. Book ahead at aeroportbeauvais.com or pay at the terminal kiosk.',pr:14,prMax:17},
+{tm:'20:15',n:'Arrive Porte Maillot (west Paris edge)',ty:'activity',desc:'Terminus of the shuttle. From here take Metro 1 / RER C eastward.',pr:0},
+{tm:'20:30',n:'Metro to Bagnolet hotel',ty:'activity',desc:'Porte Maillot \u2192 M1 east to Nation (~28min, 18 stops) \u2192 M2 north to P\u00e8re Lachaise (5min, 4 stops) \u2192 M3 east to Gallieni terminus (7min, 3 stops). Then 10min walk to hotel on Rue \u00c9tienne Marcel. Total ~55min with bags.',pr:0},
+{tm:'21:30',n:'Check in: Paris hotel, Bagnolet',ty:'activity',st:'booked',desc:'290-302 Rue \u00c9tienne Marcel, 93170 Bagnolet. Ref 6751758443. Reception open 24/7 usually. Drop bags, freshen up.',pr:0},
+{tm:'22:00',n:'Late dinner in Bagnolet / 20th arr',ty:'food',desc:'Grab dinner locally \u2014 the 20th arr (Belleville) has late-open bistros, couscous, Vietnamese, and wine bars. M3 one stop back towards P\u00e8re Lachaise for more options.',pr:20,prMax:35},
+]},
+{dt:'Jul 4',wd:'Sat',c:'paris',t:'Louvre + Notre-Dame',evs:[
+{tm:'07:45',n:'\u27a4 Leave hotel (Bagnolet)',ty:'activity',desc:'Walk 10min to Gallieni M3. M3 west to P\u00e8re Lachaise (3 stops, 7min) \u2192 M2 south to Nation (4 stops, 7min) \u2192 M1 west to Palais Royal-Mus\u00e9e du Louvre (7 stops, 13min). Total ~45min. Arrive Louvre Pyramid by 08:40, queue for 09:00 opening.',pr:0},
+{tm:'09:00',n:'Louvre: Michelangelo & Rodin + sculpture route',ty:'museum',st:'booked',desc:'CONFIRMED \u2014 Timed entry 09:00 booked. Ed: \u20ac32 (non-EEA) \u00b7 Franciny: \u20ac22 (EEA) \u00b7 \u20ac54 total, Franciny paid \u00b7 PDF on Franciny\'s Louvre account. Arrive 08:30. Head STRAIGHT to Mona Lisa (Room 711, Denon) while quiet, then Winged Victory, then Michelangelo & Rodin in Hall Napoleon. After: Cour Marly + Cour Puget sculpture courtyards, Venus de Milo. Exit by 12:00.',pr:22.98,link:'https://www.louvre.fr/en/visit'},
+{tm:'12:00',n:'Lunch near the Louvre / Tuileries',ty:'food',desc:'Quick bistro lunch in the 1st arr. Many cheap options in the nearby Les Halles area.',pr:15,prMax:25,opt:true},
+{tm:'13:00',n:'Walk Seine bookstalls \u2192 Ile de la Cite',ty:'activity',desc:'Walk east along the river \u2014 10min from the Louvre to the bookstalls. Browse the green boxes, then cross Pont Neuf or Pont au Change to Ile de la Cite.',pr:0},
+{tm:'14:00',n:'Notre-Dame Cathedral',ty:'museum',desc:'Reopened late 2024 after the fire. Exterior + parvis free. Interior free but timed-slot only \u2014 book via notredamedeparis.fr. ~45min.',pr:0,link:'https://www.notredamedeparis.fr/en/'},
+{tm:'15:30',n:'Paris Plages (riverside stroll)',ty:'free',desc:'Walk west along the Seine from Ile de la Cite. Urban beaches, US Independence Day 250th celebrations.',pr:0},
+{tm:'17:00',n:'Fnac Live Festival (drop in)',ty:'free',desc:'Free open-air music festival at Paris City Hall (H\u00f4tel de Ville). Runs 6pm-midnight. Free ticket from any Fnac store during the day.',pr:0,opt:true},
+{tm:'20:00',n:'Late dinner near H\u00f4tel de Ville / Marais',ty:'food',desc:'Stay for dinner in the 4th arr \u2014 plenty of bistros, wine bars, and late-night options around the Marais. Linger at the festival if you like.',pr:18,prMax:30,opt:true},
+{tm:'22:30',n:'\u27a4 Return to hotel',ty:'activity',desc:'From H\u00f4tel de Ville: M1 east to Nation (~15min) \u2192 M3 to Gallieni (~8min) \u2192 walk ~10min. Home around 23:15.',pr:0},
+]},
+{dt:'Jul 5',wd:'Sun',c:'paris',t:'BIRTHDAY',bday:true,evs:[
+{tm:'09:15',n:'\u27a4 Leave hotel (Bagnolet)',ty:'transit',desc:'Walk 10min to Gallieni. M3 \u2192 Op\u00e9ra (~20min) \u2192 M8 west \u2192 Franklin D. Roosevelt (2 stops, ~4min) \u2192 walk 3min to Petit Palais. Total ~40min. Arrive just before 10:00 opening.',pr:0},
+{tm:'10:00',n:'Petit Palais: Mus\u00e9e des Beaux-Arts de la Ville de Paris',ty:'museum',desc:'FREE \u2014 no booking, no timed entry, just walk in. If there\'s a queue at the main entrance, use the side entrance on the right \u2014 usually no queue at all. One of the most overlooked museums in Paris. Beaux-Arts building with a domed glass ceiling and secret garden courtyard. Monet, Renoir, Courbet, Rubens, Rembrandt, Delacroix, Art Nouveau jewellery. Allow ~2hrs.',pr:0,link:'https://www.petitpalais.paris.fr/en'},
+{tm:'12:00',n:'Walk to Champs-\u00c9lys\u00e9es',ty:'activity',desc:'Petit Palais exits onto Avenue Winston Churchill \u2014 turn left and you\'re on the Champs in 3 minutes. Head up towards the Arc de Triomphe to find a great viewing spot before the Carnaval crowd fills in.',pr:0},
+{tm:'13:00',n:'Carnaval Tropical de Paris',ty:'free',desc:'4,000+ dancers parade Champs-Elysees from 1pm. Brazilian/Amazon theme \u2014 samba, carnival costumes, steel drums.',pr:0},
+{tm:'15:00',n:'Metro to Mus\u00e9e Carnavalet (Marais)',ty:'transit',desc:'M1 from George V east to Saint-Paul (~15min, 9 stops) \u2192 5min walk to 23 Rue de S\u00e9vign\u00e9.',pr:0},
+{tm:'15:15',n:'Mus\u00e9e Carnavalet: History of Paris',ty:'museum',desc:'Permanent collection is FREE \u2014 no mandatory booking. You can just walk in (confirmed on official site). They also offer optional free zero-euro timed slots at carnavalet.paris.fr which skip any wait \u2014 worth trying to grab one. If you couldn\'t book it, that\'s because you were probably on the paid temporary exhibitions page \u2014 the permanent collection is different. Paris history in two 17th-century Marais mansions. Proust\'s reconstructed bedroom. Art Nouveau rooms by Mucha. Open until 18:00.',pr:0,link:'https://www.carnavalet.paris.fr/en/visit/pratical-information'},
+{tm:'17:30',n:'Back to hotel to change for dinner',ty:'activity',desc:'Marais \u2192 hotel: M11 from Rambuteau \u2192 Mairie des Lilas (direct, 20min) \u2192 walk. Or M8/M9 via R\u00e9publique \u2192 Gallieni. ~35min.',pr:0},
+{tm:'19:15',n:'\u27a4 Leave hotel — head to Bateaux Parisiens pier',ty:'transit',desc:'Gallieni \u2192 M3 \u2192 Op\u00e9ra \u2192 M8 \u2192 Bir-Hakeim (Line 6) OR RER C to Champ de Mars Tour Eiffel. ~45min. Pier 5 or 7, Port de la Bourdonnais, 75007 Paris (near Eiffel Tower). MUST ARRIVE BY 20:15.',pr:0},
+{tm:'20:30',n:'🛥️ Seine Birthday Dinner Cruise — Bateaux Parisiens',ty:'activity',st:'booked',desc:'✅ BOOKED — Privilege Service &middot; Booking #4570106 &middot; Pier 5 or 7, Port de la Bourdonnais, 75007 Paris &middot; €370 total / £314.50 🎁 paid exclusively by Ed (birthday gift to Franciny) &middot; CHECK-IN BY 20:15 (15 min early) &middot; 2.5hr cruise ending ~23:00 &middot; Window seating included &middot; Champagne &amp; wine at table &middot; Smart attire required (no shorts, flip-flops, sportswear) &middot; Bring printed confirmation &middot; Metro: Line 6 Bir-Hakeim or RER C Champ de Mars',pr:157.25},
+{tm:'22:30',n:'\u27a4 Return to hotel',ty:'activity',desc:'Cruise ends around 22:30. From Pont de l\'Alma: RER C or M9 to P\u00e8re Lachaise (~30min) \u2192 M3 to Gallieni (~8min) \u2192 walk (~10min). Home ~midnight.',pr:0},
+]},
+{dt:'Jul 6',wd:'Mon',c:'paris',t:'Montmartre + Eiffel Tower',evs:[
+{tm:'09:15',n:'\u27a4 Leave hotel for Sacr\u00e9-C\u0153ur',ty:'activity',desc:'Walk to Gallieni. M3 west to P\u00e8re Lachaise (7min) \u2192 M2 north to Anvers (~12min, 7 stops) \u2192 walk up the hill or Funicul\u00e2ire (~10min). Total ~45min.',pr:0},
+{tm:'10:00',n:'Sacre-Coeur & Montmartre',ty:'activity',desc:'Hilltop basilica, panoramic views, artists\' square (Place du Tertre). Free.',pr:0},
+{tm:'12:30',n:'Lunch in Montmartre',ty:'food',desc:'Cafe terrace lunch around Abbesses. Cheaper than the tourist traps right by the basilica.',pr:15,prMax:25,opt:true},
+{tm:'14:00',n:'Metro to Canal Saint-Martin',ty:'activity',desc:'M12 from Abbesses south to Madeleine (~10min) \u2192 M8 to R\u00e9publique (~8min) \u2192 walk east to canal. OR faster: M2 from Anvers to Jaur\u00e8s \u2192 walk south. ~25min.',pr:0},
+{tm:'14:30',n:'Canal Saint-Martin',ty:'activity',desc:'Tree-lined canal walk, iron footbridges. Du Pain et des Id\u00e9es at 34 Rue Yves Toudic for pastries.',pr:0},
+{tm:'16:00',n:'\u27a4 Metro to Eiffel Tower',ty:'activity',desc:'Canal St-Martin area \u2192 M5 to R\u00e9publique \u2192 M9 to Trocad\u00e9ro (classic photo approach, ~30min) OR M8 to \u00c9cole Militaire + walk. Aim to arrive at the entry queue by 17:15.',pr:0},
+{tm:'17:30',n:'Eiffel Tower: Top Floor by Lifts',ty:'museum',st:'booked',desc:'CONFIRMED &mdash; \u00a367.54 / \u20ac73.40 paid (Franciny). 2 Adult tickets. To the top \u2014 276m. Sunset 21:51, so you\'ll be at the summit through golden hour and into blue hour. Champagne bar at the summit (Mo\u00ebt by the glass), Pierre Herm\u00e9 macarons on the 2nd floor. Allow 2hrs+. QR: 341262010089686723 &amp; 341262010089686811 &middot; Purchase #262010275340.',pr:33.77,link:'https://ticket.toureiffel.paris/en'},
+{tm:'20:00',n:'Dinner near Champ de Mars',ty:'food',desc:'Last Paris dinner. Bistros around Rue Cler (7th arr) stay open late. Or a casual bite with the Eiffel Tower glittering behind you.',pr:18,prMax:30,opt:true},
+{tm:'21:30',n:'\u27a4 Return to hotel',ty:'activity',desc:'From Champ de Mars/Bir-Hakeim: M6 east to Nation \u2192 M3 to Gallieni \u2192 walk. ~45min. Pack for Lyon tomorrow \u2014 train departs Jul 7.',pr:0},
+]},
+
+// LYON (Jul 7-8 · 1 night · arrive Tue, full day Wed)
+{dt:'Jul 7',wd:'Tue',c:'lyon',t:'Paris → Lyon 🧳 Checkout + Travel',travel:true,evs:[
+{tm:'09:30',n:'Checkout hotelF1 + pack for train',ty:'activity',desc:'Paris to Lyon train is now booked for 12:26, so keep this as a clean checkout-and-station morning. Catacombs no longer fits safely before the train.',pr:0},
+{tm:'10:15',n:'Metro/taxi to Paris Gare de Lyon',ty:'activity',desc:'Leave Bagnolet with bags. Metro route is about 35-45min with changes; taxi is simpler if bags feel annoying. Aim to be inside Gare de Lyon by 11:20 at the latest.',pr:0},
+{tm:'11:20',n:'Lunch / supplies at Gare de Lyon',ty:'food',desc:'Grab sandwiches, water and snacks before boarding. OUIGO has no proper onboard catering, so buy food before the platform.',pr:12,prMax:25,opt:true},
+{tm:'11:46',n:'OUIGO boarding opens',ty:'transit',st:'booked',desc:'BOOKED by Franciny — Ref UUTZ5J. Boarding opens 40 minutes before departure. Boarding closes 5 minutes before departure at 12:21, so do not arrive last-minute.',pr:0},
+{tm:'12:26',n:'✅ OUIGO Paris Gare de Lyon → Lyon Part-Dieu',ty:'activity',st:'booked',desc:'CONFIRMED — Train n°7803 &middot; 12:26→14:22 &middot; 1h56 &middot; €76 total paid by Franciny &middot; Ticket exchangeable under conditions and non-refundable &middot; Tickets downloadable from 03 Jul 2026.',pr:32.825},
+{tm:'14:22',n:'Arrive Lyon Part-Dieu → Quadraverde apartment',ty:'activity',desc:'From Lyon Part-Dieu, take Metro/transport toward Vieux-Lyon/Saint-Paul or taxi to Quadraverde. Address: 6 rue Nicolas Sicard. Get door code from property in advance.',pr:0},
+{tm:'15:15',n:'Check in / bag drop at Quadraverde apartment',ty:'activity',st:'booked',desc:'✅ BOOKED — Conf. #5856674449, PIN 0831 &middot; 6 rue Nicolas Sicard, Vieux-Lyon 5th arr. &middot; Check-in from 16:00 officially; ask host if early bag drop/check-in is possible &middot; Contact: +33 6 81 42 52 42 &middot; No meals — kitchenette in apartment',pr:0},
+{tm:'16:30',n:'Vieux Lyon wander',ty:'activity',desc:'Renaissance old town. Cobblestones, painted facades. Earlier arrival gives a gentler afternoon before dinner.',pr:0},
+{tm:'19:30',n:'Dinner at a bouchon',ty:'food',desc:'Lyon\'s signature bistros. Quenelles, salade lyonnaise, praline tart.',pr:17,prMax:30},
+]},
+{dt:'Jul 8',wd:'Wed',c:'lyon',t:'Lyon Full Day 🧳 Checkout + Evening Train',travel:true,evs:[
+{tm:'09:00',n:'🧳 CHECKOUT DAY — bags stay at hotel all day',ty:'transit',desc:'Check out of Quadraverde by 11:00. Ask host to hold your bags if possible (small apartment — confirm in advance). You\'ll collect them at 16:30 before the train — so you\'re bag-free all day for Fourviere and Les Halles.',pr:0},
+{tm:'09:30',n:'Fourviere Basilica + Roman theatre',ty:'activity',desc:'Funicular up. Panoramic views. Walk through the 2000-year-old amphitheatre ruins. Free. No French needed.',pr:0},
+{tm:'12:00',n:'Les Halles de Lyon Paul Bocuse',ty:'food',desc:'Legendary food hall. 60 stalls: oysters, charcuterie, cheese, pastries. Lunch heaven.',pr:13,prMax:26},
+{tm:'14:30',n:'Traboules walk, Vieux Lyon',ty:'activity',desc:'Secret Renaissance passageways. Cour des Voraces hidden courtyard. Free.',pr:0},
+{tm:'09:45',n:'Collect bags + leave Quadraverde',ty:'activity',desc:'Train is now 11:10 from Lyon Part-Dieu. Leave Vieux-Lyon with bags around 09:45-10:00 so you are not rushed.',pr:0},
+{tm:'10:20',n:'Arrive Lyon Part-Dieu / buy snacks',ty:'transit',desc:'OUIGO boarding opens 30 minutes before departure and closes 5 minutes before departure. Be at the station early with food/water bought before boarding.',pr:0},
+{tm:'10:40',n:'OUIGO boarding opens',ty:'transit',st:'booked',desc:'BOOKED by Franciny — Ref DZY82B. Boarding opens 30 minutes before departure and closes at 11:05.',pr:0},
+{tm:'11:10',n:'✅ OUIGO Lyon Part-Dieu → Montpellier Sud-de-France',ty:'activity',st:'booked',desc:'CONFIRMED — Train n°7867 &middot; 11:10→12:56 &middot; 1h46 &middot; €66 total paid by Franciny &middot; OUIGO Essentiel &middot; Seats: Coach 7, Places 771 + 772 &middot; 2 hand bags + 2 cabin bags included &middot; Tickets downloadable from 04 Jul 2026 &middot; Exchangeable under conditions and non-refundable.',pr:28.505},
+{tm:'12:56',n:'Arrive Montpellier Sud-de-France → hotel',ty:'transit',st:'booked',desc:'Important: this is Montpellier Sud-de-France, not central Saint-Roch. Take the shuttle/tram connection or taxi to Premiere Classe Montpellier Ouest / Saint-Jean-de-Védas. Hotel booked — Conf. #5856649209; check-in from 15:00.',pr:0},
+{tm:'15:00',n:'Check in Premiere Classe Montpellier Ouest',ty:'activity',st:'booked',desc:'BOOKED — Conf. #5856649209 · PIN 7615 · Allée Jean-Monnet, Saint-Jean-de-Védas · Check-in 15:00-21:00 · Non-refundable · Paid by Franciny.',pr:0},
+{tm:'20:30',n:'Dinner on Place de la Comédie',ty:'food',desc:'Evening dinner on Montpellier\'s main square after settling in.',pr:15,prMax:25},
+]},
+
+// MONTPELLIER (Jul 8-10 · 2 nights)
+{dt:'Jul 9',wd:'Thu',c:'montpellier',t:'Montpellier: Beach + City',evs:[
+{tm:'09:30',n:'Proper beach morning: Palavas-les-Flots',ty:'activity',desc:'Mediterranean beach time before the city afternoon. From Montpellier, take tram/bus toward Palavas and plan roughly 09:30-12:30 for swim, sand, coffee and a slow reset.',pr:0},
+{tm:'14:00',n:'Arc de Triomphe + Promenade du Peyrou',ty:'activity',desc:'Montpellier\'s own mini Arc + shaded promenade with aqueduct views.',pr:0},
+{tm:'16:00',n:'Jardin des Plantes',ty:'activity',desc:'Oldest botanical garden in France (1593). Free. Peaceful, shaded.',pr:0},
+{tm:'20:00',n:'Festival Radio France: Bertrand Chamayou piano',ty:'concert',desc:'Music, not a French-language show: "De Mendelssohn a Lennon" at Opera Comedie. Mostly instrumental piano, so French is only for signs/program notes. Keep only if you fancy a proper classical/piano night; otherwise skip and do dinner in Comedie.',pr:20,opt:true,link:'https://www.montpellier-tourisme.fr/agenda/tout-l-agenda/festival-radio-france-occitanie-montpellier-montpellier-fr-5363661/'},
+{tm:'21:00',n:'Dinner + Comedie evening',ty:'food',desc:'The main square at night: street performers, lit cafes.',pr:15,prMax:25},
+]},
+{dt:'Jul 10',wd:'Fri',c:'montpellier',t:'Montpellier → Barcelona 🧳 Checkout + Friday Evening Options',travel:true,evs:[
+{tm:'08:45',n:'Breakfast + pack in Montpellier',ty:'food',desc:'Keep this morning calm. Pack chargers, tickets, passports/ID and water/snacks for the bus before leaving the hotel.',pr:8,prMax:15,opt:true},
+{tm:'09:45',n:'Checkout Premiere Classe',ty:'activity',desc:'Checkout with bags. The hotel is not central and the bus leaves from Montpellier Sabines, so do not plan sightseeing this morning.',pr:0},
+{tm:'10:00',n:'Travel to Montpellier Sabines bus station',ty:'transit',desc:'Go from Premiere Classe Montpellier Ouest / Saint-Jean-de-Védas to Montpellier Gare Routière Sabines. Allow 30-40min by tram/taxi with bags, even if maps says less.',pr:0},
+{tm:'10:45',n:'Arrive at Montpellier Sabines buffer',ty:'transit',desc:'Aim to be at the bus station 45-55min before departure. Find the correct FlixBus stop/platform, use toilets, buy water/snacks, and keep the QR ticket ready.',pr:0},
+{tm:'11:10',n:'FlixBus boarding buffer',ty:'transit',st:'booked',desc:'Be ready at the stop about 30min before departure. FlixBus can board early and will not wait if you are away from the stand.',pr:0},
+{tm:'11:40',n:'✅ FlixBus Montpellier Sabines → Barcelona Nord',ty:'activity',st:'booked',desc:'BOOKED by Franciny — Booking #335 491 8981 &middot; £64.96 paid &middot; Fri 10 Jul 2026 &middot; Montpellier (Sabines) 11:40 → Barcelona (Bus Terminal Nord) 16:30 &middot; Confirmation email sent to franciny2210@gmail.com.',pr:32.48,link:'https://www.flixbus.com/'},
+{tm:'16:30',n:'Arrive Barcelona Nord',ty:'transit',st:'booked',desc:'Scheduled arrival at Barcelona Bus Terminal Nord. Build in a realistic 15-20min exit/toilet/bag reset before transferring to the hotel.',pr:0},
+{tm:'16:50',n:'Barcelona Nord → Hotel Sagrada Familia',ty:'transit',desc:'Transfer to Hotel Sagrada Familia, Calle Còrsega 541. Taxi is simplest with bags (~15-25min depending on traffic); metro/tram can work but allow ~30-40min door-to-door.',pr:0},
+{tm:'17:30',n:'Check in Hotel Sagrada Familia',ty:'activity',st:'booked',desc:'✅ BOOKED — Conf. #26051370464 &middot; Calle Còrsega 541 &middot; Check-in from 14:00 &middot; PIN 8704986 &middot; Drop bags, freshen up.',pr:0},
+{tm:'19:30',n:'Culture option: Grec Festival theatre',ty:'activity',desc:'Grec Festival has several Friday-night performing arts options around the city, including Dorian Gray at Teatre Romea and No miris at CCCB. Better if you want theatre/dance/culture rather than another big music crowd.',pr:18,prMax:42,opt:true,link:'https://www.barcelona.cat/grec/en'},
+{tm:'20:30',n:'Easy option: flamenco in the Gothic Quarter',ty:'activity',desc:'Los Tarantos / similar tablao flamenco is short, central and low-commitment after the train. Good if you want dinner nearby and do not want a late night before Saturday Cruïlla.',pr:25,prMax:45,opt:true,link:'https://www.lostarantosbarcelona.com/en/'},
+{tm:'16:30',n:'Big-night option: Stephan Bodzin open-air electronic',ty:'concert',desc:'Beachside progressive house/techno at Seasea Club, 16:30-23:30. Only pick this if you want a proper electronic night; it is less relaxed and starts before you may be settled.',pr:15,prMax:35,opt:true,link:'https://ra.co/events/2387915'},
+]},
+
+// BARCELONA (Jul 10-14 · 4 nights)
+{dt:'Jul 11',wd:'Sat',c:'barcelona',t:'Gaudi Day + Cruïlla Festival',evs:[
+{tm:'08:40',n:'Leave Hotel Sagrada Familia → C/ Marina entrance',ty:'transit',desc:'Hotel is very close to the basilica. Leave around 08:40 for the 09:00 booked entry so you have a calm buffer for security and the C/ Marina access point. Bring official photo ID.',pr:0},
+{tm:'09:00',n:'✅ Sagrada Família with Towers',ty:'museum',st:'booked',desc:'BOOKED by Franciny — Locator 99295241 &middot; 2 General tickets &middot; €72 total paid &middot; Basilica entry 09:00 &middot; Passion facade tower 09:30 &middot; Download Sagrada Família Oficial app for tickets + audioguide before arrival &middot; Non-transferable; official photo ID required.',pr:31.10,link:'https://sagradafamilia.org/en/tickets'},
+{tm:'12:15',n:'Sagrada Família → Passeig de Gràcia / Casa Batlló',ty:'transit',desc:'Metro L2 from Sagrada Família to Passeig de Gràcia or taxi if tired. Allow 20-30min including walking. Aim to be nearby before the 13:00 Casa Batlló slot.',pr:0},
+{tm:'12:35',n:'Quick bite near Passeig de Gràcia',ty:'food',desc:'Small lunch/snack before Casa Batlló: sandwich, pastry, tapas counter, or coffee nearby. Keep it light because entry is at 13:00.',pr:10,prMax:18,opt:true},
+{tm:'13:00',n:'✅ Casa Batlló Silver APP',ty:'museum',st:'booked',desc:'BOOKED by Franciny — Locator 99296724 &middot; 2 Adult Silver APP tickets &middot; €68 total paid &middot; Passeig de Gràcia 43 &middot; Silver Upgrade included &middot; Download Gaudí App for tickets + immersive audioguide before arrival &middot; Bring headphones and enough battery.',pr:29.375,link:'https://www.casabatllo.es/en/online-tickets/'},
+{tm:'15:15',n:'Casa Batlló → hotel reset',ty:'transit',desc:'Return to Hotel Sagrada Familia to rest, charge phones, change if needed, and grab festival tickets/screenshots. Metro/taxi roughly 20-30min.',pr:0},
+{tm:'16:10',n:'Leave hotel → Parc del Fòrum for Cruïlla',ty:'transit',desc:'Festival starts at 17:00. From Hotel Sagrada Familia: metro/tram route is roughly 35-45min depending on connections. Eat something before you go so you are not relying only on festival food.',pr:0},
+{tm:'17:00',n:'✅ Festival Cruïlla 2026 — General Saturday tickets',ty:'festival',st:'booked',desc:'BOOKED by Franciny — 2 General Dissabte tickets &middot; Purchase code ZX96E1BB92D3 &middot; Parc del Fòrum &middot; Total €191.40 paid (€174 tickets + €17.40 fees) &middot; Download PDF or Passbook from the confirmation email before travel.',pr:82.80,link:'https://tickets.oneboxtds.com/cruilla/events?hl=en-US'},
+{tm:'TBC',n:'Two Door Cinema Club at Cruïlla Festival',ty:'festival',img:IMG.tdcc,desc:'Northern Irish indie-pop trio. "What You Know," "Something Good Can Work," "Sun." Exact 2026 set time still TBC — check official schedule closer to July.',pr:0,link:'https://www.cruillabarcelona.cat/en/artists/two-door-cinema-club/'},
+{tm:'TBC',n:'Faithless at Cruïlla Festival',ty:'festival',img:IMG.faithless,desc:'British electronic legends. "Insomnia," "God Is a DJ," "We Come 1." Included in the Saturday festival ticket; exact set time TBC.',pr:0},
+{tm:'TBC',n:'The Hives at Cruïlla Festival',ty:'festival',desc:'Swedish garage rock in matching black-and-white suits. Included in the Saturday festival ticket; exact set time TBC.',pr:0},
+]},
+{dt:'Jul 12',wd:'Sun',c:'barcelona',t:'Barcelona: Park Guell + Gothic Quarter',evs:[
+{tm:'08:35',n:'Leave hotel → Park Güell',ty:'transit',desc:'From Hotel Sagrada Familia, allow about 40-50min by metro/bus/taxi because Park Güell is uphill. Leave 08:35 for the 09:30 booked ticket.',pr:0},
+{tm:'09:30',n:'✅ Park Güell admission',ty:'museum',st:'booked',desc:'BOOKED by Franciny — Locator 700204231262 &middot; Order 326171434752 &middot; Authorisation 249699 &middot; 2 General tickets &middot; €36 total paid &middot; Reserved time 09:30. Tickets are valid only until 10:00, so do not be late.',pr:15.55,link:'https://parkguell.barcelona/en/buy-tickets'},
+{tm:'10:45',n:'Park Güell → La Boqueria / Las Ramblas',ty:'transit',desc:'Taxi is easiest after the uphill park visit. Public transport also works but can be fiddly; allow 35-45min.',pr:0},
+{tm:'12:00',n:'La Boqueria market',ty:'food',desc:'Iconic food market off Las Ramblas. Fresh juice, jamon, tapas counters.',pr:0},
+{tm:'14:00',n:'Museum of Contemporary Art',ty:'museum',desc:'Free Saturday afternoons. 30th anniversary collection show.',pr:0,opt:true},
+{tm:'17:00',n:'Gothic Quarter wander',ty:'activity',desc:'Cathedral, Placa Reial, narrow medieval alleys, street musicians.',pr:0},
+]},
+{dt:'Jul 13',wd:'Mon',c:'barcelona',t:'Barcelona: Beach + Relaxed Day',evs:[
+{tm:'09:00',n:'Leave hotel → Barceloneta beach',ty:'transit',desc:'Metro/bus or taxi from Sagrada Família area to Barceloneta. Allow ~25-35min. Bring swimwear, towel, suncream, and a small bag you can keep close.',pr:0},
+{tm:'09:30',n:'Barceloneta beach block',ty:'activity',desc:'This is the main Barcelona beach time: swim, sand, chiringuito coffee/breakfast, and no rushing. Aim for roughly 09:30-12:30, then rinse/change before lunch.',pr:0},
+{tm:'13:00',n:'Lunch by the beach or in El Born',ty:'food',desc:'Either stay beachside for seafood/paella, or walk/taxi into El Born for tapas + vermouth hour.',pr:13,prMax:21,opt:true},
+{tm:'14:25',n:'Leave lunch area → Palau de la Música',ty:'transit',desc:'If doing flamenco, leave the beach/El Born area by 14:25 and arrive early. Palau de la Música is central but you do not want to rush entry.',pr:0,opt:true},
+{tm:'15:00',n:'Flamenco at Palau de la Musica',ty:'activity',desc:'Gran Gala Flamenco in a UNESCO stained-glass concert hall. World-class dancers.',pr:26,prMax:47,opt:true},
+{tm:'17:00',n:'Hotel/rest stop before sunset',ty:'transit',desc:'Optional reset after flamenco/beach: shower, change, charge phones, then head out again for sunset if you still have energy.',pr:0,opt:true},
+{tm:'18:00',n:'Bunkers del Carmel sunset',ty:'activity',desc:'Old anti-aircraft bunkers with 360\u00b0 city panorama. Best free sunset spot in Barcelona.',pr:0},
+{tm:'21:30',n:'Montjuic Magic Fountain',ty:'free',desc:'Free light + music + water show. Coloured fountains dance in front of the National Art Museum.',pr:0},
+]},
+{dt:'Jul 14',wd:'Tue',c:'barcelona',t:'Fly Home 🧳 Gentle Morning + Airport',evs:[
+{tm:'08:30',n:'Final Sagrada Família neighbourhood breakfast',ty:'food',desc:'Easy final morning near the hotel: coffee, pastry, and one last look/photo around Sagrada Família. Keep it local — no beach today, because the flight needs a proper airport buffer.',pr:10,prMax:18,opt:true},
+{tm:'10:00',n:'Pack, check room, download tickets',ty:'activity',desc:'Pack calmly, check passports/cards/chargers, download boarding passes and festival PDFs offline, and take screenshots. Hotel Sagrada Familia checkout is by 11:00.',pr:0},
+{tm:'11:00',n:'Checkout + bags to Barcelona Sants',ty:'transit',desc:'Metro L5 westbound from Sagrada Família / Hospital Clínic direction to Sants Estació. Keep this simple with luggage; allow ~20min door-to-door.',pr:0},
+{tm:'11:40',n:'Arrive Sants + find airport train/platform',ty:'transit',desc:'Give yourselves a calm buffer at Barcelona Sants with luggage. Buy/check ticket, find the R2 Nord airport train or switch to Aerobus/taxi if train timing is awkward.',pr:0},
+{tm:'12:00',n:'Sants \u2192 Barcelona Airport (T2)',ty:'activity',desc:'Option 1 (cheapest, \u20ac3): Renfe R2 Nord train from Sants \u2192 BCN Aeroport T2, ~25min, runs every 30min. Option 2: Aerobus \u20ac7, door-to-door from Pl. Catalunya. Option 3: Taxi \u20ac40. Ryanair flies from T2.',pr:3,prMax:7},
+{tm:'13:00',n:'Arrive BCN airport, check in',ty:'activity',desc:'Arrive 3hrs before the 16:30 Ryanair flight to Birmingham (budget airlines require full time margin).',pr:0},
+{tm:'16:30',n:'Ryanair FR3792 BCN \u2192 Birmingham',ty:'activity',st:'booked',desc:'BOOKED. Res #Q2GDRW. Priority + 2 cabin bags. Seats purchased (numbers TBC via app). Direct 2h25. Check-in opens 60 days before = May 15 at 16:30 \u2014 do via Ryanair app ASAP.',pr:0},
+{tm:'17:55',n:'Land BHX \u2014 home stretch! \ud83c\udfe0',ty:'transit',desc:'Arrive Birmingham International (BHX). Follow signs for passport control.',pr:0},
+{tm:'18:30',n:'Clear passport control + collect bags',ty:'transit',desc:'EU passports \u2014 use eGates for speed. Allow ~30-40min for passport control + baggage reclaim. Bags usually on belt within 20min of landing.',pr:0},
+{tm:'18:45',n:'\u27a4 BHX International \u2192 Birmingham New Street',ty:'transit',st:'pending',desc:'Short covered walkway from terminal to Birmingham International railway station. West Midlands Railway Cross-City line to Birmingham New Street. ~15min journey.',pr:12,prMax:15},
+{tm:'19:15',n:'\u27a4 Birmingham New Street \u2192 Stroud',ty:'transit',st:'pending',desc:'GWR service towards Cheltenham / Gloucester / Bristol. ~1h10 to Stroud. Trains run approximately every 30min in the evening \u2014 check live departures on National Rail app. Platform usually 7-10.',pr:22,prMax:28},
+{tm:'20:30',n:'Arrive Stroud \u2014 end of trip! \ud83c\udf89',ty:'transit',desc:'Welcome home after 11 nights away! Paris \u2192 Lyon \u2192 Montpellier \u2192 Barcelona \u2192 back. Total adventure complete.',pr:0},
+]}
+]},
+
+};
+
+const VIS=[
+// PARIS
+{c:'paris',r:3,n:'Eiffel Tower',s:'Icon of Paris',plan:'Mon 6 Jul · 17:30 — Top Floor ✅ BOOKED',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg/500px-Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg'},
+{c:'paris',r:3,n:'Arc de Triomphe',s:'Top of the Champs-Elysees',plan:'Sun 5 Jul · 13:00 — seen from Champs-Élysées / Carnaval backdrop',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Arc_de_Triomphe%2C_Paris_21_October_2010.jpg/500px-Arc_de_Triomphe%2C_Paris_21_October_2010.jpg'},
+{c:'paris',r:2,n:'Champs-Elysees',s:'The world\'s most famous avenue',plan:'Sun 5 Jul · 12:30–14:00 — walk + Carnaval Tropical parade',img:IMG.champs},
+{c:'paris',r:3,n:'Notre-Dame',s:'Gothic cathedral on Ile de la Cite',plan:'Sat 4 Jul · 14:00 — exterior + interior (timed slot needed)',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Notre-Dame_de_Paris%2C_4_October_2017.jpg/500px-Notre-Dame_de_Paris%2C_4_October_2017.jpg'},
+{c:'paris',r:3,n:'The Louvre',s:'Michelangelo & Rodin show',plan:'Sat 4 Jul · 09:00 — Michelangelo & Rodin combi ✅ BOOKED',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Louvre_Museum_Wikimedia_Commons.jpg/500px-Louvre_Museum_Wikimedia_Commons.jpg'},
+{c:'paris',r:3,n:'Musee d\'Orsay',s:'Impressionists in a grand station',plan:null,img:IMG.orsay},
+{c:'paris',r:3,n:'Musée de l\'Orangerie',s:'Monet\'s Water Lilies — the real thing',plan:null,img:IMG.orangerie},
+{c:'paris',r:3,n:'Petit Palais',s:'Free Beaux-Arts gem on the Champs',plan:'Sun 5 Jul · 10:00 — free, no booking, right on the Champs',img:IMG.petitpalais},
+{c:'paris',r:2,n:'Musée Carnavalet',s:'History of Paris — free, walk in',plan:'Sun 5 Jul · 15:15 — History of Paris, free entry',img:IMG.carnavalet},
+{c:'paris',r:3,n:'Sacre-Coeur',s:'Montmartre hilltop views',plan:'Mon 6 Jul · 10:00 — basilica + Place du Tertre',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Le_sacre_coeur.jpg/500px-Le_sacre_coeur.jpg'},
+{c:'paris',r:3,n:'Montmartre',s:'Cobbled village of artists',plan:'Mon 6 Jul · 10:00–12:30 — Sacré-Cœur + artists\' square',img:IMG.montmartre},
+{c:'paris',r:2,n:'Canal Saint-Martin',s:'Amelie\'s riverside Paris',plan:'Mon 6 Jul · 14:30 — afternoon walk + pastries',img:IMG.canal},
+{c:'paris',r:3,n:'Seine at Sunset',s:'Birthday dinner cruise',plan:'Sun 5 Jul · 20:00 — birthday dinner cruise (optional)',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Bercy%2C_Paris_01.jpg/500px-Bercy%2C_Paris_01.jpg'},
+
+// LYON
+{c:'lyon',r:3,n:'Fourviere Basilica',s:'Hilltop views over Lyon',plan:'Wed 8 Jul · 09:00 — funicular up, panoramic views',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Fourviere_Lyon.jpg/500px-Fourviere_Lyon.jpg'},
+{c:'lyon',r:3,n:'Roman Amphitheatre',s:'Where Pulp plays!',plan:'Wed 8 Jul · 09:00 — alongside Fourvière visit',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Lyon_-_Lugdunum_-_Th%C3%A9atre_Romain.jpg/500px-Lyon_-_Lugdunum_-_Th%C3%A9atre_Romain.jpg'},
+{c:'lyon',r:3,n:'Vieux Lyon',s:'Traboules & Renaissance streets',plan:'Tue 7 Jul · 17:00 wander + Wed 8 Jul · 14:30 traboules walk',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Vieuxlyon_saintjean_toits.jpg/500px-Vieuxlyon_saintjean_toits.jpg'},
+{c:'lyon',r:3,n:'Fourviere Interior',s:'Gold mosaic Byzantine masterpiece',plan:'Wed 8 Jul · 09:00 — inside the basilica',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Interior_of_the_Basilique_Notre-Dame_de_Fourvi%C3%A8re%2C_Lyon_-_DSC05532.JPG/500px-Interior_of_the_Basilique_Notre-Dame_de_Fourvi%C3%A8re%2C_Lyon_-_DSC05532.JPG'},
+{c:'lyon',r:2,n:'Place Bellecour',s:'Huge royal square + Ferris wheel',plan:null,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Place_Bellecour_%28Lyon%2C_2024%2C_version_recentr%C3%A9e_2%29.jpg/500px-Place_Bellecour_%28Lyon%2C_2024%2C_version_recentr%C3%A9e_2%29.jpg'},
+{c:'lyon',r:2,n:'Place des Terreaux',s:'Bartholdi\'s dramatic chariot fountain',plan:null,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Fontaine_Bartholdi_12.jpg/500px-Fontaine_Bartholdi_12.jpg'},
+{c:'lyon',r:2,n:'Mur des Canuts',s:'Europe\'s largest trompe-l\'oeil mural',plan:null,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Mur_des_Canuts_01.jpg/500px-Mur_des_Canuts_01.jpg'},
+{c:'lyon',r:1,n:'Confluence District',s:'Futuristic Musee des Confluences',plan:null,img:'https://upload.wikimedia.org/wikipedia/en/thumb/7/77/Confluence_museum_from_Raymond_Barre_bridge.jpg/500px-Confluence_museum_from_Raymond_Barre_bridge.jpg'},
+
+// MONTPELLIER
+{c:'montpellier',r:3,n:'Place de la Comedie',s:'Heart of the city',plan:'Thu 9 Jul — all day + Fri 10 Jul · morning',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Montpellier_Place_de_la_Com%C3%A9die.jpg/500px-Montpellier_Place_de_la_Com%C3%A9die.jpg'},
+{c:'montpellier',r:3,n:'Ecusson (Old Town)',s:'Honey-stone medieval lanes',plan:'Thu 9 Jul — city wander through the day',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Vue_%C3%A9cusson.jpg/500px-Vue_%C3%A9cusson.jpg'},
+{c:'montpellier',r:2,n:'Saint-Pierre Cathedral',s:'Gothic twin-turreted porch',plan:null,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Cath%C3%A9drale_Saint-Pierre_de_Montpellier_%282402940561%29.jpg/500px-Cath%C3%A9drale_Saint-Pierre_de_Montpellier_%282402940561%29.jpg'},
+{c:'montpellier',r:2,n:'Aqueduc Saint-Clement',s:'17th-century arched aqueduct',plan:'Thu 9 Jul · 14:00 — Promenade du Peyrou walk',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Aqueduc_de_Saint-Cl%C3%A9ment_-_panoramio_%283%29.jpg/500px-Aqueduc_de_Saint-Cl%C3%A9ment_-_panoramio_%283%29.jpg'},
+{c:'montpellier',r:2,n:'Jardin des Plantes',s:'Oldest in France (1593)',plan:'Thu 9 Jul · 16:00',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Montpellier_jardin_plantes3.jpg/500px-Montpellier_jardin_plantes3.jpg'},
+{c:'montpellier',r:1,n:'Musee Fabre',s:'Courbet, Delacroix, Soulages',plan:null,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Mus%C3%A9e_Fabre_-_panoramio.jpg/500px-Mus%C3%A9e_Fabre_-_panoramio.jpg'},
+
+// BARCELONA
+{c:'barcelona',r:3,n:'Sagrada Familia',s:'140+ years in the making',plan:'Sat 11 Jul · 09:00 — with Passion tower ✅ BOOKED',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/%CE%A3%CE%B1%CE%B3%CF%81%CE%AC%CE%B4%CE%B1_%CE%A6%CE%B1%CE%BC%CE%AF%CE%BB%CE%B9%CE%B1_2941.jpg/500px-%CE%A3%CE%B1%CE%B3%CF%81%CE%AC%CE%B4%CE%B1_%CE%A6%CE%B1%CE%BC%CE%AF%CE%BB%CE%B9%CE%B1_2941.jpg'},
+{c:'barcelona',r:3,n:'Park Guell',s:'Gaudi\'s mosaic wonderland',plan:'Sun 12 Jul · 09:30 — ✅ BOOKED',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Parc_guell_-_panoramio.jpg/500px-Parc_guell_-_panoramio.jpg'},
+{c:'barcelona',r:3,n:'Casa Batllo',s:'Gaudi\'s dragon-scale house',plan:'Sat 11 Jul · 13:00 — Silver APP ✅ BOOKED',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Casa_Batllo_Overview_Barcelona_Spain_cut.jpg/500px-Casa_Batllo_Overview_Barcelona_Spain_cut.jpg'},
+{c:'barcelona',r:2,n:'Casa Mila',s:'La Pedrera rooftop',plan:'Sat 11 Jul · 17:00 — warrior chimneys at sunset',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Casa_Mil%C3%A0%2C_general_view.jpg/500px-Casa_Mil%C3%A0%2C_general_view.jpg'},
+{c:'barcelona',r:3,n:'Gothic Quarter',s:'Medieval labyrinth',plan:'Sun 12 Jul · 17:00 — cathedral, Plaça Reial, alleys',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Barcelona_-_Carrer_del_Bisbe.jpg/500px-Barcelona_-_Carrer_del_Bisbe.jpg'},
+{c:'barcelona',r:3,n:'Palau de la Musica',s:'Flamenco in UNESCO gem',plan:'Mon 13 Jul · 15:00 — Gran Gala Flamenco (optional)',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/22_11_01_Palau_DSCF2611_52502512616_cc1e7db845_k.jpg/500px-22_11_01_Palau_DSCF2611_52502512616_cc1e7db845_k.jpg'},
+{c:'barcelona',r:3,n:'Las Ramblas & La Boqueria',s:'Tree-lined boulevard + legendary market',plan:'Sun 12 Jul · 12:00 — La Boqueria market + Ramblas stroll',img:IMG.rambla},
+{c:'barcelona',r:3,n:'Hospital de Sant Pau',s:'Largest Art Nouveau complex (UNESCO)',plan:null,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Hospital_Sant_Pau%2C_main_facade.jpg/500px-Hospital_Sant_Pau%2C_main_facade.jpg'},
+{c:'barcelona',r:2,n:'Barceloneta Beach',s:'Mediterranean swim + chiringuitos',plan:'Mon 13 Jul · 10:00 — morning swim',img:IMG.beach},
+{c:'barcelona',r:2,n:'Montjuic Magic Fountain',s:'Free light & music show at 9:30pm',plan:'Mon 13 Jul · 21:30 — free show',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Barcelona_-_Font_M%C3%A0gica_-_2016.jpg/500px-Barcelona_-_Font_M%C3%A0gica_-_2016.jpg'},
+{c:'barcelona',r:2,n:'Bunkers del Carmel',s:'360° sunset panorama',plan:'Mon 13 Jul · 18:00 — best free sunset in Barcelona',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Tur%C3%B3_Rovira.jpg/500px-Tur%C3%B3_Rovira.jpg'},
+{c:'barcelona',r:2,n:'MNAC (Palau Nacional)',s:'Catalonia\'s top art museum',plan:null,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Palau_Nacional%2C_Barcelona.jpg/500px-Palau_Nacional%2C_Barcelona.jpg'},
+{c:'barcelona',r:2,n:'Picasso Museum',s:'Early Picasso in Born palaces',plan:null,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Museu_Picasso_Barcelona.jpg/500px-Museu_Picasso_Barcelona.jpg'},
+{c:'barcelona',r:1,n:'Casa Vicens',s:'Gaudi\'s first (Moorish) house',plan:null,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Gaud%C3%AD_-_Casa_Vicens.JPG/500px-Gaud%C3%AD_-_Casa_Vicens.JPG'},
+{c:'barcelona',r:1,n:'Tibidabo + Sagrat Cor',s:'Hilltop church + vintage funfair',plan:null,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Temple_del_Sagrat_Cor_vist_des_de_la_Talaia_del_Tibidabo.JPG/500px-Temple_del_Sagrat_Cor_vist_des_de_la_Talaia_del_Tibidabo.JPG'},
+{c:'barcelona',r:1,n:'Arc de Triomf & Ciutadella',s:'Red-brick arch + central park',plan:null,img:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Barcelona_-_Arc_de_Triomf_%282%29.JPG/500px-Barcelona_-_Arc_de_Triomf_%282%29.JPG'},
+];
+
+// Shared event descriptions + images (looked up by event name)
+const EI={
+'Fnac Live Festival':{img:IMG.champs,desc:'A completely free open-air music festival in the grand plaza in front of Paris City Hall (Hotel de Ville). A massive stage hosts around 30 artists over 3 days, from 6pm to midnight each night, spanning French pop, indie rock, electronic, and hip-hop. Tens of thousands of people pack in as the sun sets over the ornate Renaissance facade of City Hall — one of the best free festivals in Europe. Free but you need a ticket from any Fnac store.'},
+'Paris Plages opens':{img:IMG.plages,desc:'Paris\'s beloved summer tradition where kilometres of the Seine riverbank are transformed into actual sandy beaches with palm trees, deck chairs, parasols, misting stations, and free activities including petanque, volleyball, and dance classes. Stroll barefoot along the river with ice cream, recline in a deckchair watching boats pass, or cool off in the water features — all with Notre-Dame, the Pont Neuf, and grand Haussmann buildings as your backdrop. This year celebrates 250 years of Franco-American friendship (July 4 = US Independence Day 250th). Completely free, all day.'},
+'Paris Jazz Festival':{img:IMG.jardin,desc:'A free weekend jazz concert series held every Saturday and Sunday afternoon in the Parc Floral de Paris, a gorgeous botanical garden in the Bois de Vincennes filled with lily ponds, sculptural gardens, and towering trees. World-class jazz ensembles perform on an open-air stage among the greenery while families and couples spread picnic blankets on the grass. The atmosphere is utterly relaxed and almost magical — wine from your picnic basket, the finest jazz on the planet just metres away, all for just the park entry fee.'},
+'Free Museum Day':{img:IMG.louvre,desc:'July 5th is the first Sunday of the month — normally free entry to the Louvre, Musee d\'Orsay, Orangerie, Rodin, Picasso, and more. However, free timed slots at d\'Orsay and Picasso sold out. Switched to: Musée de l\'Orangerie (paid tickets, easy to get — Monet Water Lilies) in the morning, and Musée Carnavalet (always free, no booking needed — History of Paris) in the afternoon.'},
+'Michelangelo & Rodin exhibition':{img:IMG.louvre,desc:'A once-in-a-lifetime exhibition at the Louvre\'s Hall Napoleon — the first ever dialogue between Michelangelo and Auguste Rodin, two of the greatest sculptors who ever lived. Around 300 works in marble, bronze, plaster, and terracotta explore how Rodin drew direct inspiration from the Italian Renaissance master. Displayed alongside the Louvre\'s permanent collection including the Mona Lisa, Winged Victory, and Venus de Milo.'},
+'Carnaval Tropical de Paris':{img:IMG.champs,desc:'A dazzling, exuberant street parade that floods the entire Champs-Elysees with Caribbean, Brazilian, African, and tropical culture. Over 4,000 costumed dancers in towering feathered headdresses and sequined bodysuits samba down the boulevard, accompanied by steel drum bands, floats blasting zouk and reggae, and stilt-walkers. This year\'s theme is "Amazon" with a Brazilian focus. The atmosphere is pure, unbridled joy against the backdrop of the Arc de Triomphe. Completely free to watch — around half a million spectators attend.'},
+'Renoir and Love (last day!)':{img:IMG.orsay,desc:'Around 50 paintings from Renoir\'s Impressionist period at the Musee d\'Orsay — all about love, joy, dancing couples, and luminous Parisian life. This is the exhibition\'s FINAL DAY (July 5). Unfortunately the free Sunday timed slots sold out — so the Orsay is not in the plan this trip. The Orangerie next door has similar Impressionist spirit via Monet\'s Water Lilies.'},
+'Petit Palais: Musée des Beaux-Arts de la Ville de Paris':{img:IMG.petitpalais,link:'https://www.petitpalais.paris.fr/en',desc:'Completely free, forever, no booking, no timed slots — just walk in. The Petit Palais is one of the great unsung museums of Paris, built for the 1900 World\'s Fair and sitting in a magnificent Beaux-Arts palace right at the foot of the Champs-Élysées. The building has a breathtaking domed glass ceiling and a secret garden courtyard in the centre where a café serves coffee and cake. The collection spans 3,000 years: ancient Greek and Roman bronzes, medieval tapestries and reliquaries, Dutch Golden Age masters (Rembrandt, Rubens), 19th-century French painting (Monet, Renoir, Courbet, Delacroix, Gustave Moreau), and extraordinary Art Nouveau jewellery by René Lalique. Easily 2-3 hours. And then you walk straight out the front door onto the Champs-Élysées.'},
+'Musée de l\'Orangerie':{img:IMG.orangerie,link:'https://www.musee-orangerie.fr/en/visit/practical-information/prices-and-opening-times',desc:'One of the greatest art experiences in the world: Monet\'s Water Lilies (Nymphéas) — eight enormous paintings, each 2 metres tall and up to 17 metres wide, displayed in two oval rooms that Monet himself designed. The rooms are flooded with natural light; the effect is profoundly immersive, like standing inside the painting. Downstairs, the Jean Walter and Paul Guillaume collection: Cézanne, Picasso, Matisse, Modigliani, Renoir, Soutine — 144 masterworks in an intimate setting. Located in the Tuileries Garden at Place de la Concorde. €12.50 per person. Book paid tickets online — much easier than the free-Sunday lottery.'},
+'Musée Carnavalet':{img:IMG.carnavalet,link:'https://www.carnavalet.paris.fr/en',desc:'The entire history of Paris — from Stone Age dug-out canoes found under Notre-Dame, through Roman Lutetia, medieval Paris, the Revolution, the Belle Époque, and Marcel Proust\'s era — displayed across two magnificent connected 17th-century mansions in the heart of the Marais. Proust\'s actual bedroom has been faithfully reconstructed. There are extraordinary Art Nouveau rooms designed by Alphonse Mucha. Best of all: the permanent collection is completely free, with no timed entry and no booking required — just walk in off the street. One of the most underrated museums in all of Paris.'},
+'Seine dinner cruise':{img:IMG.seine,link:'https://www.bateauxparisiens.com/en/meal-cruise/dinner-cruise.html',desc:'Board an elegant glass-enclosed boat and glide along the Seine while being served a multi-course French dinner with wine pairings. Over the evening you\'ll float past Notre-Dame, the Louvre, Pont Alexandre III, and the Musee d\'Orsay, all illuminated in golden light. The highlight: every evening on the hour, the Eiffel Tower erupts into a 5-minute sparkling light show with 20,000 twinkling bulbs — seeing this from the water with birthday champagne is unforgettable. Operators include Bateaux Parisiens (from the Eiffel Tower) or Le Calife (more intimate, live music).'},
+'Eiffel Tower: Summit by lift':{img:IMG.eiffel,link:'https://ticket.toureiffel.paris/en',desc:'Go right to the top of the most famous structure on Earth — 276 metres up. The first floor has a glass floor where you look straight down 57m, plus Madame Brasserie restaurant. The second floor has the celebrated Pierre Herme macaron bar where you can savour handmade macarons by the "Picasso of Pastry" while gazing over Paris. At the summit, a champagne bar serves glasses of Moet (from around £13). On a clear July evening the views stretch 70 kilometres. Book timed slots well in advance — July sells out 2-3 months ahead.'},
+'Fondation Louis Vuitton: Calder':{img:IMG.louvre,desc:'The building itself is a masterpiece — designed by Frank Gehry, it looks like enormous glass sails billowing in the wind at the edge of the Bois de Boulogne. Inside, the exhibition celebrates Alexander Calder, the American sculptor who invented the "mobile" — delicate, balanced abstract sculptures that hang from the ceiling and move with the air, creating an ever-shifting ballet of painted shapes in bold primary colours. Around 300 works spanning tabletop pieces to room-filling installations. Art that delights the inner child in everyone.'},
+'Sacre-Coeur & Montmartre':{img:IMG.sacrecoeur,desc:'A breathtaking white-domed basilica at the highest point in Paris — from its front steps you get a sweeping panorama across the entire city to the Eiffel Tower and beyond. The neighbourhood of Montmartre around it is a cobblestoned hilltop village of winding lanes, hidden staircases, and the famous Place du Tertre where portrait artists paint just as Picasso, Monet, and Renoir once did here. Tiny wine bars, the last vineyard in Paris, and cafes with terraces spilling onto the sidewalks. Visit at sunset when the light turns golden.'},
+'Canal Saint-Martin':{img:IMG.canal,desc:'A 4.5km tree-lined waterway in the 10th arrondissement where young Parisians gather on warm summer evenings to sit along the water with wine, cheese, and baguettes, watching pleasure boats pass through the picturesque iron locks. The surrounding streets are a treasure trove of vintage shops, specialty coffee roasters, natural wine bars, and some of the best casual restaurants in Paris. If you\'ve seen the film Amelie, you\'ll recognise this canal — the whimsical, romantic atmosphere is exactly what you\'ll find in real life.'},
+'Fourviere Basilica + Roman ruins':{img:IMG.fourviere,desc:'A jaw-droppingly ornate basilica crowning Fourviere hill, its interior an explosion of gold mosaics, stained glass, and polished marble. Take the funicular railway up from Vieux Lyon metro — at the top, the terrace offers one of France\'s most spectacular views: Lyon spread below, two rivers converging, and on clear days the snow-capped Alps on the horizon. Walk down through the remarkably preserved 2,000-year-old Roman amphitheatre ruins — built in 15 BC, this is where the Nuits de Fourviere concerts happen. Free.'},
+'Fourviere Basilica + Roman theatre':{img:IMG.fourviere,desc:'A jaw-droppingly ornate basilica crowning Fourviere hill. Take the funicular up from Vieux Lyon — at the top, panoramic views across the entire city with the Alps on the horizon. The Roman amphitheatre ruins (built 15 BC) are right next door — this is where the Nuits de Fourviere concerts take place. Free.'},
+'Les Halles de Lyon Paul Bocuse':{img:IMG.halles,desc:'Lyon\'s legendary indoor food hall, named after Paul Bocuse, the "Chef of the Century" who made Lyon the gastronomic capital of France. Around 50 vendors offer the absolute finest: regional sausages, silky Saint-Marcellin cheeses ripened to oozing perfection, hand-piped praline tarts, freshly shucked oysters, charcuterie towers, Bresse chicken (the finest poultry in the world), and the famous quenelles — pillowy pike dumplings in creamy sauce. Not a tourist market but a living temple of French food culture where locals come to eat, argue about cheese, and celebrate the art of eating well.'},
+'Traboules walk, Vieux Lyon':{img:IMG.vieuxLyon,desc:'Traboules are secret passageways unique to Lyon — hidden corridors cutting through buildings, connecting streets via courtyards and covered galleries invisible from outside. Built by Renaissance silk merchants to transport delicate fabrics without rain exposure, they were later used by the French Resistance during WWII. The most spectacular is Cour des Voraces — a breathtaking six-story open staircase spiralling through a narrow courtyard. Push open an unmarked door, step into a shadowy passage, and emerge into a sunlit Renaissance courtyard with carved stone arches. Free, self-guided.'},
+'Traboules walk':{img:IMG.vieuxLyon,desc:'Secret Renaissance passageways cutting through buildings, connecting streets via hidden courtyards. Built by silk merchants in the 1500s, later used by the French Resistance in WWII. Don\'t miss Cour des Voraces — a dramatic six-story spiral staircase. Free.'},
+'PULP at Nuits de Fourviere':{img:IMG.pulp,link:'https://www.nuitsdefourviere.com/programme-2026',desc:'Pulp are a legendary British band from Sheffield fronted by the impossibly charismatic Jarvis Cocker — tall, bespectacled, sharp-suited, widely regarded as one of the greatest frontmen in British music. Their anthems "Common People," "Disco 2000," "Babies," and "Sorted for E\'s and Wizards" defined Britpop in the 1990s. Jarvis prowls the stage with angular dance moves, synths and guitars build to euphoric crescendos, and when "Common People" hits its final chorus the entire audience becomes one massive, joyous, shouting choir. Now picture that inside a 2,000-year-old Roman amphitheatre under the stars — one of the most extraordinary concert settings on Earth.'},
+'Nuits de Fourviere: Camille Symphonique':{img:IMG.romanTheatre,link:'https://www.nuitsdefourviere.com/programme-2026',desc:'Camille is one of France\'s most innovative musicians — she uses the human voice as a complete instrument, layering beatboxing, throat singing, whispered textures, and soaring melodies. For "Camille Symphonique," she performs her songs completely reimagined for the full Orchestre National de Lyon conducted by Dylan Corlay. Her extraordinary voice intertwining with surging strings, brass, and woodwinds in a 2,000-year-old Roman amphitheatre under the stars. A one-off concert event.'},
+'Nuits de Fourviere: Zip Zap Circus':{img:IMG.romanTheatre,link:'https://www.nuitsdefourviere.com/programme-2026',desc:'Zip Zap Circus is a groundbreaking company from Cape Town, South Africa, founded in 1992 after apartheid, bringing together young performers from different backgrounds into a world-class ensemble. Jaw-dropping acrobatics, aerial silk performances, contortion, tumbling, and tightrope walking, all performed with distinctly South African energy infused with African music and dance rhythms. Seeing them perform in a 2,000-year-old Roman amphitheatre with acrobats soaring through the warm night air above ancient stone is transcendent.'},
+'Festival Radio France: Chamayou':{img:IMG.montpellier,link:'https://lefestival.eu/programmes/',desc:'Bertrand Chamayou is one of the most acclaimed classical pianists in the world today — a Frenchman who has won the Victoires de la Musique Classique multiple times, known for dazzling technical virtuosity and fearless emotional intensity. He performs a solo recital at the Opera Comedie as part of the Festival Radio France, one of the south of France\'s most important classical/jazz festivals (100+ events, ~30 free). Sitting just metres from a world-class pianist as his fingers fly across the keys in an intimate concert hall. Tickets from around £8.50.'},
+'Tohu-Bohu electronic night':{img:IMG.montpellier,desc:'The late-night electronic music programme of the Festival Radio France, held at Domaine d\'O — a stunning outdoor estate with an 18th-century chateau, ancient trees, a lake, and open-air amphitheatres. Imagine dancing under a canopy of stars in the warm Mediterranean night air, surrounded by century-old plane trees strung with lights, the bass reverberating off stone walls. International DJs and emerging artists performing deep house, techno, and experimental electronica. Sophisticated, immersive, and uniquely southern French.'},
+'LES ESTIVALES wine festival':{img:IMG.montpellier,desc:'Montpellier\'s beloved Friday evening wine festival on the grand Esplanade Charles de Gaulle. Buy a tasting glass for a few euros and stroll from stall to stall sampling wines from over 160 Languedoc wineries, each poured and explained by the winemakers themselves. Live bands and DJs play on stages, artisan food vendors sell local cheeses, grilled meats, paella, and oysters, and the whole scene is bathed in golden Mediterranean summer evening light. Free entry, 6-11:30pm. The most wonderfully relaxed way to discover southern French wines.'},
+'Street art walk: Rue du Bras de Fer':{img:IMG.montpellier,desc:'Montpellier has quietly become one of France\'s most vibrant street art cities — enormous colourful murals, intricate stencils, and bold graffiti covering walls and alleyways, particularly around Rue du Bras de Fer and the Figuerolles district. Building-sized photorealistic portraits, surrealist dreamscapes, and witty political commentary. Exploring on foot is like a treasure hunt through the city\'s creative soul. Free.'},
+'Street art: Rue du Bras de Fer':{img:IMG.montpellier,desc:'Montpellier is one of France\'s best street art cities — enormous murals, stencils, and graffiti around Rue du Bras de Fer and Figuerolles. Building-sized portraits, surrealist dreamscapes, and political commentary. A free treasure hunt on foot.'},
+'Jardin des Plantes':{img:IMG.jardin,desc:'The oldest botanical garden in all of France, established in 1593 by King Henry IV — over 430 years old. Behind its entrance: towering ancient trees including a massive ginkgo planted in 1795, a spectacular lotus pond, an orangery with exotic citrus, and winding paths through groves so old and dense they feel like a living cathedral. Over 2,500 plant species from every continent. A place of extraordinary peace right in the middle of a bustling city. Free.'},
+'Sagrada Familia':{img:IMG.sagrada,link:'https://sagradafamilia.org/en/tickets',desc:'Antoni Gaudi\'s unfinished masterpiece — a colossal basilica under construction since 1882, one of the longest-running building projects in human history. Outside: soaring towers decorated with organic shapes resembling honeycombs, snail shells, and fruits. But nothing prepares you for stepping inside: a vast luminous forest of branching columns rising like stone trees, and the light — pouring through enormous stained glass windows in a progression from warm reds and golds to cool blues and purples, painting the white columns in constantly shifting pools of liquid colour. A genuinely spiritual experience that moves many visitors to tears. Book timed morning slot 2-3 months ahead.'},
+'Casa Batllo':{img:IMG.casaBatllo,link:'https://www.casabatllo.es/en/',desc:'Gaudi\'s fantastical house on Passeig de Gracia — the facade ripples with iridescent broken ceramic tiles in blues, greens, and purples, balconies shaped like jawbones, and a roofline arching like a dragon\'s spine. Legend says it tells the story of Saint George (Catalonia\'s patron saint) slaying the dragon: the roof is the dragon\'s back, the cross-topped tower is his lance. Inside, not a single straight line exists — walls curve like waves, ceilings swirl like whirlpools, and a genius light well distributes natural light evenly. The immersive audio tour uses augmented reality to bring rooms alive.'},
+'Park Guell':{img:IMG.parkGuell,link:'https://parkguell.barcelona/en',desc:'Gaudi\'s sprawling hilltop wonderland — originally planned as a luxury estate, now one of the most enchanting public spaces on Earth (UNESCO World Heritage Site). The famous mosaic salamander "El Drac" at the entrance is one of Barcelona\'s most iconic symbols. At the top: the famous serpentine bench, a continuous undulating seat covered entirely in dazzling broken ceramic tiles in every colour, designed to be both beautiful and ergonomically shaped. From this bench: the entire city cascading to the Mediterranean, the Sagrada Familia\'s towers rising in the middle distance. Book a timed slot.'},
+'La Pedrera (Casa Mila)':{img:IMG.casaMila,link:'https://www.lapedrera.com/en',desc:'Gaudi\'s last great residential building — its undulating stone facade ripples like waves of the sea, so radical that scandalised locals nicknamed it "La Pedrera" (The Quarry). The rooftop is the highlight: surreal ventilation towers sculpted into shapes resembling helmeted medieval warriors and alien sentinels, covered in broken tiles and glass. At sunset, you wander among these silent warrior figures as the sky turns pink behind them and the Sagrada Familia\'s spires glow in the distance. Below, the Espai Gaudi museum explains Gaudi\'s revolutionary techniques. UNESCO World Heritage Site.'},
+'Gothic Quarter morning':{img:IMG.gothic,desc:'The ancient heart of Barcelona — a labyrinth of narrow medieval streets dating back to the Roman era (you can still see original Roman walls). The magnificent Barcelona Cathedral has a serene cloister where 13 white geese wander freely. Every turn reveals something unexpected: a tiny Romanesque chapel between apartment buildings, a jazz club in a medieval cellar, artisan ceramics workshops. The golden light filtering through gaps between ancient stone walls reminds you that people have walked these exact streets for over two thousand years.'},
+'Gothic Quarter wander':{img:IMG.gothic,desc:'Medieval labyrinth in the heart of Barcelona — narrow streets from the Roman era, the magnificent Cathedral with 13 white geese in the cloister, Placa Reial with its Gaudi lampposts, and hidden surprises around every corner. Two thousand years of history in winding stone alleys.'},
+'Barceloneta beach':{img:IMG.beach,desc:'Barcelona\'s most famous beach — morning swim in the Mediterranean, chill on the sand, then lunch at a chiringuito (beach bar) serving fresh grilled seafood, paella, and sangria with your toes in the sand and the sea stretching to the horizon.'},
+'La Boqueria market':{img:IMG.rambla,desc:'Barcelona\'s most famous food market on La Rambla — a vast, sensory-overloading covered hall behind a striking Art Nouveau entrance. Stalls piled with glistening fresh fruit arranged like edible rainbows, whole legs of Iberian jamon, towers of seafood on crushed ice, barrels of olives, and freshly squeezed tropical juices. The famous Bar Pinotxo near the entrance serves some of the most authentic food in Barcelona: sizzling garlic prawns, baby squid, and crispy artichokes. Been feeding Barcelona since 1217.'},
+'Montjuic Magic Fountain':{img:IMG.sagrada,desc:'A spectacular free light-and-water show on summer evenings at the foot of Montjuic hill. Enormous jets of water dance, sway, and leap in patterns synchronised to classical music and pop songs, while rainbow-coloured lights illuminate the water from below. Behind the fountain, the illuminated Palau Nacional provides a monumental backdrop. Shows every 30 minutes, around 15-20 minutes each. The fact that this world-class spectacle is completely free is quintessentially Barcelona.'},
+'Sala Montjuic outdoor cinema':{img:IMG.gothic,link:'https://www.salamontjuic.org/en/',desc:'One of the most magical open-air cinema experiences in the world, held in the dry moat of medieval Montjuic Castle overlooking Barcelona and the Mediterranean. Gates open around 8:30pm — claim a spot on the grassy slopes, spread a blanket. Food trucks serve wood-fired pizzas, craft beers, and sangria. A live band performs a full concert as the sun sets, then once darkness falls, the film begins on a big screen against the castle walls. Live music, picnic dinner, film under the stars, city lights below — impossibly romantic.'},
+'Flamenco at Palau de la Musica Catalana':{img:IMG.palau,link:'https://www.palaumusica.cat/en/gran-gala-flamenco_927626',desc:'The Palau de la Musica Catalana is widely considered one of the most beautiful concert halls ever built — a UNESCO World Heritage Site whose interior is an explosion of colour: a vast inverted stained-glass dome in gold, blue, and rose, the stage framed by sculptured muses, walls covered in mosaic flowers, every surface shimmering with ceramic and glass. Inside this breathtaking room, the Gran Gala Flamenco show: a guitarist plays rapid-fire passages, a singer wails the deep, guttural "cante jondo" expressing raw human passion, and the dancer performs fierce percussive footwork that hammers the stage like gunshots. The combination of flamenco\'s raw intensity with the Palau\'s otherworldly beauty is almost overwhelming. Unforgettable.'},
+'Museum of Contemporary Art (MACBA)':{img:IMG.gothic,desc:'Barcelona\'s major contemporary art museum in the Raval neighbourhood, celebrating its 30th anniversary in 2026 with a major collection show. Free entry on Saturday afternoons 4-8pm.'},
+'Museum of Contemporary Art (free Saturday 4-8pm)':{img:IMG.gothic,desc:'Barcelona\'s major contemporary art museum. 30th anniversary collection show. Free Saturday afternoons 4-8pm.'},
+'Rue Paratilla "Spice Street"':{img:IMG.castillet,desc:'A narrow, atmospheric street in Perpignan\'s old quarter lined with North African and Middle Eastern shops whose doorways spill cascading displays of spices. Pyramids of golden turmeric, paprika red as rubies, saffron threads, dried rose petals, vats of olives, sacks of couscous — the air thick with cinnamon, coriander, and cardamom. The shopkeepers are friendly and happy to explain their wares and offer tastings. A vivid reminder that Perpignan sits where France, Catalonia, and North Africa blend together.'},
+'BBF Barcelona Beach Festival':{img:IMG.beach,desc:'A massive open-air electronic dance music festival directly on the sand at Platja del Forum. World-class DJs on a towering stage facing the sea, spectacular LED screens, pyrotechnics, and sound systems powerful enough to make the sand vibrate. Between sets you can literally walk into the sea to cool off. Something surreal about a full-scale festival on a beach with the Barcelona skyline behind you.'},
+};
+
+// State
+let curOpt='B+', curFilt='all', curVFilt='all';
+let checked={}; // {optKey: {dayIdx_evIdx: true/false}}
+Object.keys(OPT).forEach(k=>{checked[k]={}; OPT[k].days.forEach((d,di)=>d.evs.forEach((e,ei)=>{if(e.opt)checked[k][di+'_'+ei]=true; else if(e.pr>0)checked[k][di+'_'+ei]=true;}))});
+
+function evIcon(e){
+  const n=(e.n||'').toLowerCase();
+  // Trains first (before flights, so "BHX → New Street" gets train not plane)
+  if(/\btrain\b|new street|\bgwr\b|sncf|renfe|ouigo|tgv|cross.city|cross-city/.test(n)) return '🚆';
+  // Flights / airports
+  if(/ryanair|fly home|airport|\bbhx\b|\bbva\b|beauvais|\bland\b/.test(n)) return '✈️';
+  // Metro / underground
+  if(/\bmetro\b|\brer\b/.test(n)) return '🚇';
+  // Bus / shuttle / coach
+  if(/shuttle|aerobus|\bbus\b|coach/.test(n)) return '🚌';
+  // Hotel / accommodation
+  if(/hotel|hostal|check.?in|checkout/.test(n)) return '🏨';
+  // Home arrival
+  if(/arrive stroud|end of trip/.test(n)) return '🏠';
+  // Passport / customs
+  if(/passport|collect bag/.test(n)) return '🛂';
+  return '';
+}
+
+function renderDays(){
+const o=OPT[curOpt];
+document.getElementById('days').innerHTML=o.days.map((d,di)=>{
+const hide=curFilt!=='all'&&d.c!==curFilt?' hidden':'';
+const bday=d.bday?' birthday':'';
+const badge=d.bday?'<span class="bday-badge">Birthday!</span>':'';
+const evs=d.evs.map((e,ei)=>{
+const key=di+'_'+ei;
+const isChecked=checked[curOpt][key];
+const hasPrice=e.pr>0;
+const isOpt=e.opt;
+const info=EI[e.n]||{};
+const cb=hasPrice?`<input type="checkbox" class="ev-check" data-k="${key}" ${isChecked?'checked':''} onchange="toggle('${key}',this.checked)">`:'';
+const prStr=e.pr>0
+  ?(e.prMax
+    ?`~\u00a3${Math.round(e.pr*2)}-\u00a3${Math.round(e.prMax*2)}`
+    :(e.st==='booked'?`\u00a3${(e.pr*2).toFixed(2)}`:`~\u00a3${(e.pr*2).toFixed(2)}`))
+  :(e.ty==='free'?'Free':'');
+const prClass=isChecked&&hasPrice?' checked':'';
+const tyLabel=e.ty==='free'?'FREE':e.ty==='concert'?'MUSIC':e.ty==='museum'?'CULTURE':e.ty==='food'?'FOOD':e.ty==='cinema'?'CINEMA':e.ty==='festival'?'FESTIVAL':e.ty==='transit'?'TRAVEL':'';
+const tyClass='t-'+e.ty;
+const transitCls=e.ty==='transit'?' ev-transit':'';
+const stCls=e.st==='pending'?' ev-pending':e.st==='booked'?' ev-booked':'';
+const stTag=e.st==='pending'?'<span class="tag t-pending">⏳ PENDING</span>':e.st==='booked'?'<span class="tag t-booked">✅ BOOKED</span>':'';
+const descText=info.desc||e.desc||'';
+const desc=descText?`<div class="ev-desc">${descText}</div>`:'';
+const tagHtml=tyLabel?`<span class="tag ${tyClass}">${tyLabel}</span>`:'';
+const optTag=isOpt?'<span class="tag" style="background:#f5f3f0;color:#999">OPTIONAL</span>':'';
+const evImg=e.img||info.img||'';
+const imgHtml=evImg?`<div class="ev-img lazy-bg" data-bg="${evImg}" onclick="openLB('${evImg}','${e.n.replace(/'/g,"\\\\'")}')"></div>`:'';
+const linkUrl=e.link||info.link||'';
+const linkHtml=linkUrl&&e.st!=='booked'?`<a class="ev-link" href="${linkUrl}" target="_blank" rel="noopener">Book / More info &rarr;</a>`:'';
+const tmHtml=e.tm?`<span class="ev-time">${e.tm}</span> `:'';
+const icon=evIcon(e);
+const iconHtml=icon?`<span class="ev-icon">${icon}</span>`:'';
+return `<li class="ev${transitCls}${stCls}">${cb}${imgHtml}<div class="ev-body"><div class="ev-name">${tmHtml}${iconHtml}${e.n}</div>${desc}${linkHtml}<div class="ev-tags">${stTag}${tagHtml}${optTag}</div></div>${prStr?`<span class="ev-price${prClass}">${prStr}</span>`:''}</li>`;
+}).join('');
+return `<div class="day${bday}${hide}" data-c="${d.c}"><div class="bar bar-${d.c}"></div><div class="day-body"><div class="day-head"><span class="day-date">${d.wd} ${d.dt}</span><span class="day-num">Day ${di+1}</span></div><div class="day-title">${d.t} ${badge}</div><span class="city-label cl-${d.c}">${C[d.c].n}</span><ul class="events">${evs}</ul></div></div>`;
+}).join('');
+initLazyBackgrounds(document.getElementById('days'));
+}
+
+function renderVision(){
+document.getElementById('vgrid').innerHTML=VIS.slice().sort((a,b)=>(b.r||0)-(a.r||0)).map(v=>{
+const hide=curVFilt!=='all'&&v.c!==curVFilt?' hidden':'';
+const r=v.r||0;
+const stars=`<span class="fs">${'\u2605'.repeat(r)}</span><span class="es">${'\u2606'.repeat(3-r)}</span>`;
+const rLbl=r===3?'MUST-SEE':r===2?'WORTH IT':'BONUS';
+const itTag=v.plan
+  ?`<span class="it-tag it-in">\u2713 ${v.plan}</span>`
+  :`<span class="it-tag it-out">\u2717 Not in plan</span>`;
+	return `<div class="pol${hide}" data-vc="${v.c}" data-r="${r}"><div class="img lazy-bg" data-bg="${v.img}"><span class="ctag" style="background:${C[v.c].cl}">${C[v.c].n}</span><span class="rtag r${r}">${rLbl}</span>${itTag}</div><div class="cap">${v.n}</div><div class="capsub">${v.s}</div><div class="stars" title="${r}/3 stars">${stars}</div></div>`;
+	}).join('');
+	initLazyBackgrounds(document.getElementById('vgrid'));
+}
+
+function initLazyBackgrounds(root=document){
+const els=root.querySelectorAll('.lazy-bg[data-bg]');
+if(!els.length)return;
+const apply=el=>{el.style.backgroundImage=`url('${el.dataset.bg}')`;el.removeAttribute('data-bg');};
+if(!('IntersectionObserver' in window)){els.forEach(apply);return;}
+const bgObserver=new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(!entry.isIntersecting)return;
+apply(entry.target);
+bgObserver.unobserve(entry.target);
+});
+},{rootMargin:'250px 0px'});
+els.forEach(el=>bgObserver.observe(el));
+}
+
+function updateBudget(){
+const o=OPT[curOpt];
+// Split itinerary prices into booked (already in PAID) vs pending
+let itin_booked=0, itin_pending=0;
+o.days.forEach((d,di)=>d.evs.forEach((e,ei)=>{
+  const key=di+'_'+ei;
+  if(!checked[curOpt][key]||!e.pr)return;
+  if(e.st==='booked') itin_booked+=e.pr*2;
+  else itin_pending+=e.pr*2;
+}));
+
+// Confirmed & paid totals from the PAID array (covers all categories)
+const PA=typeof PAID!=='undefined'?PAID:[];
+const paidTotal=PA.reduce((s,p)=>s+p.amt,0);
+const paidHotels=PA.filter(p=>p.cat==='hotel').reduce((s,p)=>s+p.amt,0);
+const paidFlights=PA.filter(p=>p.cat==='flight').reduce((s,p)=>s+p.amt,0);
+const paidTransport=PA.filter(p=>p.cat==='train').reduce((s,p)=>s+p.amt,0);
+const paidActs=PA.filter(p=>p.cat==='activity').reduce((s,p)=>s+p.amt,0);
+
+// Estimate remaining: pending itinerary items + food rough estimate + outstanding bookings
+const foodEst=Math.round(o.pr.food*2); // rough food est for 2 (\u00a3357*2=\u00a3714)
+const catacombs=53; // Catacombs still to book (urgent) ~\u00a353
+const returnTrain=50; // BHX\u2192Stroud return train est ~\u00a350
+const estRemaining=Math.round(itin_pending+catacombs+returnTrain);
+const grandEst=Math.round(paidTotal+estRemaining+foodEst);
+
+document.getElementById('budgetPaid').textContent='\u00a3'+paidTotal.toFixed(2);
+document.getElementById('budgetEst').textContent='~\u00a3'+estRemaining;
+document.getElementById('budgetTotal').textContent='~\u00a3'+grandEst;
+
+document.getElementById('bHotels').textContent='\u00a3'+paidHotels.toFixed(2)+' \u2705';
+document.getElementById('bFlights').textContent='\u00a3'+paidFlights.toFixed(2)+' \u2705';
+document.getElementById('bTransport').textContent='\u00a3'+paidTransport.toFixed(2)+' + est pending';
+document.getElementById('bActs').textContent='\u00a3'+paidActs.toFixed(2)+' paid';
+document.getElementById('bFood').textContent='~\u00a3'+foodEst;
+}
+
+function toggle(key,val){checked[curOpt][key]=val;updateBudget();}
+function filt(c){curFilt=c;document.querySelectorAll('#filters .fbtn').forEach(b=>b.classList.toggle('active',b.dataset.c===c));document.querySelectorAll('.day').forEach(d=>{if(c==='all')d.classList.remove('hidden');else d.classList.toggle('hidden',d.dataset.c!==c)});}
+function filtV(c){curVFilt=c;document.querySelectorAll('.vision .fbtn').forEach(b=>b.classList.toggle('active',b.dataset.vc===c));document.querySelectorAll('.pol').forEach(p=>{if(c==='all')p.classList.remove('hidden');else p.classList.toggle('hidden',p.dataset.vc!==c)});}
+
+// Lightbox
+function openLB(src,cap){
+const lb=document.getElementById('lightbox');
+document.getElementById('lbImg').src=src;
+document.getElementById('lbCap').textContent=cap;
+lb.classList.add('open');
+}
+function closeLB(){document.getElementById('lightbox').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLB();});
+
+renderDays();renderVision();updateBudget();
+if(typeof renderConfirmedPlan==='function')renderConfirmedPlan();
+</script>
+</body>
+</html>
