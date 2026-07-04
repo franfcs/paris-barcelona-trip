@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
+<title>Paris to Barcelona — July 2026 Trip Plan</title>
+<style>
+@page{size:A4;margin:18mm 16mm 20mm 16mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Georgia,'Times New Roman',serif;color:#1a1a1a;line-height:1.55;font-size:10.5pt;background:#fff}
+h1,h2,h3,h4{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+
+/* Cover */
+.cover{text-align:center;padding:60px 20px 40px;page-break-after:always}
+.cover h1{font-size:32pt;font-weight:300;letter-spacing:.03em;margin-bottom:4px;color:#1e3a5f}
+.cover h1 b{font-weight:700}
+.cover .sub{font-size:14pt;color:#777;margin-bottom:30px}
+.cover .route{display:flex;align-items:center;justify-content:center;gap:0;margin:24px 0}
+.cover .route .dot{width:12px;height:12px;border-radius:50%;border:2px solid #ccc}
+.cover .route .line{width:40px;height:2px;background:#ddd;margin-bottom:16px}
+.cover .route .city{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9pt;color:#777;font-family:-apple-system,sans-serif;font-weight:600}
+.d-paris{background:#1e3a5f!important}.d-lyon{background:#7b2252!important}.d-montpellier{background:#0d6b5e!important}.d-perpignan{background:#8b6914!important}.d-barcelona{background:#922b21!important}
+.cover .stats{display:flex;justify-content:center;gap:32px;margin:30px 0;font-family:-apple-system,sans-serif}
+.cover .stat{text-align:center}
+.cover .stat .num{font-size:28pt;font-weight:700;color:#1e3a5f}
+.cover .stat .lbl{font-size:8pt;color:#999;text-transform:uppercase;letter-spacing:.08em}
+.cover .tagline{font-size:11pt;color:#555;max-width:500px;margin:20px auto 0;line-height:1.6}
+
+/* Summary box */
+.summary{background:#f8f7f5;border:1px solid #e8e6e3;border-radius:8px;padding:16px 20px;margin:0 0 20px;page-break-inside:avoid}
+.summary h2{font-size:13pt;margin-bottom:8px;color:#1e3a5f}
+.summary table{width:100%;border-collapse:collapse;font-size:9.5pt;font-family:-apple-system,sans-serif}
+.summary td{padding:4px 8px;border-bottom:1px solid #eee;vertical-align:top}
+.summary td:last-child{text-align:right;font-weight:600;white-space:nowrap}
+.summary .total td{border-top:2px solid #1e3a5f;font-weight:700;font-size:10.5pt;border-bottom:none}
+
+/* Day sections */
+.day-section{page-break-inside:avoid;margin-bottom:18px;border-left:4px solid #ddd;padding-left:14px}
+.day-section.paris{border-color:#1e3a5f}.day-section.lyon{border-color:#7b2252}
+.day-section.montpellier{border-color:#0d6b5e}.day-section.perpignan{border-color:#8b6914}
+.day-section.barcelona{border-color:#922b21}
+.day-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+.day-header h3{font-size:13pt;color:#1a1a1a}
+.day-header .date{font-size:9pt;color:#999;font-family:-apple-system,sans-serif}
+.day-city{display:inline-block;font-size:7pt;font-weight:700;padding:2px 7px;border-radius:3px;color:#fff;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-family:-apple-system,sans-serif}
+.dc-paris{background:#1e3a5f}.dc-lyon{background:#7b2252}.dc-montpellier{background:#0d6b5e}.dc-perpignan{background:#8b6914}.dc-barcelona{background:#922b21}
+
+/* Events */
+.event{display:flex;gap:10px;padding:7px 0;border-top:1px solid #f0eeeb;page-break-inside:avoid}
+.event:first-child{border-top:none}
+.event-img{width:70px;height:50px;border-radius:4px;background-size:cover;background-position:center;flex-shrink:0}
+.event-body{flex:1;min-width:0}
+.event-name{font-weight:700;font-size:10pt;font-family:-apple-system,sans-serif}
+.event-desc{font-size:9pt;color:#444;margin-top:2px;line-height:1.45}
+.event-meta{font-size:8pt;color:#999;margin-top:2px;font-family:-apple-system,sans-serif}
+.event-price{font-size:9pt;font-weight:700;color:#1e3a5f;white-space:nowrap;flex-shrink:0;font-family:-apple-system,sans-serif;text-align:right;min-width:60px}
+.tag{font-size:6.5pt;padding:1px 5px;border-radius:2px;font-weight:700;font-family:-apple-system,sans-serif;display:inline-block;margin-right:3px}
+.t-free{background:#e8f5e9;color:#2e7d32}.t-music{background:#f3e5f5;color:#7b1fa2}.t-culture{background:#e8f0fe;color:#1565c0}
+.t-food{background:#fff3e0;color:#e65100}.t-cinema{background:#e0f2f1;color:#00695c}.t-festival{background:#fff8e1;color:#f57f17}
+
+/* Birthday */
+.day-section.birthday{border-left:4px solid #f0a500;background:linear-gradient(90deg,#fffdf5,#fff);padding:10px 14px;border-radius:0 6px 6px 0}
+
+/* Section dividers */
+.section-title{font-size:18pt;font-weight:300;color:#1e3a5f;margin:24px 0 12px;padding-top:12px;border-top:2px solid #e8e6e3;page-break-after:avoid}
+.section-sub{font-size:9pt;color:#999;margin:-8px 0 14px;font-family:-apple-system,sans-serif}
+
+/* Hotels & Transport */
+.rec-table{width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:14px;font-family:-apple-system,sans-serif}
+.rec-table th{text-align:left;padding:6px 8px;background:#f8f7f5;font-size:8pt;text-transform:uppercase;letter-spacing:.06em;color:#777;border-bottom:1px solid #ddd}
+.rec-table td{padding:5px 8px;border-bottom:1px solid #f0eeeb;vertical-align:top}
+.rec-table td:last-child{text-align:right;font-weight:700;color:#1e3a5f;white-space:nowrap}
+
+/* Booking checklist */
+.checklist{list-style:none;font-family:-apple-system,sans-serif;font-size:9.5pt}
+.checklist li{padding:5px 0;border-bottom:1px solid #f0eeeb;display:flex;gap:6px}
+.checklist li::before{content:'\\2610';font-size:12pt;color:#999;flex-shrink:0}
+.checklist .urgent::before{content:'\\2757';color:#c0392b}
+
+/* Page break helpers */
+.page-break{page-break-before:always}
+.no-break{page-break-inside:avoid}
+
+/* Footer */
+.footer{text-align:center;font-size:7.5pt;color:#bbb;margin-top:30px;padding-top:10px;border-top:1px solid #eee;font-family:-apple-system,sans-serif}
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+<h1>Paris <b>&rarr;</b> Barcelona</h1>
+<div class="sub">Birthday Trip &middot; July 2026</div>
+<div class="route">
+<div class="city"><div class="dot d-paris"></div>Paris</div><div class="line"></div>
+<div class="city"><div class="dot d-lyon"></div>Lyon</div><div class="line"></div>
+<div class="city"><div class="dot d-montpellier"></div>Montpellier</div><div class="line"></div>
+<div class="city"><div class="dot d-perpignan"></div>Perpignan</div><div class="line"></div>
+<div class="city"><div class="dot d-barcelona"></div>Barcelona</div>
+</div>
+<div class="stats">
+<div class="stat"><div class="num">11</div><div class="lbl">Nights</div></div>
+<div class="stat"><div class="num">5</div><div class="lbl">Cities</div></div>
+<div class="stat"><div class="num">12</div><div class="lbl">Days</div></div>
+</div>
+<div class="tagline"><b>The Gaudi Edition</b> &mdash; July 3 to 14, 2026<br><br>
+Birthday in Paris with free museums and a Seine dinner cruise. Pulp in a 2,000-year-old Roman amphitheatre in Lyon. Street art and wine festivals in Montpellier. Gaudi&rsquo;s masterpieces and Two Door Cinema Club in Barcelona.</div>
+</div>
+
+<!-- BUDGET SUMMARY -->
+<h2 class="section-title">Budget Overview</h2>
+<p class="section-sub">Total for two people &middot; mid-range &middot; all prices in GBP</p>
+
+<div class="summary">
+<table>
+<tr><td>Hotels (11 nights)</td><td>&pound;612</td></tr>
+<tr><td>Flights (Birmingham &harr; Paris/Barcelona)</td><td>&pound;138 &ndash; 188</td></tr>
+<tr><td>Trains/bus (Paris &rarr; Lyon &rarr; Montpellier &rarr; Barcelona)</td><td>Paris &rarr; Lyon booked: €76 &middot; Lyon &rarr; Montpellier booked: €66 &middot; Montpellier &rarr; Barcelona FlixBus booked: &pound;64.96</td></tr>
+<tr><td>Activities &amp; events (depends on selection)</td><td>&pound;400 &ndash; 1,100</td></tr>
+<tr><td>Food &amp; drink (12 days)</td><td>&pound;714</td></tr>
+<tr class="total"><td>Estimated total for two</td><td>&pound;1,920 &ndash; 2,780</td></tr>
+</table>
+</div>
+
+<!-- DAY BY DAY -->
+<h2 class="section-title">Day-by-Day Itinerary</h2>
+<p class="section-sub">Option B+ &middot; The Gaudi Edition &middot; 11 nights</p>
+
+<!-- Day 1 -->
+<div class="day-section paris">
+<div class="day-header"><h3>Day 1 &mdash; Arrive in Paris</h3><span class="date">Thursday 3 July</span></div>
+<span class="day-city dc-paris">Paris</span>
+<div class="event"><div class="event-body"><span class="event-name">Settle in, neighbourhood walk</span><div class="event-desc">Arrive at your hotel, drop bags, and take an evening walk along the Seine to get your bearings. The river is magical at sunset.</div></div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Avenue_des_Champs-%C3%89lys%C3%A9es_July_24%2C_2009_N1.jpg/500px-Avenue_des_Champs-%C3%89lys%C3%A9es_July_24%2C_2009_N1.jpg')"></div><div class="event-body"><span class="event-name">Fnac Live Festival</span><div class="event-desc">A completely free open-air music festival in the grand plaza in front of Paris City Hall. Around 30 artists over 3 days, 6pm to midnight, spanning French pop, indie rock, electronic, and hip-hop. One of the best free festivals in Europe.</div><div class="event-meta"><span class="tag t-free">FREE</span> Free (ticket from any Fnac store)</div></div><div class="event-price">Free</div></div>
+</div>
+
+<!-- Day 2 -->
+<div class="day-section paris">
+<div class="day-header"><h3>Day 2 &mdash; Paris Sightseeing</h3><span class="date">Friday 4 July</span></div>
+<span class="day-city dc-paris">Paris</span>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Paris_Plages_2009%2C_16_Ao%C3%BBt_%285%29.jpg/500px-Paris_Plages_2009%2C_16_Ao%C3%BBt_%285%29.jpg')"></div><div class="event-body"><span class="event-name">Paris Plages opens</span><div class="event-desc">Paris&rsquo;s beloved summer tradition where kilometres of the Seine riverbank are transformed into sandy beaches with palm trees, deck chairs, and free activities. This year celebrates 250 years of Franco-American friendship.</div><div class="event-meta"><span class="tag t-free">FREE</span></div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg/500px-Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg')"></div><div class="event-body"><span class="event-name">Eiffel Tower: Summit by lift</span><div class="event-desc">Right to the top &mdash; 276 metres up. Glass floor on the first level, Pierre Herm&eacute; macaron bar on the second, and a champagne bar at the summit serving glasses of Mo&euml;t. On a clear July evening the views stretch 70 kilometres. Book timed slots well in advance.</div><div class="event-meta"><span class="tag t-culture">CULTURE</span> ticket.toureiffel.paris</div></div><div class="event-price">&pound;62</div></div>
+<div class="event"><div class="event-body"><span class="event-name">Seine bookstalls &amp; &Icirc;le de la Cit&eacute;</span><div class="event-desc">Browse the famous green bookstalls along the river. Walk across to Notre-Dame Cathedral (exterior).</div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-body"><span class="event-name">Paris Jazz Festival</span><div class="event-desc">Free jazz concerts in the Parc Floral botanical garden. World-class ensembles on an open-air stage among lily ponds and towering trees. Bring a picnic blanket and wine.</div><div class="event-meta"><span class="tag t-free">FREE</span> &pound;5 park entry per person</div></div><div class="event-price">&pound;10</div></div>
+</div>
+
+<!-- Day 3 - BIRTHDAY -->
+<div class="day-section paris birthday">
+<div class="day-header"><h3>Day 3 &mdash; BIRTHDAY</h3><span class="date">Sunday 5 July</span></div>
+<span class="day-city dc-paris">Paris</span>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Louvre_Museum_Wikimedia_Commons.jpg/500px-Louvre_Museum_Wikimedia_Commons.jpg')"></div><div class="event-body"><span class="event-name">Free Museum Day</span><div class="event-desc">July 5th is the first Sunday of the month = FREE entry to the Louvre, Mus&eacute;e d&rsquo;Orsay, Orangerie, Mus&eacute;e Rodin, Mus&eacute;e Picasso, and more. At the Louvre: the Michelangelo &amp; Rodin exhibition (300 works). At the Orsay: Renoir and Love &mdash; its FINAL DAY. Arrive by 9am.</div><div class="event-meta"><span class="tag t-free">FREE</span></div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Avenue_des_Champs-%C3%89lys%C3%A9es_July_24%2C_2009_N1.jpg/500px-Avenue_des_Champs-%C3%89lys%C3%A9es_July_24%2C_2009_N1.jpg')"></div><div class="event-body"><span class="event-name">Carnaval Tropical de Paris</span><div class="event-desc">Over 4,000 costumed dancers in towering feathered headdresses samba down the Champs-&Eacute;lys&eacute;es at 1pm. Steel drum bands, floats, stilt-walkers. This year&rsquo;s Brazilian/Amazon theme. The largest tropical carnival in Europe, around half a million spectators. Free to watch.</div><div class="event-meta"><span class="tag t-free">FREE</span></div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Bercy%2C_Paris_01.jpg/500px-Bercy%2C_Paris_01.jpg')"></div><div class="event-body"><span class="event-name">Seine dinner cruise (birthday evening)</span><div class="event-desc">Float past Notre-Dame, the Louvre, and Pont Alexandre III while being served a multi-course French dinner. The highlight: the Eiffel Tower erupts into a sparkling light show every hour on the hour &mdash; 20,000 twinkling bulbs. Birthday champagne package available.</div><div class="event-meta"><span class="tag t-culture">CULTURE</span> Optional &middot; bateauxparisiens.com</div></div><div class="event-price">&pound;152&ndash;280</div></div>
+</div>
+
+<!-- Day 4 -->
+<div class="day-section paris">
+<div class="day-header"><h3>Day 4 &mdash; Relaxed Paris Day</h3><span class="date">Monday 6 July</span></div>
+<span class="day-city dc-paris">Paris</span>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Le_sacre_coeur.jpg/500px-Le_sacre_coeur.jpg')"></div><div class="event-body"><span class="event-name">Sacr&eacute;-C&oelig;ur &amp; Montmartre</span><div class="event-desc">White-domed basilica at Paris&rsquo;s highest point with panoramic views across the entire city. Cobblestoned hilltop village of winding lanes, artists&rsquo; squares, and caf&eacute; terraces. Where Picasso, Monet, and Renoir once lived.</div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/People%2C_Canal_Saint-Martin%2C_Paris_July_2014.jpg/500px-People%2C_Canal_Saint-Martin%2C_Paris_July_2014.jpg')"></div><div class="event-body"><span class="event-name">Canal Saint-Martin</span><div class="event-desc">A tree-lined waterway where Parisians gather on summer evenings with wine and cheese. Vintage shops, coffee roasters, natural wine bars. If you&rsquo;ve seen Am&eacute;lie, you&rsquo;ll recognise it.</div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-body"><span class="event-name">Fondation Louis Vuitton: Calder exhibition (optional)</span><div class="event-desc">Frank Gehry&rsquo;s glass-sailed building houses 300 works by Alexander Calder &mdash; the inventor of the mobile. Delicate sculptures that move with the air, creating an ever-shifting ballet of colour.</div><div class="event-meta"><span class="tag t-culture">CULTURE</span></div></div><div class="event-price">&pound;28</div></div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- Day 5 -->
+<div class="day-section lyon">
+<div class="day-header"><h3>Day 5 &mdash; Paris &rarr; Lyon</h3><span class="date">Tuesday 7 July</span></div>
+<span class="day-city dc-lyon">Lyon</span>
+<div class="event"><div class="event-body"><span class="event-name">OUIGO Paris Gare de Lyon &rarr; Lyon Part-Dieu</span><div class="event-desc">BOOKED by Franciny. Tuesday 7 July 2026, train n&deg;7803, 12:26&rarr;14:22. Ref UUTZ5J. Boarding opens 11:46 and closes 12:21. Ticket exchangeable under conditions and non-refundable. Tickets downloadable from 03 Jul 2026.</div><div class="event-meta">€76 total paid</div></div><div class="event-price">&pound;65.65</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Fourviere_Lyon.jpg/500px-Fourviere_Lyon.jpg')"></div><div class="event-body"><span class="event-name">Fourvi&egrave;re Basilica + Roman theatre</span><div class="event-desc">Take the funicular up to the jaw-droppingly ornate hilltop basilica. Interior of gold mosaics, stained glass, and polished marble. Panoramic views across Lyon with the Alps on the horizon. Walk through the 2,000-year-old Roman amphitheatre ruins next door.</div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Lyon_-_Lugdunum_-_Th%C3%A9atre_Romain.jpg/500px-Lyon_-_Lugdunum_-_Th%C3%A9atre_Romain.jpg')"></div><div class="event-body"><span class="event-name">Nuits de Fourvi&egrave;re: Camille Symphonique (optional)</span><div class="event-desc">French singer Camille performing with the full Orchestre National de Lyon at 9:30pm in the Roman amphitheatre. She uses her voice as a complete instrument &mdash; layering beatboxing, throat singing, and soaring melodies. A one-off orchestral reimagining under the stars.</div><div class="event-meta"><span class="tag t-music">MUSIC</span> nuitsdefourviere.com</div></div><div class="event-price">&pound;42&ndash;86</div></div>
+</div>
+
+<!-- Day 6 -->
+<div class="day-section lyon">
+<div class="day-header"><h3>Day 6 &mdash; Lyon: Pulp Night</h3><span class="date">Wednesday 8 July</span></div>
+<span class="day-city dc-lyon">Lyon</span>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Lyon_3e_-_Halles_de_Lyon-Paul_Bocuse_-_Entr%C3%A9e_livraisons_%28f%C3%A9v_2019%29.jpg/500px-Lyon_3e_-_Halles_de_Lyon-Paul_Bocuse_-_Entr%C3%A9e_livraisons_%28f%C3%A9v_2019%29.jpg')"></div><div class="event-body"><span class="event-name">Les Halles de Lyon Paul Bocuse</span><div class="event-desc">Lyon&rsquo;s legendary food hall named after the &ldquo;Chef of the Century.&rdquo; 50 vendors: regional sausages, silky Saint-Marcellin cheeses, hand-piped praline tarts, freshly shucked oysters, and the famous quenelles &mdash; pillowy pike dumplings in creamy sauce.</div><div class="event-meta"><span class="tag t-food">FOOD</span></div></div><div class="event-price">&pound;26&ndash;52</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Vieuxlyon_saintjean_toits.jpg/500px-Vieuxlyon_saintjean_toits.jpg')"></div><div class="event-body"><span class="event-name">Traboules walk, Vieux Lyon</span><div class="event-desc">Secret passageways cutting through Renaissance buildings &mdash; push open an unmarked door, step into a shadowy passage, emerge into a sunlit courtyard with carved stone arches. Built by silk merchants in the 1500s, used by the French Resistance in WWII. Don&rsquo;t miss Cour des Voraces &mdash; a breathtaking six-storey spiral staircase.</div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/PulpEventim290723_%28110_of_130%29_%2853082647673%29.jpg/500px-PulpEventim290723_%28110_of_130%29_%2853082647673%29.jpg')"></div><div class="event-body"><span class="event-name">PULP at Nuits de Fourvi&egrave;re (optional)</span><div class="event-desc">Jarvis Cocker and Pulp &mdash; one of the greatest British frontmen performing &ldquo;Common People,&rdquo; &ldquo;Disco 2000,&rdquo; and &ldquo;Babies&rdquo; in a 2,000-year-old Roman amphitheatre at 9:30pm. When the final chorus of &ldquo;Common People&rdquo; hits, the entire audience becomes one massive, joyous choir. Under the stars, ancient stone amplifying every note.</div><div class="event-meta"><span class="tag t-music">MUSIC</span> nuitsdefourviere.com</div></div><div class="event-price">&pound;68&ndash;112</div></div>
+</div>
+
+<!-- Day 7 -->
+<div class="day-section montpellier">
+<div class="day-header"><h3>Day 6 &mdash; Lyon &rarr; Montpellier</h3><span class="date">Wednesday 8 July</span></div>
+<span class="day-city dc-montpellier">Montpellier</span>
+<div class="event"><div class="event-body"><span class="event-name">OUIGO Lyon Part-Dieu &rarr; Montpellier Sud-de-France</span><div class="event-desc">BOOKED by Franciny. Wednesday 8 July 2026, train n&deg;7867, 11:10&rarr;12:56. Ref DZY82B. Seats: Coach 7, Places 771 + 772. 2 hand bags and 2 cabin bags included. Tickets downloadable from 04 Jul 2026. Non-refundable.</div></div><div class="event-price">&pound;57.01</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Montpellier_fg02.jpg/500px-Montpellier_fg02.jpg')"></div><div class="event-body"><span class="event-name">Street art walk &amp; Jardin des Plantes</span><div class="event-desc">Montpellier is one of France&rsquo;s best street art cities &mdash; enormous murals around Rue du Bras de Fer. Then visit the oldest botanical garden in France (1593): towering ancient trees, a lotus pond, and paths through groves that feel like a living cathedral.</div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-body"><span class="event-name">Festival Radio France: Bertrand Chamayou (optional)</span><div class="event-desc">One of the world&rsquo;s most acclaimed pianists performing at the Opera Comedie. Dazzling technical virtuosity and fearless emotional intensity. Part of a 100-event classical/jazz festival.</div><div class="event-meta"><span class="tag t-music">MUSIC</span> lefestival.eu</div></div><div class="event-price">&pound;18</div></div>
+<div class="event"><div class="event-body"><span class="event-name">Tohu-Bohu electronic night (optional)</span><div class="event-desc">Outdoor electronic music at Domaine d&rsquo;O &mdash; an 18th-century chateau surrounded by ancient trees. Dancing under the stars in the warm Mediterranean air.</div><div class="event-meta"><span class="tag t-festival">FESTIVAL</span></div></div><div class="event-price">&pound;16</div></div>
+</div>
+
+<!-- Day 8 -->
+<div class="day-section barcelona">
+<div class="day-header"><h3>Day 8 &mdash; Montpellier &rarr; Barcelona</h3><span class="date">Friday 10 July</span></div>
+<span class="day-city dc-barcelona">Barcelona</span>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Barcelona_Beach.jpg/500px-Barcelona_Beach.jpg')"></div><div class="event-body"><span class="event-name">&#9989; FlixBus Montpellier &rarr; Barcelona</span><div class="event-desc">Booked by Franciny. Friday 10 July 2026, Montpellier (Sabines) 11:40 to Barcelona (Bus Terminal Nord) 16:30. Booking number 335 491 8981. Paid &pound;64.96. Confirmation email sent to franciny2210@gmail.com. Arrive at Sabines by about 10:45 and be ready for boarding around 11:10.</div></div><div class="event-price">&pound;64.96</div></div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- Day 9 -->
+<div class="day-section barcelona">
+<div class="day-header"><h3>Day 9 &mdash; Barcelona: Gaud&iacute; Day + Cru&iuml;lla Festival</h3><span class="date">Saturday 11 July</span></div>
+<span class="day-city dc-barcelona">Barcelona</span>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/%CE%A3%CE%B1%CE%B3%CF%81%CE%AC%CE%B4%CE%B1_%CE%A6%CE%B1%CE%BC%CE%AF%CE%BB%CE%B9%CE%B1_2941.jpg/500px-%CE%A3%CE%B1%CE%B3%CF%81%CE%AC%CE%B4%CE%B1_%CE%A6%CE%B1%CE%BC%CE%AF%CE%BB%CE%B9%CE%B1_2941.jpg')"></div><div class="event-body"><span class="event-name">&#9989; Sagrada Fam&iacute;lia with Towers</span><div class="event-desc">Booked by Franciny. Basilica entry 09:00, Passion facade tower 09:30. Locator 99295241. 2 General tickets, total paid &euro;72. Access via C/ Marina. Download the Sagrada Fam&iacute;lia Oficial app for tickets and audioguide. Official photo ID required.</div><div class="event-meta"><span class="tag t-culture">CULTURE</span> sagradafamilia.org</div></div><div class="event-price">&pound;62</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Casa_Batllo_Overview_Barcelona_Spain_cut.jpg/500px-Casa_Batllo_Overview_Barcelona_Spain_cut.jpg')"></div><div class="event-body"><span class="event-name">&#9989; Casa Batll&oacute; Silver APP</span><div class="event-desc">Booked by Franciny. Saturday 11 July 2026 at 13:00. Passeig de Gr&agrave;cia 43. Locator 99296724. 2 Adult Silver APP tickets, total paid &euro;68. Download the Gaud&iacute; App for tickets and immersive audioguide. Bring headphones and enough battery.</div><div class="event-meta"><span class="tag t-culture">CULTURE</span> casabatllo.es</div></div><div class="event-price">&pound;59</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Faithless_-_The_Dance_Never_Ends_at_Budapest_02.jpg/500px-Faithless_-_The_Dance_Never_Ends_at_Budapest_02.jpg')"></div><div class="event-body"><span class="event-name">&#9989; Festival Cru&iuml;lla 2026 &mdash; General Saturday tickets</span><div class="event-desc">Booked by Franciny. Saturday 11 July 2026 from 17:00 at Parc del F&ograve;rum. 2 General Dissabte tickets. Purchase code ZX96E1BB92D3. Total paid: &euro;191.40 (&euro;174 tickets + &euro;17.40 fees). Download PDF or Passbook before travel.</div><div class="event-meta"><span class="tag t-festival">FESTIVAL</span> tickets.oneboxtds.com/cruilla</div></div><div class="event-price">&pound;166</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Two_Door_Cinema_Club%2C_Bonnaroo_2012_%287188380925%29.jpg/500px-Two_Door_Cinema_Club%2C_Bonnaroo_2012_%287188380925%29.jpg')"></div><div class="event-body"><span class="event-name">Two Door Cinema Club at Cru&iuml;lla Festival</span><div class="event-desc">Northern Irish indie-pop trio whose shimmering guitar anthems &ldquo;What You Know,&rdquo; &ldquo;Undercover Martyn,&rdquo; and &ldquo;Sun&rdquo; are precision-engineered for festival fields. Exact 2026 set time still TBC.</div><div class="event-meta"><span class="tag t-festival">FESTIVAL</span> Included in Saturday ticket</div></div></div>
+<div class="event"><div class="event-body"><span class="event-name">Also playing: Faithless, The Hives + Jon Batiste</span><div class="event-desc">All included with the same Saturday Cru&iuml;lla ticket. Check exact stage times closer to July.</div></div></div>
+</div>
+
+<!-- Day 10 -->
+<div class="day-section barcelona">
+<div class="day-header"><h3>Day 10 &mdash; Barcelona: Gaud&iacute; Day 2</h3><span class="date">Sunday 12 July</span></div>
+<span class="day-city dc-barcelona">Barcelona</span>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Parc_guell_-_panoramio.jpg/500px-Parc_guell_-_panoramio.jpg')"></div><div class="event-body"><span class="event-name">&#9989; Park G&uuml;ell admission</span><div class="event-desc">Booked by Franciny. Sunday 12 July 2026 at 09:30. 2 General tickets, total paid &euro;36. Locator 700204231262. Order 326171434752. Authorisation 249699. Tickets are valid only until 10:00, 30 minutes after the reserved time.</div><div class="event-meta"><span class="tag t-culture">CULTURE</span> parkguell.barcelona</div></div><div class="event-price">&pound;31</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Casa_Mil%C3%A0%2C_general_view.jpg/500px-Casa_Mil%C3%A0%2C_general_view.jpg')"></div><div class="event-body"><span class="event-name">La Pedrera (Casa Mil&agrave;)</span><div class="event-desc">Gaud&iacute;&rsquo;s last great building. Undulating stone facade like waves of the sea. The rooftop is the highlight: surreal ventilation towers sculpted into helmeted warriors. Visit at sunset.</div><div class="event-meta"><span class="tag t-culture">CULTURE</span> lapedrera.com</div></div><div class="event-price">&pound;42</div></div>
+<div class="event"><div class="event-body"><span class="event-name">Museum of Contemporary Art (free Saturday 4&ndash;8pm)</span><div class="event-desc">Barcelona&rsquo;s major contemporary art museum. 30th anniversary collection show. Free on Saturday afternoons.</div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/22_11_01_Palau_DSCF2611_52502512616_cc1e7db845_k.jpg/500px-22_11_01_Palau_DSCF2611_52502512616_cc1e7db845_k.jpg')"></div><div class="event-body"><span class="event-name">Flamenco at Palau de la M&uacute;sica Catalana (optional)</span><div class="event-desc">The Palau is widely considered one of the most beautiful concert halls ever built &mdash; a UNESCO World Heritage Site with an inverted stained-glass dome, mosaic flower columns, and sculptured muses. Inside, the Gran Gala Flamenco: rapid-fire guitar, guttural deep song, and fierce percussive footwork. Unforgettable.</div><div class="event-meta"><span class="tag t-culture">CULTURE</span> palaumusica.cat</div></div><div class="event-price">&pound;52&ndash;94</div></div>
+</div>
+
+<!-- Day 11 -->
+<div class="day-section barcelona">
+<div class="day-header"><h3>Day 11 &mdash; Barcelona: Relaxed Day</h3><span class="date">Monday 13 July</span></div>
+<span class="day-city dc-barcelona">Barcelona</span>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Barcelona_Beach.jpg/500px-Barcelona_Beach.jpg')"></div><div class="event-body"><span class="event-name">Barceloneta beach</span><div class="event-desc">Morning swim in the Mediterranean. Chill on the sand. Lunch at a chiringuito (beach bar) with fresh grilled seafood, paella, and sangria.</div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Barcelona_-_Carrer_del_Bisbe.jpg/500px-Barcelona_-_Carrer_del_Bisbe.jpg')"></div><div class="event-body"><span class="event-name">Gothic Quarter</span><div class="event-desc">Medieval labyrinth of narrow streets dating back to the Roman era. The magnificent Cathedral with 13 white geese in the cloister. Plac&cedil;a Reial with Gaud&iacute;&rsquo;s early lampposts. Hidden chapels, jazz cellars, artisan workshops.</div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-body"><span class="event-name">La Boqueria market</span><div class="event-desc">Barcelona&rsquo;s most famous food market on La Rambla. Stalls piled with fresh fruit, Iberian jamon, towers of seafood, and freshly squeezed tropical juices. Been feeding Barcelona since 1217.</div></div><div class="event-price">Free</div></div>
+<div class="event"><div class="event-body"><span class="event-name">Montju&iuml;c Magic Fountain</span><div class="event-desc">Free light-and-water show on summer evenings. Enormous jets of water dance to music while rainbow lights illuminate the fountain. A quintessentially Barcelona spectacle.</div><div class="event-meta"><span class="tag t-free">FREE</span></div></div><div class="event-price">Free</div></div>
+</div>
+
+<!-- Day 12 -->
+<div class="day-section barcelona">
+<div class="day-header"><h3>Day 12 &mdash; Fly Home</h3><span class="date">Tuesday 14 July</span></div>
+<span class="day-city dc-barcelona">Barcelona</span>
+<div class="event"><div class="event-body"><span class="event-name">Last morning in Barcelona</span><div class="event-desc">Final wander, final coffee, final view of the sea.</div></div></div>
+<div class="event"><div class="event-body"><span class="event-name">Flight from Barcelona to Bristol or Birmingham</span><div class="event-desc">Afternoon flight home. easyJet and Ryanair both fly direct, about 2.5 hours. Ryanair to Birmingham from &pound;27pp is the cheapest option found.</div></div><div class="event-price">&pound;54&ndash;170</div></div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- HOTELS -->
+<h2 class="section-title">Hotel Recommendations</h2>
+<p class="section-sub">Real prices from MoodTrip &middot; July 2026 &middot; per room per night</p>
+
+<table class="rec-table">
+<tr><th>City</th><th>Hotel</th><th>Rating</th><th>Per Night</th></tr>
+<tr><td>Paris (4 nights)</td><td>B&amp;B Hotel Paris 17 Batignolles</td><td>8.1/10</td><td>&pound;111</td></tr>
+<tr><td>Paris</td><td>Campanile Paris 12 Bercy Village</td><td>7.9/10</td><td>&pound;143</td></tr>
+<tr><td>Lyon (2 nights)</td><td>Odalys City Bioparc</td><td>8.1/10</td><td>&pound;60</td></tr>
+<tr><td>Lyon</td><td>Adonis Lyon Dock Ouest</td><td>8.0/10</td><td>&pound;61</td></tr>
+<tr><td>Montpellier (1 night)</td><td>Halt Hotel</td><td>8.8/10</td><td>&pound;51</td></tr>
+<tr><td>Montpellier</td><td>B&amp;B Hotel Centre Le Mill&eacute;naire</td><td>7.4/10</td><td>&pound;62</td></tr>
+<tr><td>Barcelona (4 nights)</td><td>Ilunion Les Corts Spa</td><td>8.3/10</td><td>&pound;131</td></tr>
+<tr><td>Barcelona</td><td>Barcel&oacute; Sants</td><td>8.7/10</td><td>&pound;137</td></tr>
+</table>
+
+<!-- TRANSPORT -->
+<h2 class="section-title">Transport</h2>
+<p class="section-sub">Live prices from Google Flights &amp; SNCF &middot; per person unless noted</p>
+
+<table class="rec-table">
+<tr><th>Route</th><th>Operator</th><th>Duration</th><th>Price (each)</th></tr>
+<tr><td>Birmingham &rarr; Paris CDG</td><td>easyJet</td><td>1h 25m</td><td>&pound;47</td></tr>
+<tr><td>Birmingham &rarr; Paris Beauvais</td><td>Ryanair</td><td>1h 10m</td><td>&pound;42</td></tr>
+<tr><td>Bristol &rarr; Paris CDG</td><td>easyJet</td><td>1h 25m</td><td>&pound;71</td></tr>
+<tr><td colspan="4" style="background:#f8f7f5;font-weight:600">Trains within France/Spain (check live prices before paying)</td></tr>
+<tr><td>Paris &rarr; Lyon</td><td>OUIGO n&deg;7803</td><td>12:26&rarr;14:22</td><td>BOOKED &middot; €76</td></tr>
+<tr><td>Lyon &rarr; Montpellier</td><td>OUIGO n&deg;7867</td><td>11:10&rarr;12:56</td><td>BOOKED &middot; €66</td></tr>
+<tr><td>Montpellier &rarr; Barcelona</td><td>FlixBus</td><td>11:40&rarr;16:30</td><td>BOOKED &middot; &pound;64.96</td></tr>
+<tr><td colspan="4" style="background:#f8f7f5;font-weight:600">Return flight</td></tr>
+<tr><td>Barcelona &rarr; Birmingham</td><td>Ryanair</td><td>2h 25m</td><td><b>&pound;27</b></td></tr>
+<tr><td>Barcelona &rarr; Bristol</td><td>easyJet</td><td>2h 30m</td><td>&pound;40</td></tr>
+</table>
+
+<!-- BOOKING CHECKLIST -->
+<h2 class="section-title">Booking Checklist</h2>
+<p class="section-sub">Book these in order of urgency</p>
+
+<ul class="checklist">
+<li class="urgent">Eiffel Tower summit tickets &mdash; sells out 2&ndash;3 months ahead for July &mdash; ticket.toureiffel.paris</li>
+<li class="done">Sagrada Fam&iacute;lia with Passion tower (Jul 11, 09:00) &mdash; BOOKED by Franciny &mdash; locator 99295241</li>
+<li class="done">OUIGO Paris Gare de Lyon &rarr; Lyon Part-Dieu (Jul 7, 12:26) &mdash; BOOKED by Franciny &mdash; ref UUTZ5J</li>
+<li class="done">OUIGO Lyon Part-Dieu &rarr; Montpellier Sud-de-France (Jul 8, 11:10) &mdash; BOOKED by Franciny &mdash; ref DZY82B</li>
+<li class="done">FlixBus Montpellier Sabines &rarr; Barcelona Nord (Jul 10, 11:40&rarr;16:30) &mdash; BOOKED by Franciny &mdash; ref 335 491 8981</li>
+<li>Flights: Birmingham to Paris + Barcelona to Birmingham &mdash; easyjet.com / ryanair.com</li>
+<li>Hotels across all cities &mdash; booking.com or trivago.co.uk</li>
+<li>Pulp at Nuits de Fourvi&egrave;re (if going) &mdash; nuitsdefourviere.com</li>
+<li class="done">Cru&iuml;lla Festival Saturday ticket (Jul 11) &mdash; BOOKED by Franciny &mdash; code ZX96E1BB92D3</li>
+<li>Flamenco at Palau de la M&uacute;sica &mdash; palaumusica.cat</li>
+<li class="done">Casa Batll&oacute; Silver APP (Jul 11, 13:00) &mdash; BOOKED by Franciny &mdash; locator 99296724</li>
+<li class="done">Park G&uuml;ell admission (Jul 12, 09:30) &mdash; BOOKED by Franciny &mdash; locator 700204231262</li>
+<li>La Pedrera tickets &mdash; lapedrera.com</li>
+<li>Seine birthday dinner cruise &mdash; bateauxparisiens.com</li>
+</ul>
+
+<div class="footer">
+Paris &rarr; Barcelona &middot; Birthday Trip &middot; July 2026 &middot; The Gaudi Edition (11 nights)
+</div>
+
+</body>
+</html>

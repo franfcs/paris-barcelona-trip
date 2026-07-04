@@ -1,0 +1,11 @@
+name = "paris-barcelona-trip"
+main = "worker.js"
+compatibility_date = "2024-11-06"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[kv_namespaces]]
+binding = "TRIP_KV"
+id = "5e2f7fc2ee434bcb8ee1d63d59952a85"
