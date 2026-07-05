@@ -123,6 +123,25 @@ a{color:#4a90d9;text-decoration:none}a:hover{text-decoration:underline}
 .day.birthday .bar{background:linear-gradient(90deg,#f0a500,#ff6b6b,#f0a500);height:5px}
 .bday-badge{display:inline-block;background:linear-gradient(135deg,#f0a500,#ff6b6b);color:#fff;padding:2px 10px;border-radius:8px;font-size:.7rem;font-weight:700;margin-left:6px}
 
+/* Collapsible days */
+.day-body{cursor:default}
+.day-head{cursor:pointer;user-select:none}
+.day-chev{font-size:.85rem;color:#bbb;transition:transform .2s;margin-left:8px;display:inline-block}
+.day.collapsed .day-chev{transform:rotate(-90deg)}
+.day.collapsed .city-label,.day.collapsed .events{display:none}
+.day.collapsed .day-title{margin-bottom:0;font-size:1rem;opacity:.85}
+.day.collapsed .day-body{padding:11px 18px}
+.day-count{font-size:.65rem;color:#aaa;font-weight:600;margin-left:8px}
+.day.collapsed:hover{box-shadow:0 2px 10px rgba(0,0,0,.09)}
+.day.today{border:2px solid #e91e8c;box-shadow:0 2px 12px rgba(233,30,140,.18)}
+.day.today .bar{background:linear-gradient(90deg,#e91e8c,#ff6b6b,#e91e8c);height:5px}
+.today-badge{display:inline-block;background:linear-gradient(135deg,#e91e8c,#ff6b6b);color:#fff;padding:2px 9px;border-radius:8px;font-size:.68rem;font-weight:700;margin-left:6px;letter-spacing:.03em}
+.itin-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.itin-toolbar .itbtn{background:#fff;border:1px solid #e2e2df;border-radius:8px;padding:6px 13px;font-size:.8rem;cursor:pointer;font-weight:600;color:#444;font-family:inherit}
+.itin-toolbar .itbtn:hover{background:#f5f3f0}
+.itin-toolbar .itbtn.primary{background:#e91e8c;color:#fff;border-color:#e91e8c}
+.itin-toolbar .itbtn.primary:hover{background:#c2177a}
+
 /* Events */
 .events{list-style:none}
 .ev{padding:10px 0;border-top:1px solid #f0eeeb;display:flex;gap:10px;align-items:flex-start;font-size:.85rem}
@@ -349,6 +368,11 @@ document.querySelectorAll('.main-tabs button').forEach(b=>b.classList.toggle('ac
 <button class="fbtn" data-c="barcelona" onclick="filt('barcelona')">Barcelona</button>
 </div>
 
+<div class="itin-toolbar">
+<button class="itbtn primary" onclick="showTodayOnly()">📍 Today only</button>
+<button class="itbtn" onclick="setAllDays(false)">Expand all</button>
+<button class="itbtn" onclick="setAllDays(true)">Collapse all</button>
+</div>
 <div class="days" id="days"></div>
 </div><!-- /itinerary part 1 -->
 
@@ -1833,11 +1857,45 @@ function evIcon(e){
   return '';
 }
 
+// ── Collapsible days: figure out which day is "today" and default others closed ──
+const MONTHS={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function dayIndexForToday(){
+  const o=OPT[curOpt];const now=new Date();
+  for(let i=0;i<o.days.length;i++){
+    const m=/(\w{3})\s+(\d+)/.exec(o.days[i].dt);if(!m)continue;
+    if(now.getMonth()===MONTHS[m[1]]&&now.getDate()===parseInt(m[2],10)&&now.getFullYear()===2026)return i;
+  }
+  return -1; // trip not currently running
+}
+let dayCollapsed=null; // array of booleans, one per day
+function initDayCollapse(){
+  const o=OPT[curOpt];const todayIdx=dayIndexForToday();
+  try{const saved=JSON.parse(localStorage.getItem('dayCollapse_v1'));
+    if(saved&&saved.length===o.days.length){dayCollapsed=saved;return;}}catch(e){}
+  // default: if trip is running, collapse everything except today; else expand all
+  dayCollapsed=o.days.map((_,i)=> todayIdx>=0 ? i!==todayIdx : false);
+}
+function saveDayCollapse(){try{localStorage.setItem('dayCollapse_v1',JSON.stringify(dayCollapsed));}catch(e){}}
+window.toggleDay=function(di){dayCollapsed[di]=!dayCollapsed[di];saveDayCollapse();renderDays();};
+window.setAllDays=function(collapsed){dayCollapsed=dayCollapsed.map(()=>collapsed);saveDayCollapse();renderDays();};
+window.showTodayOnly=function(){
+  const t=dayIndexForToday();
+  if(t<0){alert('Trip dates are Jul 3–14, 2026 — no "today" in that range right now. Showing all days.');dayCollapsed=dayCollapsed.map(()=>false);}
+  else{dayCollapsed=dayCollapsed.map((_,i)=>i!==t);}
+  saveDayCollapse();renderDays();
+  const el=document.querySelector('.day.today');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+};
+
 function renderDays(){
 const o=OPT[curOpt];
+if(!dayCollapsed||dayCollapsed.length!==o.days.length)initDayCollapse();
+const todayIdx=dayIndexForToday();
 document.getElementById('days').innerHTML=o.days.map((d,di)=>{
 const hide=curFilt!=='all'&&d.c!==curFilt?' hidden':'';
 const bday=d.bday?' birthday':'';
+const isToday=di===todayIdx;
+const collapsed=dayCollapsed[di]?' collapsed':'';
+const todayCls=isToday?' today':'';
 const badge=d.bday?'<span class="bday-badge">Birthday!</span>':'';
 const evs=d.evs.map((e,ei)=>{
 const key=di+'_'+ei;
@@ -1870,7 +1928,10 @@ const icon=evIcon(e);
 const iconHtml=icon?`<span class="ev-icon">${icon}</span>`:'';
 return `<li class="ev${transitCls}${stCls}">${cb}${imgHtml}<div class="ev-body"><div class="ev-name">${tmHtml}${iconHtml}${e.n}</div>${desc}${linkHtml}<div class="ev-tags">${stTag}${tagHtml}${optTag}</div></div>${prStr?`<span class="ev-price${prClass}">${prStr}</span>`:''}</li>`;
 }).join('');
-return `<div class="day${bday}${hide}" data-c="${d.c}"><div class="bar bar-${d.c}"></div><div class="day-body"><div class="day-head"><span class="day-date">${d.wd} ${d.dt}</span><span class="day-num">Day ${di+1}</span></div><div class="day-title">${d.t} ${badge}</div><span class="city-label cl-${d.c}">${C[d.c].n}</span><ul class="events">${evs}</ul></div></div>`;
+const evCount=d.evs.length;
+const todayBadge=isToday?'<span class="today-badge">● TODAY</span>':'';
+const countHtml=dayCollapsed[di]?`<span class="day-count">${evCount} item${evCount!==1?'s':''}</span>`:'';
+return `<div class="day${bday}${todayCls}${collapsed}${hide}" data-c="${d.c}"><div class="bar bar-${d.c}"></div><div class="day-body"><div class="day-head" onclick="toggleDay(${di})"><span class="day-date">${d.wd} ${d.dt}${countHtml}</span><span style="display:flex;align-items:center"><span class="day-num">Day ${di+1}</span><span class="day-chev">▼</span></span></div><div class="day-title">${d.t} ${todayBadge}${badge}</div><span class="city-label cl-${d.c}">${C[d.c].n}</span><ul class="events">${evs}</ul></div></div>`;
 }).join('');
 initLazyBackgrounds(document.getElementById('days'));
 }
