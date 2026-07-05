@@ -25,7 +25,7 @@ if('serviceWorker' in navigator){
    Mirrors the interactive keys to a Cloudflare Worker + KV so ticks/edits
    are shared across phone & laptop. Fails silently offline / on GitHub Pages. */
 (function(){
-  var SYNC_KEYS=['bookDone_v1','bookDetails_v2','popChecked_v1','pdState_v2','pdTrends_v1'];
+  var SYNC_KEYS=['bookDone_v1','bookDetails_v2','popChecked_v1','pdState_v2','pdTrends_v1','dayNotes_v1'];
   var API='/api/state';
   var _set=localStorage.setItem.bind(localStorage);
   var _get=localStorage.getItem.bind(localStorage);
@@ -141,6 +141,15 @@ a{color:#4a90d9;text-decoration:none}a:hover{text-decoration:underline}
 .itin-toolbar .itbtn:hover{background:#f5f3f0}
 .itin-toolbar .itbtn.primary{background:#e91e8c;color:#fff;border-color:#e91e8c}
 .itin-toolbar .itbtn.primary:hover{background:#c2177a}
+/* Per-day note */
+.day.collapsed .day-note-wrap{display:none}
+.day-note-wrap{margin-top:12px}
+.day-note-lbl{font-size:.72rem;font-weight:700;color:#e91e8c;letter-spacing:.03em;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.day-note{width:100%;box-sizing:border-box;border:1px solid #f3d6e6;background:#fff8fc;border-radius:8px;padding:9px 11px;font-family:inherit;font-size:.88rem;color:#333;resize:vertical;min-height:44px;line-height:1.45}
+.day-note:focus{outline:none;border-color:#e91e8c;background:#fff}
+.day-note::placeholder{color:#c99db8}
+.day-note-saved{font-size:.68rem;color:#27ae60;margin-left:6px;opacity:0;transition:opacity .2s}
+.day-note-saved.show{opacity:1}
 
 /* Events */
 .events{list-style:none}
@@ -1867,6 +1876,18 @@ function dayIndexForToday(){
   }
   return -1; // trip not currently running
 }
+let dayNotes={}; // {dayIndex: "note text"}
+try{dayNotes=JSON.parse(localStorage.getItem('dayNotes_v1'))||{};}catch(e){dayNotes={};}
+let noteSaveT=null;
+window.saveDayNote=function(di,val){
+  dayNotes[di]=val;
+  clearTimeout(noteSaveT);
+  noteSaveT=setTimeout(function(){
+    localStorage.setItem('dayNotes_v1',JSON.stringify(dayNotes)); // triggers cloud sync
+    var f=document.getElementById('ns-'+di);
+    if(f){f.classList.add('show');setTimeout(function(){f.classList.remove('show');},1500);}
+  },500);
+};
 let dayCollapsed=null; // array of booleans, one per day
 function initDayCollapse(){
   const o=OPT[curOpt];const todayIdx=dayIndexForToday();
@@ -1930,8 +1951,12 @@ return `<li class="ev${transitCls}${stCls}">${cb}${imgHtml}<div class="ev-body">
 }).join('');
 const evCount=d.evs.length;
 const todayBadge=isToday?'<span class="today-badge">● TODAY</span>':'';
-const countHtml=dayCollapsed[di]?`<span class="day-count">${evCount} item${evCount!==1?'s':''}</span>`:'';
-return `<div class="day${bday}${todayCls}${collapsed}${hide}" data-c="${d.c}"><div class="bar bar-${d.c}"></div><div class="day-body"><div class="day-head" onclick="toggleDay(${di})"><span class="day-date">${d.wd} ${d.dt}${countHtml}</span><span style="display:flex;align-items:center"><span class="day-num">Day ${di+1}</span><span class="day-chev">▼</span></span></div><div class="day-title">${d.t} ${todayBadge}${badge}</div><span class="city-label cl-${d.c}">${C[d.c].n}</span><ul class="events">${evs}</ul></div></div>`;
+const noteVal=(dayNotes[di]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const hasNote=noteVal.trim()!=='';
+const noteFlag=(dayCollapsed[di]&&hasNote)?'<span class="day-count" style="color:#e91e8c">📝 note</span>':'';
+const countHtml=dayCollapsed[di]?`<span class="day-count">${evCount} item${evCount!==1?'s':''}</span>${noteFlag}`:'';
+const noteHtml=`<div class="day-note-wrap"><div class="day-note-lbl">📝 My note<span class="day-note-saved" id="ns-${di}">saved ✓</span></div><textarea class="day-note" data-di="${di}" placeholder="Changed plans, ideas, reminders… e.g. 'skipped the museum, went to the market instead'" oninput="saveDayNote(${di},this.value)">${noteVal}</textarea></div>`;
+return `<div class="day${bday}${todayCls}${collapsed}${hide}" data-c="${d.c}"><div class="bar bar-${d.c}"></div><div class="day-body"><div class="day-head" onclick="toggleDay(${di})"><span class="day-date">${d.wd} ${d.dt}${countHtml}</span><span style="display:flex;align-items:center"><span class="day-num">Day ${di+1}</span><span class="day-chev">▼</span></span></div><div class="day-title">${d.t} ${todayBadge}${badge}</div><span class="city-label cl-${d.c}">${C[d.c].n}</span><ul class="events">${evs}</ul>${noteHtml}</div></div>`;
 }).join('');
 initLazyBackgrounds(document.getElementById('days'));
 }
