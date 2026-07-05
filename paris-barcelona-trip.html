@@ -377,6 +377,58 @@ document.querySelectorAll('.main-tabs button').forEach(b=>b.classList.toggle('ac
 <button class="fbtn" data-c="barcelona" onclick="filt('barcelona')">Barcelona</button>
 </div>
 
+<style>
+.tips-card{border:1px solid #e8e6e3;border-radius:12px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:14px;overflow:hidden}
+.tips-card>summary{list-style:none;cursor:pointer;padding:13px 18px;font-weight:700;font-size:1rem;color:#1e3a5f;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#fff8fc,#fff)}
+.tips-card>summary::-webkit-details-marker{display:none}
+.tips-card>summary .chev{font-size:.8rem;color:#e91e8c;transition:transform .2s}
+.tips-card[open]>summary .chev{transform:rotate(180deg)}
+.tips-body{padding:2px 18px 16px}
+.tips-body h4{margin:14px 0 5px;font-size:.9rem;color:#e91e8c;display:flex;align-items:center;gap:5px}
+.tips-body p,.tips-body li{font-size:.86rem;line-height:1.5;color:#444}
+.tips-body ul{margin:4px 0 4px 2px;padding-left:16px}
+.tips-body li{margin-bottom:3px}
+.tips-body .k{font-weight:700;color:#222}
+.tips-body .warn{background:#fff4e6;border-left:3px solid #f0a500;border-radius:5px;padding:8px 11px;font-size:.83rem;margin:6px 0}
+.tips-body .ok{background:#eafaf0;border-left:3px solid #27ae60;border-radius:5px;padding:8px 11px;font-size:.83rem;margin:6px 0}
+.tips-body .phrase{background:#f5f3f0;border-radius:5px;padding:1px 6px;font-style:italic}
+</style>
+<details class="tips-card">
+<summary><span>🍽️ Food on a Budget &amp; Street-Smart Tips</span><span class="chev">▼</span></summary>
+<div class="tips-body">
+
+<h4>🥖 Cheap eats — the French "meal deal"</h4>
+<ul>
+<li><span class="k">Boulangerie "formule"</span> (~€6–9): baguette sandwich + drink + pastry. Look for <span class="phrase">Formule</span> or <span class="phrase">Menu</span> in the window.</li>
+<li><span class="k">Jambon-beurre</span> (ham &amp; butter baguette) — €4–6, the classic cheap lunch.</li>
+<li><span class="k">Supermarkets</span> (Monoprix, Franprix, Carrefour City, Lidl) — sandwich + drink + fruit ≈ €6. Perfect for a <span class="k">Seine picnic</span>.</li>
+<li><span class="k">Crêpes / kebab-grec</span> street stands — €4–8 everywhere.</li>
+<li><span class="k">L'As du Fallafel</span> (Le Marais) — famous falafel ~€9, huge.</li>
+<li><span class="k">Bouillon Chartier / Bouillon Pigalle</span> — proper sit-down French, mains €9–14, no booking (just queue).</li>
+</ul>
+
+<h4>💧 Free water &amp; money-savers</h4>
+<ul>
+<li>Ask for <span class="phrase">une carafe d'eau</span> — restaurants must give free tap water.</li>
+<li>Free public fountains everywhere, incl. sparkling <span class="k">Wallace &amp; pétillante fountains</span> — bring a refillable bottle.</li>
+<li><span class="k">Too Good To Go</span> app — bakeries/restaurants sell surplus food €3–5. Works in Paris &amp; Barcelona.</li>
+<li>Eat your big meal at <span class="k">lunch</span> — bistro <span class="phrase">formule midi</span> (€12–16 for 2 courses) is far cheaper than dinner.</li>
+</ul>
+
+<h4>🍷 Drinking alcohol in public — know the difference</h4>
+<div class="ok"><span class="k">🇫🇷 France (Paris, Lyon, Montpellier):</span> Generally <span class="k">fine</span> — picnicking with wine by the Seine, canals &amp; parks is normal and tolerated. A few zones/times are restricted, and being visibly drunk in public (<span class="phrase">ivresse publique</span>) is an offence. So: a glass of wine by the river 👍, getting hammered on the street 👎.</div>
+<div class="warn"><span class="k">🇪🇸 Barcelona is different:</span> Street drinking (<span class="phrase">botellón</span>) is <span class="k">banned and fined</span> — fines can be €300+. No drinking on streets, squares or the beach. Drink in bars, restaurants, terraces or your accommodation instead. Also ignore people selling cans of beer on the street/beach — it's illegal and a common tourist trap.</div>
+
+<h4>🛡️ Street-smart</h4>
+<ul>
+<li><span class="k">Pickpockets</span> on the metro &amp; at big sights (Eiffel, Sagrada, Las Ramblas) — bag zipped &amp; in front, phone away in crowds.</li>
+<li>Decline friendship bracelets / petition-signers near monuments — classic distraction scams.</li>
+<li>Tap-to-pay works nearly everywhere; carry a little cash for boulangeries &amp; markets.</li>
+</ul>
+
+</div>
+</details>
+
 <div class="itin-toolbar">
 <button class="itbtn primary" onclick="showTodayOnly()">📍 Today only</button>
 <button class="itbtn" onclick="setAllDays(false)">Expand all</button>
