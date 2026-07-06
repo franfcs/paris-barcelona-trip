@@ -19,6 +19,19 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
   });
 }
+// Hide the sticky top bars when scrolling down, show when scrolling up (CSS gates this to phones)
+(function(){
+  var lastY=0,ticking=false,TH=70;
+  function upd(){
+    var y=window.pageYOffset||document.documentElement.scrollTop||0;
+    if(y>lastY&&y>TH)document.body.classList.add('nav-hidden');
+    else if(y<lastY-4)document.body.classList.remove('nav-hidden');
+    lastY=y<0?0:y;ticking=false;
+  }
+  window.addEventListener('scroll',function(){
+    if(!ticking){window.requestAnimationFrame(upd);ticking=true;}
+  },{passive:true});
+})();
 </script>
 <script>
 /* ── Cloud sync ──
@@ -238,6 +251,9 @@ a{color:#4a90d9;text-decoration:none}a:hover{text-decoration:underline}
 .budget-bar{flex-direction:column;align-items:flex-start}
 .pol{width:150px;padding:5px 5px 24px}
 .tabs{gap:4px}.tab-btn{padding:8px 12px;font-size:.8rem}
+/* Auto-hide the sticky top bars on scroll-down (phone only) for more reading space */
+.budget-bar,.main-tabs{transition:transform .28s ease}
+body.nav-hidden .budget-bar,body.nav-hidden .main-tabs{transform:translateY(-170%)}
 }
 /* Lightbox */
 .lightbox{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);align-items:center;justify-content:center;cursor:pointer}
