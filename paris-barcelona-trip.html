@@ -254,7 +254,16 @@ a{color:#4a90d9;text-decoration:none}a:hover{text-decoration:underline}
 /* Auto-hide the sticky top bars on scroll-down (phone only) for more reading space */
 .budget-bar,.main-tabs{transition:transform .28s ease}
 body.nav-hidden .budget-bar,body.nav-hidden .main-tabs{transform:translateY(-170%)}
+/* Stop horizontal overflow: collapse wide grids to a single column on phones */
+.maps-grid,.rec-grid,.plan-grid,.price-grid,.pop-grid,.tr-grid{grid-template-columns:1fr}
+.pd-layout{grid-template-columns:1fr}
+.pd-pool{position:static;max-height:none;margin-bottom:12px}
+/* Wide tables scroll inside themselves instead of pushing the whole page sideways */
+table{display:block;overflow-x:auto;max-width:100%}
 }
+/* Never let the page itself scroll sideways + wrap long tokens */
+html,body{overflow-x:hidden;max-width:100%}
+.container,.day,.ev-desc,.tips-body,.misc-card,.bi-body{overflow-wrap:break-word;word-break:break-word}
 /* Lightbox */
 .lightbox{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);align-items:center;justify-content:center;cursor:pointer}
 .lightbox.open{display:flex}
