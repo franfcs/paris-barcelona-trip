@@ -15,8 +15,13 @@
 <meta name="theme-color" content="#1e3a5f">
 <script>
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  var _hadCtrl=!!navigator.serviceWorker.controller, _refreshing=false;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(_refreshing)return;
+    if(_hadCtrl){_refreshing=true;location.reload();} else {_hadCtrl=true;}
+  });
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('./sw.js').then(function(reg){reg&&reg.update();}).catch(function(){});
   });
 }
 // Hide the sticky top bars when scrolling down, show when scrolling up (CSS gates this to phones)
