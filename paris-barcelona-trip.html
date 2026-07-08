@@ -351,9 +351,8 @@ body[data-tab="predep"] .tab-block[data-panel="predep"]{display:block}
 <button class="active" data-mt="itinerary" onclick="setTab('itinerary')"><span class="icn">&#128197;</span>Itinerary</button>
 <button data-mt="checklist" onclick="setTab('checklist')"><span class="icn">&#9989;</span>Bookings</button>
 <button data-mt="confirmed" onclick="setTab('confirmed')"><span class="icn">&#128179;</span>Confirmed &amp; Paid</button>
-<button data-mt="bonus" onclick="setTab('bonus')"><span class="icn">&#10024;</span>Bonus Sights</button>
 <button data-mt="maps" onclick="setTab('maps')"><span class="icn">&#128506;</span>Maps</button>
-<button data-mt="vision" onclick="setTab('vision')"><span class="icn">&#127912;</span>Vision Board</button>
+<button data-mt="vision" onclick="setTab('vision')"><span class="icn">&#127912;</span>Sights &amp; Vision</button>
 <button data-mt="misc" onclick="setTab('misc')"><span class="icn">&#128206;</span>Misc</button>
 <button data-mt="predep" onclick="setTab('predep')"><span class="icn">&#128668;</span>Before We Go</button>
 </div>
@@ -853,205 +852,6 @@ renderPaid();
 
 </div><!-- /itinerary part 2 -->
 
-<div class="tab-block" data-panel="bonus">
-<!-- Bonus Sights -->
-<div class="sec"><h2>Bonus Sights &amp; Pop Culture</h2><p>Tick the ones you want to visit &middot; saved to your browser &middot; tiles fetch live photos from Wikipedia</p></div>
-<style>
-.pop-filters{display:flex;gap:8px;justify-content:center;margin:10px 0 14px;flex-wrap:wrap}
-.pop-filters button{background:#fff;border:1px solid #ddd;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500}
-.pop-filters button.active{background:#1e3a5f;color:#fff;border-color:#1e3a5f}
-.pop-filters .count{background:#f9a825;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px}
-.pop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:4px 0 24px}
-.pop-tile{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.06);position:relative;transition:transform .15s,box-shadow .15s}
-.pop-tile:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
-.pop-tile.checked{box-shadow:0 0 0 3px #f9a825, 0 4px 12px rgba(0,0,0,.12)}
-.pop-tile .pimg{height:160px;background:#e0e0e0 center/cover no-repeat;position:relative}
-.pop-tile .ptag{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.7);color:#fff;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600;letter-spacing:.5px}
-.pop-tile.emily .ptag{background:#ec407a}
-.pop-tile.ladybug .ptag{background:#e53935}
-.pop-tile.both .ptag{background:linear-gradient(90deg,#ec407a 50%,#e53935 50%)}
-.pop-tile.bcn .ptag{background:#922b21}
-.pop-tile.lyon .ptag{background:#7b2252}
-.pop-tile .pcheck{position:absolute;top:8px;right:8px;width:30px;height:30px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:bold;color:#bbb;user-select:none;border:2px solid #fff;transition:all .15s}
-.pop-tile .pcheck:hover{background:#fff;color:#666}
-.pop-tile.checked .pcheck{background:#f9a825;color:#fff;border-color:#f9a825}
-.pop-tile .pbody{padding:12px 14px}
-.pop-tile .ptitle{font-weight:600;color:#1e3a5f;font-size:14px;line-height:1.2}
-.pop-tile .paddr{color:#666;font-size:11px;margin-top:3px}
-.pop-tile .pdesc{color:#333;font-size:12px;line-height:1.45;margin-top:6px}
-</style>
-<div class="pop-filters">
-<button class="active" data-pf="all" onclick="popFilter('all')">All</button>
-<button data-pf="emily" onclick="popFilter('emily')">Emily in Paris</button>
-<button data-pf="ladybug" onclick="popFilter('ladybug')">Ladybug</button>
-<button data-pf="bcn" onclick="popFilter('bcn')">Barcelona</button>
-<button data-pf="lyon" onclick="popFilter('lyon')">Lyon</button>
-<button data-pf="checked" onclick="popFilter('checked')">My List <span class="count" id="popCount">0</span></button>
-</div>
-<div class="pop-grid" id="popGrid"></div>
-<script>
-// w = Wikipedia article slug; images fetched live from REST API
-const POP=[
-// Emily in Paris
-{id:'estrapade',t:'Place de l\'Estrapade',a:'5th arr &middot; M10 Cardinal Lemoine',s:'emily',tag:'EMILY',w:'Place_de_l%27Estrapade',d:'Emily\'s apartment with the famous green door. Facade only, 10min from the Panth&eacute;on.'},
-{id:'terranera',t:'Terra Nera',a:'18 Rue des Foss&eacute;s Saint-Jacques',s:'emily',tag:'EMILY',w:'Place_de_l%27Estrapade',d:'The real Italian restaurant that plays Gabriel\'s "Les Deux Comp&egrave;res". Book dinner to eat inside the actual set.'},
-{id:'boulmod',t:'Boulangerie Moderne',a:'16 Rue des Foss&eacute;s Saint-Jacques',s:'emily',tag:'EMILY',w:'Panth%C3%A9on,_Paris',d:'"Best pain au chocolat in Paris" per Emily. Queue on weekends. Next door to Terra Nera.'},
-{id:'valois',t:'Place de Valois (Savoir)',a:'1st arr &middot; behind Palais Royal',s:'emily',tag:'EMILY',w:'Palais-Royal',d:'Emily\'s marketing firm exterior. Quiet leafy square one block from the Palais Royal columns.'},
-{id:'flore',t:'Caf&eacute; de Flore',a:'172 Bd Saint-Germain &middot; 6th arr',s:'emily',tag:'EMILY',w:'Caf%C3%A9_de_Flore',d:'Emily/Mindy brunch classic. Overpriced but the terrace is a vibe. Order a noisette.'},
-{id:'alex3',t:'Pont Alexandre III',a:'Between Invalides &amp; Champs-&Eacute;lys&eacute;es',s:'emily',tag:'EMILY',w:'Pont_Alexandre_III',d:'The ornate golden bridge &mdash; Emily\'s signature "I love Paris" moments. Sunset is magic.'},
-{id:'garnier',t:'Palais Garnier (Op&eacute;ra)',a:'Place de l\'Op&eacute;ra &middot; 9th arr',s:'emily',tag:'EMILY',w:'Palais_Garnier',d:'Ballet scene backdrop. Tour &euro;15 &mdash; the Grand Staircase and golden foyer.'},
-{id:'atelier',t:'Atelier des Lumi&egrave;res',a:'38 Rue Saint-Maur &middot; 11th arr',s:'emily',tag:'EMILY',w:'Atelier_des_Lumi%C3%A8res',d:'Immersive projection venue from S3. Great rainy-afternoon fix. &euro;16.'},
-{id:'shakespeare',t:'Shakespeare and Company',a:'37 Rue de la B&ucirc;cherie &middot; 5th arr',s:'emily',tag:'EMILY',w:'Shakespeare_and_Company_(bookshop)',d:'Legendary English bookshop across from Notre-Dame. Emily browsing scenes. Free.'},
-{id:'laduree',t:'Ladur&eacute;e Champs-&Eacute;lys&eacute;es',a:'75 Av. des Champs-&Eacute;lys&eacute;es',s:'emily',tag:'EMILY',w:'Ladur%C3%A9e',d:'Original macaron patisserie. Emily\'s pastel-box obsession.'},
-{id:'crazyhorse',t:'Le Crazy Horse',a:'12 Av. George V &middot; 8th arr',s:'emily',tag:'EMILY',w:'Crazy_Horse_(Paris)',d:'Legendary Parisian cabaret since 1951. Choreographed nude dance, light art, and show-stopping numbers. Tickets from &euro;95. Evening show.'},
-{id:'giverny',t:'Claude Monet House &amp; Gardens (Giverny)',a:'Giverny, Normandy &middot; 75min train from Paris',s:'emily',tag:'EMILY',w:'Fondation_Claude_Monet',d:'Monet\'s home + the actual water lily pond that inspired the paintings. Day trip: train to Vernon + shuttle bus. &euro;13. Open Apr-Nov.'},
-
-// Ladybug
-{id:'pontarts',t:'Pont des Arts',a:'Between Louvre &amp; Institut de France',s:'ladybug',tag:'LADYBUG',w:'Pont_des_Arts',d:'Pedestrian bridge Marinette runs across in the opening credits.'},
-{id:'painidees',t:'Du Pain et des Id&eacute;es',a:'34 Rue Yves Toudic &middot; 10th arr',s:'ladybug',tag:'LADYBUG',w:'Du_Pain_et_des_Id%C3%A9es',d:'The real bakery cited as the visual inspiration for the Dupain-Cheng bakery.'},
-{id:'vosges',t:'Place des Vosges',a:'Marais &middot; 4th arr',s:'ladybug',tag:'LADYBUG',w:'Place_des_Vosges',d:'Oldest planned square in Paris. Park/picnic episode backdrop.'},
-{id:'luxembourg',t:'Jardin du Luxembourg',a:'6th arr &middot; RER Luxembourg',s:'ladybug',tag:'LADYBUG',w:'Luxembourg_Gardens',d:'Where Marinette + Adrien meet. Green chairs, fountains, Senate palace. Free.'},
-{id:'grandpalais',t:'Le Grand Palais',a:'Av. Winston Churchill &middot; 8th arr',s:'ladybug',tag:'LADYBUG',w:'Grand_Palais',d:'Giant glass-dome palace featured in multiple episodes.'},
-{id:'arc',t:'Arc de Triomphe',a:'Place Charles de Gaulle &middot; 8th arr',s:'ladybug',tag:'LADYBUG',w:'Arc_de_Triomphe',d:'Several akuma battles. Climb (&euro;13) &mdash; 284 steps, unbeatable Champs view.'},
-{id:'tuileries',t:'Jardin des Tuileries',a:'1st arr &middot; M1 Tuileries',s:'ladybug',tag:'LADYBUG',w:'Tuileries_Garden',d:'Formal gardens between Louvre &amp; Concorde. Chase sequences. Summer funfair Jun-Aug.'},
-{id:'montparnasse',t:'Tour Montparnasse',a:'15th arr &middot; M4 Montparnasse',s:'ladybug',tag:'LADYBUG',w:'Tour_Montparnasse',d:'Paris\'s only skyscraper. Rooftop has best Eiffel view in the city (&euro;18).'},
-
-// Barcelona extras
-{id:'bunkers',t:'Bunkers del Carmel',a:'Turo de la Rovira &middot; hilltop',s:'bcn',tag:'BCN',w:'Tur%C3%B3_de_la_Rovira',d:'Old anti-aircraft bunkers with 360&deg; city panorama. Best free sunset spot in Barcelona.'},
-{id:'santpau',t:'Hospital de Sant Pau',a:'Modernista complex &middot; UNESCO',s:'bcn',tag:'BCN',w:'Hospital_de_Sant_Pau',d:'Stunning Art Nouveau ex-hospital with flower-tiled pavilions. Quieter than Gaud&iacute; crowds. &euro;17.'},
-{id:'tibidabo',t:'Tibidabo',a:'Collserola mountain &middot; funicular',s:'bcn',tag:'BCN',w:'Tibidabo',d:'Mountain with a Sacr&eacute;-Coeur-style basilica + vintage funfair. Best views across the whole city.'},
-{id:'palauguell',t:'Palau G&uuml;ell',a:'Carrer Nou de la Rambla &middot; Raval',s:'bcn',tag:'BCN',w:'Palau_G%C3%BCell',d:'Lesser-known Gaud&iacute; mansion (1888). Stunning rooftop chimneys, UNESCO. &euro;12. Right by your hotel area.'},
-{id:'poble',t:'Poble Espanyol',a:'Montju&iuml;c &middot; open-air museum',s:'bcn',tag:'BCN',w:'Poble_Espanyol',d:'Replicas of buildings from every Spanish region in one village. Artisan workshops, craft shops.'},
-{id:'boqueria',t:'La Boqueria Market',a:'Las Ramblas &middot; 1st arr',s:'bcn',tag:'BCN',w:'La_Boqueria',d:'Iconic food market. Jam&oacute;n, juices, tapas counters. Best at 10am before crowds. Free to browse.'},
-{id:'magicfountain',t:'Magic Fountain of Montju&iuml;c',a:'Pla&ccedil;a de Carles Buigas',s:'bcn',tag:'BCN',w:'Magic_Fountain_of_Montju%C3%AFc',d:'Free evening light/music/water show Fri-Sat. Already on your Jul 13 relaxed day.'},
-{id:'bogatell',t:'Platja de la Bogatell',a:'Poblenou beach',s:'bcn',tag:'BCN',w:'Bogatell_beach',d:'Cleaner + less crowded than Barceloneta. Wide sand, chiringuitos, 20min walk from Cruïlla venue.'},
-
-// Lyon extras
-{id:'confluences',t:'Mus&eacute;e des Confluences',a:'Confluence district',s:'lyon',tag:'LYON',w:'Mus%C3%A9e_des_Confluences',d:'Futuristic crystal-shaped museum at the meeting of Rh&ocirc;ne + Sa&ocirc;ne. Natural history + anthropology.'},
-{id:'croixrousse',t:'Croix-Rousse',a:'Silk weavers\' district &middot; hilltop',s:'lyon',tag:'LYON',w:'Croix-Rousse',d:'Bohemian hilltop neighbourhood. Silk ateliers, daily market, amazing viewpoints, street art.'},
-{id:'teteor',t:'Parc de la T&ecirc;te d\'Or',a:'6th arr &middot; huge park',s:'lyon',tag:'LYON',w:'Parc_de_la_T%C3%AAte_d%27Or',d:'117-hectare park with lake, free zoo, botanical gardens. Perfect relaxed morning before a Nuits show.'},
-{id:'murals',t:'Fresque des Lyonnais',a:'Trompe-l\'oeil mural &middot; 1st arr',s:'lyon',tag:'LYON',w:'Fresque_des_Lyonnais',d:'Giant painted mural of 30 famous people from Lyon on a full building wall. Free. 5min from Vieux Lyon.'},
-{id:'lumiere',t:'Institut Lumi&egrave;re',a:'25 Rue du Premier-Film &middot; 8th arr',s:'lyon',tag:'LYON',w:'Institut_Lumi%C3%A8re',d:'Where cinema was invented (1895 by the Lumi&egrave;re brothers). Museum + screenings. &euro;9.'}
-];
-const popKey='popChecked_v1';
-let popChecked=JSON.parse(localStorage.getItem(popKey)||'{}');
-const wikiCache={};
-let wikiObserver=null;
-let popView='all';
-function fetchWithTimeout(url,ms=3000){
-  const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),ms);
-  return fetch(url,{signal:ctrl.signal}).finally(()=>clearTimeout(timer));
-}
-async function loadWiki(slug,tileEl){
-  if(!slug||!tileEl)return;
-  const imgEl=tileEl.querySelector('.pimg');
-  if(!imgEl)return;
-  if(wikiCache[slug]){
-    if(wikiCache[slug]!=='error'){imgEl.style.backgroundImage=`url('${wikiCache[slug]}')`;imgEl.style.backgroundSize='cover';}
-    return;
-  }
-  try{
-    const r=await fetchWithTimeout(`https://en.wikipedia.org/api/rest_v1/page/summary/${slug}`,3000);
-    if(!r.ok)throw 0;
-    const j=await r.json();
-    const url=(j.thumbnail&&j.thumbnail.source)||(j.originalimage&&j.originalimage.source);
-    if(url){wikiCache[slug]=url;imgEl.style.backgroundImage=`url('${url}')`;imgEl.style.backgroundSize='cover';}
-    else{wikiCache[slug]='error';}
-  }catch(e){wikiCache[slug]='error';}
-}
-function queueWikiImages(grid){
-  if(!('IntersectionObserver' in window)){
-    grid.querySelectorAll('.pop-tile').forEach(el=>loadWiki(el.dataset.w,el));
-    return;
-  }
-  if(!wikiObserver){
-    wikiObserver=new IntersectionObserver(entries=>{
-      entries.forEach(entry=>{
-        if(!entry.isIntersecting)return;
-        const el=entry.target;
-        wikiObserver.unobserve(el);
-        loadWiki(el.dataset.w,el);
-      });
-    },{rootMargin:'200px 0px'});
-  }
-  grid.querySelectorAll('.pop-tile').forEach(el=>wikiObserver.observe(el));
-}
-function renderPop(){
-  const grid=document.getElementById('popGrid');
-  const items=POP.filter(p=>popView==='all'?true:popView==='checked'?popChecked[p.id]:p.s===popView);
-  grid.innerHTML=items.map(p=>{
-    const on=!!popChecked[p.id];
-    return `<div class="pop-tile ${p.s} ${on?'checked':''}" data-pid="${p.id}" data-w="${p.w||''}" onclick="togglePop('${p.id}')">
-      <div class="pimg"><span class="ptag">${p.tag}</span><span class="pcheck">${on?'\u2713':''}</span></div>
-      <div class="pbody"><div class="ptitle">${p.t}</div><div class="paddr">${p.a}</div><div class="pdesc">${p.d}</div></div>
-    </div>`;
-  }).join('');
-  document.getElementById('popCount').textContent=Object.values(popChecked).filter(v=>v).length;
-  queueWikiImages(grid);
-}
-function togglePop(id){
-  popChecked[id]=!popChecked[id];
-  if(!popChecked[id])delete popChecked[id];
-  localStorage.setItem(popKey,JSON.stringify(popChecked));
-  renderPop();
-}
-function popFilter(f){
-  popView=f;
-  document.querySelectorAll('.pop-filters button').forEach(b=>b.classList.toggle('active',b.dataset.pf===f));
-  renderPop();
-}
-renderPop();
-
-// ===== Confirmed Plan by City =====
-function renderConfirmedPlan(){
-  if(typeof OPT==='undefined'||!OPT['B+'])return;
-  const opt=OPT['B+'];
-  const order=['paris','lyon','montpellier','barcelona'];
-  const nm={paris:'Paris',lyon:'Lyon',montpellier:'Montpellier',barcelona:'Barcelona'};
-  const sToC={emily:'paris',ladybug:'paris',bcn:'barcelona',lyon:'lyon'};
-  const hotels={
-    paris:{n:'Paris hotel, Bagnolet (BOOKED)',d:'Jul 3-7 &middot; 4nt &middot; &pound;268.12 &middot; Ref 6751758443',u:'#'},
-    lyon:{n:'Quadraverde Lyon',d:'Jul 7-8 &middot; 1nt &middot; &pound;59 &middot; Conf. #5856674449',u:'https://www.booking.com'},
-    montpellier:{n:'Premiere Classe Montpellier Ouest',d:'Jul 8-10 &middot; 2nt &middot; &pound;84 &middot; Conf. #5856649209',u:'https://www.booking.com'},
-    barcelona:{n:'Hotel Sagrada Familia',d:'Jul 10-14 &middot; 4nt &middot; &euro;623 &middot; Conf. #26051370464',u:'https://www.hotelsagradafamilia.com/en/'}
-  };
-  const byCity={};
-  order.forEach(c=>byCity[c]={events:[],ticked:[]});
-  opt.days.forEach(d=>{
-    if(!byCity[d.c])return;
-    d.evs.forEach(e=>{
-      if(e.n==='Settle in, neighbourhood walk'||/^Morning /.test(e.n)||/train/i.test(e.n)||/Flight /.test(e.n)||/Last morning/.test(e.n))return;
-      byCity[d.c].events.push({day:d.dt,wd:d.wd,name:e.n,type:e.ty,opt:!!e.opt,bday:d.bday});
-    });
-  });
-  POP.forEach(p=>{
-    const c=sToC[p.s];
-    if(popChecked[p.id]&&byCity[c])byCity[c].ticked.push(p);
-  });
-  const typeIcon={concert:'&#127925;',festival:'&#127925;',museum:'&#127963;',food:'&#127869;',free:'&#127881;',activity:'&#128205;'};
-  const html=order.map(c=>{
-    const data=byCity[c];
-    const h=hotels[c];
-    return `<div class="plan-city plan-${c}">
-      <h3>${nm[c]} <span class="plan-count">${data.events.length} planned &middot; ${data.ticked.length} ticked</span></h3>
-      <div class="plan-hotel">&#127968; <a href="${h.u}" target="_blank">${h.n}</a> <span class="plan-meta">${h.d}</span></div>
-      <div class="plan-sub"><div class="plan-subhdr">Already in the itinerary</div>
-        <ul class="plan-list">${data.events.map(e=>`<li><span class="plan-day">${e.wd} ${e.day}${e.bday?' &#127874;':''}</span> ${typeIcon[e.type]||'&#128205;'} ${e.name}${e.opt?' <span class="opt-tag">opt</span>':''}</li>`).join('')}</ul>
-      </div>
-      ${data.ticked.length?`<div class="plan-sub"><div class="plan-subhdr">Your ticked bonus sights</div>
-        <ul class="plan-list plan-ticked">${data.ticked.map(t=>`<li>&#9989; <strong>${t.t}</strong> <span class="plan-addr">${t.a}</span></li>`).join('')}</ul>
-      </div>`:'<div class="plan-sub plan-empty">No bonus sights ticked yet &mdash; tick tiles above to add them here.</div>'}
-    </div>`;
-  }).join('');
-  document.getElementById('confirmedPlan').innerHTML=html;
-}
-// Re-render plan after ticking
-const _origToggle=togglePop;
-togglePop=function(id){_origToggle(id);renderConfirmedPlan();}
-renderConfirmedPlan();
-</script>
-</div><!-- /bonus -->
 
 <div class="tab-block" data-panel="itinerary">
 <!-- Confirmed Plan by City -->
@@ -1381,6 +1181,207 @@ togglePop=function(id){_prevToggle2(id);setTimeout(renderMaps,50);}
 </div>
 </div>
 </div><!-- /vision -->
+
+<div class="tab-block" data-panel="vision">
+<!-- Bonus Sights (merged into Vision Board) -->
+<hr style="border:none;border-top:1px solid #e2ded9;max-width:1100px;margin:28px auto 4px">
+<div class="sec"><h2>Bonus Sights &amp; Pop Culture</h2><p>Tick the ones you want to visit &middot; saved to your browser &middot; tiles fetch live photos from Wikipedia</p></div>
+<style>
+.pop-filters{display:flex;gap:8px;justify-content:center;margin:10px 0 14px;flex-wrap:wrap}
+.pop-filters button{background:#fff;border:1px solid #ddd;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500}
+.pop-filters button.active{background:#1e3a5f;color:#fff;border-color:#1e3a5f}
+.pop-filters .count{background:#f9a825;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px}
+.pop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:4px 0 24px}
+.pop-tile{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.06);position:relative;transition:transform .15s,box-shadow .15s}
+.pop-tile:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.pop-tile.checked{box-shadow:0 0 0 3px #f9a825, 0 4px 12px rgba(0,0,0,.12)}
+.pop-tile .pimg{height:160px;background:#e0e0e0 center/cover no-repeat;position:relative}
+.pop-tile .ptag{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.7);color:#fff;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600;letter-spacing:.5px}
+.pop-tile.emily .ptag{background:#ec407a}
+.pop-tile.ladybug .ptag{background:#e53935}
+.pop-tile.both .ptag{background:linear-gradient(90deg,#ec407a 50%,#e53935 50%)}
+.pop-tile.bcn .ptag{background:#922b21}
+.pop-tile.lyon .ptag{background:#7b2252}
+.pop-tile .pcheck{position:absolute;top:8px;right:8px;width:30px;height:30px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:bold;color:#bbb;user-select:none;border:2px solid #fff;transition:all .15s}
+.pop-tile .pcheck:hover{background:#fff;color:#666}
+.pop-tile.checked .pcheck{background:#f9a825;color:#fff;border-color:#f9a825}
+.pop-tile .pbody{padding:12px 14px}
+.pop-tile .ptitle{font-weight:600;color:#1e3a5f;font-size:14px;line-height:1.2}
+.pop-tile .paddr{color:#666;font-size:11px;margin-top:3px}
+.pop-tile .pdesc{color:#333;font-size:12px;line-height:1.45;margin-top:6px}
+</style>
+<div class="pop-filters">
+<button class="active" data-pf="all" onclick="popFilter('all')">All</button>
+<button data-pf="emily" onclick="popFilter('emily')">Emily in Paris</button>
+<button data-pf="ladybug" onclick="popFilter('ladybug')">Ladybug</button>
+<button data-pf="bcn" onclick="popFilter('bcn')">Barcelona</button>
+<button data-pf="lyon" onclick="popFilter('lyon')">Lyon</button>
+<button data-pf="checked" onclick="popFilter('checked')">My List <span class="count" id="popCount">0</span></button>
+</div>
+<div class="pop-grid" id="popGrid"></div>
+<script>
+// w = Wikipedia article slug; images fetched live from REST API
+const POP=[
+// Emily in Paris
+{id:'estrapade',t:'Place de l\'Estrapade',a:'5th arr &middot; M10 Cardinal Lemoine',s:'emily',tag:'EMILY',w:'Place_de_l%27Estrapade',d:'Emily\'s apartment with the famous green door. Facade only, 10min from the Panth&eacute;on.'},
+{id:'terranera',t:'Terra Nera',a:'18 Rue des Foss&eacute;s Saint-Jacques',s:'emily',tag:'EMILY',w:'Place_de_l%27Estrapade',d:'The real Italian restaurant that plays Gabriel\'s "Les Deux Comp&egrave;res". Book dinner to eat inside the actual set.'},
+{id:'boulmod',t:'Boulangerie Moderne',a:'16 Rue des Foss&eacute;s Saint-Jacques',s:'emily',tag:'EMILY',w:'Panth%C3%A9on,_Paris',d:'"Best pain au chocolat in Paris" per Emily. Queue on weekends. Next door to Terra Nera.'},
+{id:'valois',t:'Place de Valois (Savoir)',a:'1st arr &middot; behind Palais Royal',s:'emily',tag:'EMILY',w:'Palais-Royal',d:'Emily\'s marketing firm exterior. Quiet leafy square one block from the Palais Royal columns.'},
+{id:'flore',t:'Caf&eacute; de Flore',a:'172 Bd Saint-Germain &middot; 6th arr',s:'emily',tag:'EMILY',w:'Caf%C3%A9_de_Flore',d:'Emily/Mindy brunch classic. Overpriced but the terrace is a vibe. Order a noisette.'},
+{id:'alex3',t:'Pont Alexandre III',a:'Between Invalides &amp; Champs-&Eacute;lys&eacute;es',s:'emily',tag:'EMILY',w:'Pont_Alexandre_III',d:'The ornate golden bridge &mdash; Emily\'s signature "I love Paris" moments. Sunset is magic.'},
+{id:'garnier',t:'Palais Garnier (Op&eacute;ra)',a:'Place de l\'Op&eacute;ra &middot; 9th arr',s:'emily',tag:'EMILY',w:'Palais_Garnier',d:'Ballet scene backdrop. Tour &euro;15 &mdash; the Grand Staircase and golden foyer.'},
+{id:'atelier',t:'Atelier des Lumi&egrave;res',a:'38 Rue Saint-Maur &middot; 11th arr',s:'emily',tag:'EMILY',w:'Atelier_des_Lumi%C3%A8res',d:'Immersive projection venue from S3. Great rainy-afternoon fix. &euro;16.'},
+{id:'shakespeare',t:'Shakespeare and Company',a:'37 Rue de la B&ucirc;cherie &middot; 5th arr',s:'emily',tag:'EMILY',w:'Shakespeare_and_Company_(bookshop)',d:'Legendary English bookshop across from Notre-Dame. Emily browsing scenes. Free.'},
+{id:'laduree',t:'Ladur&eacute;e Champs-&Eacute;lys&eacute;es',a:'75 Av. des Champs-&Eacute;lys&eacute;es',s:'emily',tag:'EMILY',w:'Ladur%C3%A9e',d:'Original macaron patisserie. Emily\'s pastel-box obsession.'},
+{id:'crazyhorse',t:'Le Crazy Horse',a:'12 Av. George V &middot; 8th arr',s:'emily',tag:'EMILY',w:'Crazy_Horse_(Paris)',d:'Legendary Parisian cabaret since 1951. Choreographed nude dance, light art, and show-stopping numbers. Tickets from &euro;95. Evening show.'},
+{id:'giverny',t:'Claude Monet House &amp; Gardens (Giverny)',a:'Giverny, Normandy &middot; 75min train from Paris',s:'emily',tag:'EMILY',w:'Fondation_Claude_Monet',d:'Monet\'s home + the actual water lily pond that inspired the paintings. Day trip: train to Vernon + shuttle bus. &euro;13. Open Apr-Nov.'},
+
+// Ladybug
+{id:'pontarts',t:'Pont des Arts',a:'Between Louvre &amp; Institut de France',s:'ladybug',tag:'LADYBUG',w:'Pont_des_Arts',d:'Pedestrian bridge Marinette runs across in the opening credits.'},
+{id:'painidees',t:'Du Pain et des Id&eacute;es',a:'34 Rue Yves Toudic &middot; 10th arr',s:'ladybug',tag:'LADYBUG',w:'Du_Pain_et_des_Id%C3%A9es',d:'The real bakery cited as the visual inspiration for the Dupain-Cheng bakery.'},
+{id:'vosges',t:'Place des Vosges',a:'Marais &middot; 4th arr',s:'ladybug',tag:'LADYBUG',w:'Place_des_Vosges',d:'Oldest planned square in Paris. Park/picnic episode backdrop.'},
+{id:'luxembourg',t:'Jardin du Luxembourg',a:'6th arr &middot; RER Luxembourg',s:'ladybug',tag:'LADYBUG',w:'Luxembourg_Gardens',d:'Where Marinette + Adrien meet. Green chairs, fountains, Senate palace. Free.'},
+{id:'grandpalais',t:'Le Grand Palais',a:'Av. Winston Churchill &middot; 8th arr',s:'ladybug',tag:'LADYBUG',w:'Grand_Palais',d:'Giant glass-dome palace featured in multiple episodes.'},
+{id:'arc',t:'Arc de Triomphe',a:'Place Charles de Gaulle &middot; 8th arr',s:'ladybug',tag:'LADYBUG',w:'Arc_de_Triomphe',d:'Several akuma battles. Climb (&euro;13) &mdash; 284 steps, unbeatable Champs view.'},
+{id:'tuileries',t:'Jardin des Tuileries',a:'1st arr &middot; M1 Tuileries',s:'ladybug',tag:'LADYBUG',w:'Tuileries_Garden',d:'Formal gardens between Louvre &amp; Concorde. Chase sequences. Summer funfair Jun-Aug.'},
+{id:'montparnasse',t:'Tour Montparnasse',a:'15th arr &middot; M4 Montparnasse',s:'ladybug',tag:'LADYBUG',w:'Tour_Montparnasse',d:'Paris\'s only skyscraper. Rooftop has best Eiffel view in the city (&euro;18).'},
+
+// Barcelona extras
+{id:'bunkers',t:'Bunkers del Carmel',a:'Turo de la Rovira &middot; hilltop',s:'bcn',tag:'BCN',w:'Tur%C3%B3_de_la_Rovira',d:'Old anti-aircraft bunkers with 360&deg; city panorama. Best free sunset spot in Barcelona.'},
+{id:'santpau',t:'Hospital de Sant Pau',a:'Modernista complex &middot; UNESCO',s:'bcn',tag:'BCN',w:'Hospital_de_Sant_Pau',d:'Stunning Art Nouveau ex-hospital with flower-tiled pavilions. Quieter than Gaud&iacute; crowds. &euro;17.'},
+{id:'tibidabo',t:'Tibidabo',a:'Collserola mountain &middot; funicular',s:'bcn',tag:'BCN',w:'Tibidabo',d:'Mountain with a Sacr&eacute;-Coeur-style basilica + vintage funfair. Best views across the whole city.'},
+{id:'palauguell',t:'Palau G&uuml;ell',a:'Carrer Nou de la Rambla &middot; Raval',s:'bcn',tag:'BCN',w:'Palau_G%C3%BCell',d:'Lesser-known Gaud&iacute; mansion (1888). Stunning rooftop chimneys, UNESCO. &euro;12. Right by your hotel area.'},
+{id:'poble',t:'Poble Espanyol',a:'Montju&iuml;c &middot; open-air museum',s:'bcn',tag:'BCN',w:'Poble_Espanyol',d:'Replicas of buildings from every Spanish region in one village. Artisan workshops, craft shops.'},
+{id:'boqueria',t:'La Boqueria Market',a:'Las Ramblas &middot; 1st arr',s:'bcn',tag:'BCN',w:'La_Boqueria',d:'Iconic food market. Jam&oacute;n, juices, tapas counters. Best at 10am before crowds. Free to browse.'},
+{id:'magicfountain',t:'Magic Fountain of Montju&iuml;c',a:'Pla&ccedil;a de Carles Buigas',s:'bcn',tag:'BCN',w:'Magic_Fountain_of_Montju%C3%AFc',d:'Free evening light/music/water show Fri-Sat. Already on your Jul 13 relaxed day.'},
+{id:'bogatell',t:'Platja de la Bogatell',a:'Poblenou beach',s:'bcn',tag:'BCN',w:'Bogatell_beach',d:'Cleaner + less crowded than Barceloneta. Wide sand, chiringuitos, 20min walk from Cruïlla venue.'},
+
+// Lyon extras
+{id:'confluences',t:'Mus&eacute;e des Confluences',a:'Confluence district',s:'lyon',tag:'LYON',w:'Mus%C3%A9e_des_Confluences',d:'Futuristic crystal-shaped museum at the meeting of Rh&ocirc;ne + Sa&ocirc;ne. Natural history + anthropology.'},
+{id:'croixrousse',t:'Croix-Rousse',a:'Silk weavers\' district &middot; hilltop',s:'lyon',tag:'LYON',w:'Croix-Rousse',d:'Bohemian hilltop neighbourhood. Silk ateliers, daily market, amazing viewpoints, street art.'},
+{id:'teteor',t:'Parc de la T&ecirc;te d\'Or',a:'6th arr &middot; huge park',s:'lyon',tag:'LYON',w:'Parc_de_la_T%C3%AAte_d%27Or',d:'117-hectare park with lake, free zoo, botanical gardens. Perfect relaxed morning before a Nuits show.'},
+{id:'murals',t:'Fresque des Lyonnais',a:'Trompe-l\'oeil mural &middot; 1st arr',s:'lyon',tag:'LYON',w:'Fresque_des_Lyonnais',d:'Giant painted mural of 30 famous people from Lyon on a full building wall. Free. 5min from Vieux Lyon.'},
+{id:'lumiere',t:'Institut Lumi&egrave;re',a:'25 Rue du Premier-Film &middot; 8th arr',s:'lyon',tag:'LYON',w:'Institut_Lumi%C3%A8re',d:'Where cinema was invented (1895 by the Lumi&egrave;re brothers). Museum + screenings. &euro;9.'}
+];
+const popKey='popChecked_v1';
+let popChecked=JSON.parse(localStorage.getItem(popKey)||'{}');
+const wikiCache={};
+let wikiObserver=null;
+let popView='all';
+function fetchWithTimeout(url,ms=3000){
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),ms);
+  return fetch(url,{signal:ctrl.signal}).finally(()=>clearTimeout(timer));
+}
+async function loadWiki(slug,tileEl){
+  if(!slug||!tileEl)return;
+  const imgEl=tileEl.querySelector('.pimg');
+  if(!imgEl)return;
+  if(wikiCache[slug]){
+    if(wikiCache[slug]!=='error'){imgEl.style.backgroundImage=`url('${wikiCache[slug]}')`;imgEl.style.backgroundSize='cover';}
+    return;
+  }
+  try{
+    const r=await fetchWithTimeout(`https://en.wikipedia.org/api/rest_v1/page/summary/${slug}`,3000);
+    if(!r.ok)throw 0;
+    const j=await r.json();
+    const url=(j.thumbnail&&j.thumbnail.source)||(j.originalimage&&j.originalimage.source);
+    if(url){wikiCache[slug]=url;imgEl.style.backgroundImage=`url('${url}')`;imgEl.style.backgroundSize='cover';}
+    else{wikiCache[slug]='error';}
+  }catch(e){wikiCache[slug]='error';}
+}
+function queueWikiImages(grid){
+  if(!('IntersectionObserver' in window)){
+    grid.querySelectorAll('.pop-tile').forEach(el=>loadWiki(el.dataset.w,el));
+    return;
+  }
+  if(!wikiObserver){
+    wikiObserver=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting)return;
+        const el=entry.target;
+        wikiObserver.unobserve(el);
+        loadWiki(el.dataset.w,el);
+      });
+    },{rootMargin:'200px 0px'});
+  }
+  grid.querySelectorAll('.pop-tile').forEach(el=>wikiObserver.observe(el));
+}
+function renderPop(){
+  const grid=document.getElementById('popGrid');
+  const items=POP.filter(p=>popView==='all'?true:popView==='checked'?popChecked[p.id]:p.s===popView);
+  grid.innerHTML=items.map(p=>{
+    const on=!!popChecked[p.id];
+    return `<div class="pop-tile ${p.s} ${on?'checked':''}" data-pid="${p.id}" data-w="${p.w||''}" onclick="togglePop('${p.id}')">
+      <div class="pimg"><span class="ptag">${p.tag}</span><span class="pcheck">${on?'\u2713':''}</span></div>
+      <div class="pbody"><div class="ptitle">${p.t}</div><div class="paddr">${p.a}</div><div class="pdesc">${p.d}</div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('popCount').textContent=Object.values(popChecked).filter(v=>v).length;
+  queueWikiImages(grid);
+}
+function togglePop(id){
+  popChecked[id]=!popChecked[id];
+  if(!popChecked[id])delete popChecked[id];
+  localStorage.setItem(popKey,JSON.stringify(popChecked));
+  renderPop();
+}
+function popFilter(f){
+  popView=f;
+  document.querySelectorAll('.pop-filters button').forEach(b=>b.classList.toggle('active',b.dataset.pf===f));
+  renderPop();
+}
+renderPop();
+
+// ===== Confirmed Plan by City =====
+function renderConfirmedPlan(){
+  if(typeof OPT==='undefined'||!OPT['B+'])return;
+  const opt=OPT['B+'];
+  const order=['paris','lyon','montpellier','barcelona'];
+  const nm={paris:'Paris',lyon:'Lyon',montpellier:'Montpellier',barcelona:'Barcelona'};
+  const sToC={emily:'paris',ladybug:'paris',bcn:'barcelona',lyon:'lyon'};
+  const hotels={
+    paris:{n:'Paris hotel, Bagnolet (BOOKED)',d:'Jul 3-7 &middot; 4nt &middot; &pound;268.12 &middot; Ref 6751758443',u:'#'},
+    lyon:{n:'Quadraverde Lyon',d:'Jul 7-8 &middot; 1nt &middot; &pound;59 &middot; Conf. #5856674449',u:'https://www.booking.com'},
+    montpellier:{n:'Premiere Classe Montpellier Ouest',d:'Jul 8-10 &middot; 2nt &middot; &pound;84 &middot; Conf. #5856649209',u:'https://www.booking.com'},
+    barcelona:{n:'Hotel Sagrada Familia',d:'Jul 10-14 &middot; 4nt &middot; &euro;623 &middot; Conf. #26051370464',u:'https://www.hotelsagradafamilia.com/en/'}
+  };
+  const byCity={};
+  order.forEach(c=>byCity[c]={events:[],ticked:[]});
+  opt.days.forEach(d=>{
+    if(!byCity[d.c])return;
+    d.evs.forEach(e=>{
+      if(e.n==='Settle in, neighbourhood walk'||/^Morning /.test(e.n)||/train/i.test(e.n)||/Flight /.test(e.n)||/Last morning/.test(e.n))return;
+      byCity[d.c].events.push({day:d.dt,wd:d.wd,name:e.n,type:e.ty,opt:!!e.opt,bday:d.bday});
+    });
+  });
+  POP.forEach(p=>{
+    const c=sToC[p.s];
+    if(popChecked[p.id]&&byCity[c])byCity[c].ticked.push(p);
+  });
+  const typeIcon={concert:'&#127925;',festival:'&#127925;',museum:'&#127963;',food:'&#127869;',free:'&#127881;',activity:'&#128205;'};
+  const html=order.map(c=>{
+    const data=byCity[c];
+    const h=hotels[c];
+    return `<div class="plan-city plan-${c}">
+      <h3>${nm[c]} <span class="plan-count">${data.events.length} planned &middot; ${data.ticked.length} ticked</span></h3>
+      <div class="plan-hotel">&#127968; <a href="${h.u}" target="_blank">${h.n}</a> <span class="plan-meta">${h.d}</span></div>
+      <div class="plan-sub"><div class="plan-subhdr">Already in the itinerary</div>
+        <ul class="plan-list">${data.events.map(e=>`<li><span class="plan-day">${e.wd} ${e.day}${e.bday?' &#127874;':''}</span> ${typeIcon[e.type]||'&#128205;'} ${e.name}${e.opt?' <span class="opt-tag">opt</span>':''}</li>`).join('')}</ul>
+      </div>
+      ${data.ticked.length?`<div class="plan-sub"><div class="plan-subhdr">Your ticked bonus sights</div>
+        <ul class="plan-list plan-ticked">${data.ticked.map(t=>`<li>&#9989; <strong>${t.t}</strong> <span class="plan-addr">${t.a}</span></li>`).join('')}</ul>
+      </div>`:'<div class="plan-sub plan-empty">No bonus sights ticked yet &mdash; tick tiles above to add them here.</div>'}
+    </div>`;
+  }).join('');
+  document.getElementById('confirmedPlan').innerHTML=html;
+}
+// Re-render plan after ticking
+const _origToggle=togglePop;
+togglePop=function(id){_origToggle(id);renderConfirmedPlan();}
+renderConfirmedPlan();
+</script>
+</div><!-- /bonus -->
 
 <div class="tab-block" data-panel="misc">
 <div class="sec"><h2>Misc &middot; Saved bookings & notes</h2><p>Unrelated-to-trip bookings, future ideas, deals worth keeping.</p></div>
