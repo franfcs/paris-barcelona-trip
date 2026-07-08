@@ -419,128 +419,7 @@ document.querySelectorAll('.main-tabs button').forEach(b=>b.classList.toggle('ac
 .tips-body .ok{background:#eafaf0;border-left:3px solid #27ae60;border-radius:5px;padding:8px 11px;font-size:.83rem;margin:6px 0}
 .tips-body .phrase{background:#f5f3f0;border-radius:5px;padding:1px 6px;font-style:italic}
 </style>
-<details class="tips-card">
-<summary><span>🍽️ Food on a Budget &amp; Street-Smart Tips</span><span class="chev">▼</span></summary>
-<div class="tips-body">
 
-<h4>🥖 Cheap eats — the French "meal deal"</h4>
-<ul>
-<li><span class="k">Boulangerie "formule"</span> (~€6–9): baguette sandwich + drink + pastry. Look for <span class="phrase">Formule</span> or <span class="phrase">Menu</span> in the window.</li>
-<li><span class="k">Jambon-beurre</span> (ham &amp; butter baguette) — €4–6, the classic cheap lunch.</li>
-<li><span class="k">Supermarkets</span> (Monoprix, Franprix, Carrefour City, Lidl) — sandwich + drink + fruit ≈ €6. Perfect for a <span class="k">Seine picnic</span>.</li>
-<li><span class="k">Crêpes / kebab-grec</span> street stands — €4–8 everywhere.</li>
-<li><span class="k">L'As du Fallafel</span> (Le Marais) — famous falafel ~€9, huge.</li>
-<li><span class="k">Bouillon Chartier / Bouillon Pigalle</span> — proper sit-down French, mains €9–14, no booking (just queue).</li>
-</ul>
-
-<h4>💧 Free water &amp; money-savers</h4>
-<ul>
-<li>Ask for <span class="phrase">une carafe d'eau</span> — restaurants must give free tap water.</li>
-<li>Free public fountains everywhere, incl. sparkling <span class="k">Wallace &amp; pétillante fountains</span> — bring a refillable bottle.</li>
-<li><span class="k">Too Good To Go</span> app — bakeries/restaurants sell surplus food €3–5. Works in Paris &amp; Barcelona.</li>
-<li>Eat your big meal at <span class="k">lunch</span> — bistro <span class="phrase">formule midi</span> (€12–16 for 2 courses) is far cheaper than dinner.</li>
-</ul>
-
-<h4>🍷 Drinking alcohol in public — know the difference</h4>
-<div class="ok"><span class="k">🇫🇷 France (Paris, Lyon, Montpellier):</span> Generally <span class="k">fine</span> — picnicking with wine by the Seine, canals &amp; parks is normal and tolerated. A few zones/times are restricted, and being visibly drunk in public (<span class="phrase">ivresse publique</span>) is an offence. So: a glass of wine by the river 👍, getting hammered on the street 👎.</div>
-<div class="warn"><span class="k">🇪🇸 Barcelona is different:</span> Street drinking (<span class="phrase">botellón</span>) is <span class="k">banned and fined</span> — fines can be €300+. No drinking on streets, squares or the beach. Drink in bars, restaurants, terraces or your accommodation instead. Also ignore people selling cans of beer on the street/beach — it's illegal and a common tourist trap.</div>
-
-<h4>🛡️ Street-smart</h4>
-<ul>
-<li><span class="k">Pickpockets</span> on the metro &amp; at big sights (Eiffel, Sagrada, Las Ramblas) — bag zipped &amp; in front, phone away in crowds.</li>
-<li>Decline friendship bracelets / petition-signers near monuments — classic distraction scams.</li>
-<li>Tap-to-pay works nearly everywhere; carry a little cash for boulangeries &amp; markets.</li>
-</ul>
-
-</div>
-</details>
-
-<details class="tips-card">
-<summary><span>📸 Photo Spots &amp; Must-See Points (tick as you go)</span><span class="chev">▼</span></summary>
-<style>
-.ps-list{margin:2px 0 6px}
-.ps-item{display:flex;align-items:flex-start;gap:9px;padding:5px 2px;cursor:pointer;font-size:.86rem;line-height:1.4;border-bottom:1px solid #f4eef1}
-.ps-item:last-child{border-bottom:none}
-.ps-item input{margin-top:2px;width:17px;height:17px;accent-color:#e91e8c;cursor:pointer;flex-shrink:0}
-.ps-item.done span{text-decoration:line-through;opacity:.45}
-.ps-item .k{font-weight:700;color:#222}
-</style>
-<div class="tips-body">
-<h4>🇫🇷 Paris</h4>
-<div class="ps-list">
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_0" onchange="psToggle(this)"><span><span class="k">Trocadéro (Place du Trocadéro)</span> — classic full Eiffel shot 📸</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_1" onchange="psToggle(this)"><span><span class="k">Champ de Mars</span> — Eiffel from the lawn, sparkles on the hour</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_2" onchange="psToggle(this)"><span><span class="k">Rue Saint-Dominique</span> — Eiffel peeking between the buildings</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_3" onchange="psToggle(this)"><span><span class="k">Pont Alexandre III</span> — the ornate golden bridge</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_4" onchange="psToggle(this)"><span><span class="k">Louvre Pyramid (Cour Napoléon)</span> — the glass pyramid</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_5" onchange="psToggle(this)"><span><span class="k">Palais-Royal — Colonnes de Buren</span> — striped columns</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_6" onchange="psToggle(this)"><span><span class="k">Sacré-Cœur steps</span> — Montmartre panorama</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_7" onchange="psToggle(this)"><span><span class="k">Place du Tertre</span> — artists' square</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_8" onchange="psToggle(this)"><span><span class="k">La Maison Rose / Rue de l'Abreuvoir</span> — Montmartre's prettiest corner</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_9" onchange="psToggle(this)"><span><span class="k">Arc de Triomphe</span> — down the 12 avenues</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_10" onchange="psToggle(this)"><span><span class="k">Notre-Dame from Pont de l'Archevêché</span> — cathedral from the Seine</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_11" onchange="psToggle(this)"><span><span class="k">Sainte-Chapelle</span> — stained-glass interior</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_par_12" onchange="psToggle(this)"><span><span class="k">Galeries Lafayette dome</span> — golden dome + free rooftop view</span></label>
-</div>
-<h4>🇫🇷 Lyon</h4>
-<div class="ps-list">
-<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_0" onchange="psToggle(this)"><span><span class="k">Place de la Trinité</span> — colourful film-famous facade 📸</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_1" onchange="psToggle(this)"><span><span class="k">Rue du Bœuf / La Tour Rose</span> — pink Renaissance tower courtyard</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_2" onchange="psToggle(this)"><span><span class="k">Cathédrale Saint-Jean</span> — facade + astronomical clock</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_3" onchange="psToggle(this)"><span><span class="k">Esplanade de Fourvière</span> — the big panorama over Lyon</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_4" onchange="psToggle(this)"><span><span class="k">Basilique Notre-Dame de Fourvière</span> — gilded mosaic interior</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_5" onchange="psToggle(this)"><span><span class="k">Théâtres Romains de Fourvière</span> — Roman theatre tiers</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_6" onchange="psToggle(this)"><span><span class="k">Passerelle du Palais de Justice</span> — Fourvière glowing over the Saône at night 📸</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_7" onchange="psToggle(this)"><span><span class="k">Place des Terreaux</span> — Bartholdi fountain + Hôtel de Ville</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_8" onchange="psToggle(this)"><span><span class="k">Place Bellecour</span> — Louis XIV statue</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_9" onchange="psToggle(this)"><span><span class="k">Traboule, 27 Rue Saint-Jean</span> — hidden Renaissance passage</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_10" onchange="psToggle(this)"><span><span class="k">Mur des Canuts</span> — giant painted-wall mural</span></label>
-</div>
-<h4>🇫🇷 Montpellier</h4>
-<div class="ps-list">
-<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_0" onchange="psToggle(this)"><span><span class="k">Place de la Comédie</span> — Fontaine des Trois Grâces + Opéra 📸</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_1" onchange="psToggle(this)"><span><span class="k">Promenade du Peyrou</span> — Arc + aqueduct at sunset ⭐ 📸</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_2" onchange="psToggle(this)"><span><span class="k">Aqueduc Saint-Clément (Les Arceaux)</span> — the long arches</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_3" onchange="psToggle(this)"><span><span class="k">Place de la Canourgue</span> — prettiest square + viewpoint</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_4" onchange="psToggle(this)"><span><span class="k">Cathédrale Saint-Pierre</span> — dramatic twin-turret porch</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_5" onchange="psToggle(this)"><span><span class="k">Rue Foch</span> — grand boulevard</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_6" onchange="psToggle(this)"><span><span class="k">Jardin des Plantes</span> — old greenhouse &amp; lily ponds</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_7" onchange="psToggle(this)"><span><span class="k">Antigone district</span> — Bofill's neoclassical architecture</span></label>
-</div>
-<h4>🇪🇸 Barcelona</h4>
-<div class="ps-list">
-<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_0" onchange="psToggle(this)"><span><span class="k">Sagrada Família — Plaça de Gaudí</span> — the reflection shot by the lake 📸</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_1" onchange="psToggle(this)"><span><span class="k">Park Güell</span> — mosaic terrace + city view</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_2" onchange="psToggle(this)"><span><span class="k">Casa Batlló</span> — modernista facade, Passeig de Gràcia</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_3" onchange="psToggle(this)"><span><span class="k">Casa Milà (La Pedrera)</span> — wavy stone rooftop</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_4" onchange="psToggle(this)"><span><span class="k">Bunkers del Carmel</span> — best sunset panorama ⭐</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_5" onchange="psToggle(this)"><span><span class="k">Pont del Bisbe (Gothic Quarter)</span> — the bishop's bridge</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_6" onchange="psToggle(this)"><span><span class="k">Plaça Reial</span> — palm-lined square</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_7" onchange="psToggle(this)"><span><span class="k">La Boqueria</span> — the famous market off La Rambla</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_8" onchange="psToggle(this)"><span><span class="k">Barceloneta beach</span> — sand + city skyline</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_9" onchange="psToggle(this)"><span><span class="k">Arc de Triomf</span> — the red-brick promenade</span></label>
-<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_10" onchange="psToggle(this)"><span><span class="k">Passeig de Gràcia</span> — modernista strip, great at night</span></label>
-</div>
-</div>
-</details>
-<script>
-(function(){
-  var KEY='photoSpots_v1',st={};
-  try{st=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){st={};}
-  window.psToggle=function(cb){
-    st[cb.dataset.ps]=cb.checked;
-    localStorage.setItem(KEY,JSON.stringify(st));
-    var it=cb.closest('.ps-item');if(it)it.classList.toggle('done',cb.checked);
-  };
-  function restore(){
-    document.querySelectorAll('input[data-ps]').forEach(function(cb){
-      if(st[cb.dataset.ps]){cb.checked=true;var it=cb.closest('.ps-item');if(it)it.classList.add('done');}
-    });
-  }
-  if(document.readyState!=='loading')restore();
-  else document.addEventListener('DOMContentLoaded',restore);
-})();
-</script>
 
 <div class="itin-toolbar">
 <button class="itbtn primary" onclick="showTodayOnly()">📍 Today only</button>
@@ -1405,6 +1284,95 @@ togglePop=function(id){_prevToggle2(id);setTimeout(renderMaps,50);}
 <button class="fbtn" data-vc="barcelona" onclick="filtV('barcelona')">Barcelona</button>
 </div>
 <div class="vgrid" id="vgrid"></div>
+<div style="margin-top:22px">
+<p class="sub" style="text-align:center;margin-bottom:6px">📸 Tick off every shot as you capture it</p>
+<details class="tips-card" open>
+<summary><span>📸 Photo Spots &amp; Must-See Points (tick as you go)</span><span class="chev">▼</span></summary>
+<style>
+.ps-list{margin:2px 0 6px}
+.ps-item{display:flex;align-items:flex-start;gap:9px;padding:5px 2px;cursor:pointer;font-size:.86rem;line-height:1.4;border-bottom:1px solid #f4eef1}
+.ps-item:last-child{border-bottom:none}
+.ps-item input{margin-top:2px;width:17px;height:17px;accent-color:#e91e8c;cursor:pointer;flex-shrink:0}
+.ps-item.done span{text-decoration:line-through;opacity:.45}
+.ps-item .k{font-weight:700;color:#222}
+</style>
+<div class="tips-body">
+<h4>🇫🇷 Paris</h4>
+<div class="ps-list">
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_0" onchange="psToggle(this)"><span><span class="k">Trocadéro (Place du Trocadéro)</span> — classic full Eiffel shot 📸</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_1" onchange="psToggle(this)"><span><span class="k">Champ de Mars</span> — Eiffel from the lawn, sparkles on the hour</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_2" onchange="psToggle(this)"><span><span class="k">Rue Saint-Dominique</span> — Eiffel peeking between the buildings</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_3" onchange="psToggle(this)"><span><span class="k">Pont Alexandre III</span> — the ornate golden bridge</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_4" onchange="psToggle(this)"><span><span class="k">Louvre Pyramid (Cour Napoléon)</span> — the glass pyramid</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_5" onchange="psToggle(this)"><span><span class="k">Palais-Royal — Colonnes de Buren</span> — striped columns</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_6" onchange="psToggle(this)"><span><span class="k">Sacré-Cœur steps</span> — Montmartre panorama</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_7" onchange="psToggle(this)"><span><span class="k">Place du Tertre</span> — artists' square</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_8" onchange="psToggle(this)"><span><span class="k">La Maison Rose / Rue de l'Abreuvoir</span> — Montmartre's prettiest corner</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_9" onchange="psToggle(this)"><span><span class="k">Arc de Triomphe</span> — down the 12 avenues</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_10" onchange="psToggle(this)"><span><span class="k">Notre-Dame from Pont de l'Archevêché</span> — cathedral from the Seine</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_11" onchange="psToggle(this)"><span><span class="k">Sainte-Chapelle</span> — stained-glass interior</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_par_12" onchange="psToggle(this)"><span><span class="k">Galeries Lafayette dome</span> — golden dome + free rooftop view</span></label>
+</div>
+<h4>🇫🇷 Lyon</h4>
+<div class="ps-list">
+<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_0" onchange="psToggle(this)"><span><span class="k">Place de la Trinité</span> — colourful film-famous facade 📸</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_1" onchange="psToggle(this)"><span><span class="k">Rue du Bœuf / La Tour Rose</span> — pink Renaissance tower courtyard</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_2" onchange="psToggle(this)"><span><span class="k">Cathédrale Saint-Jean</span> — facade + astronomical clock</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_3" onchange="psToggle(this)"><span><span class="k">Esplanade de Fourvière</span> — the big panorama over Lyon</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_4" onchange="psToggle(this)"><span><span class="k">Basilique Notre-Dame de Fourvière</span> — gilded mosaic interior</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_5" onchange="psToggle(this)"><span><span class="k">Théâtres Romains de Fourvière</span> — Roman theatre tiers</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_6" onchange="psToggle(this)"><span><span class="k">Passerelle du Palais de Justice</span> — Fourvière glowing over the Saône at night 📸</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_7" onchange="psToggle(this)"><span><span class="k">Place des Terreaux</span> — Bartholdi fountain + Hôtel de Ville</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_8" onchange="psToggle(this)"><span><span class="k">Place Bellecour</span> — Louis XIV statue</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_9" onchange="psToggle(this)"><span><span class="k">Traboule, 27 Rue Saint-Jean</span> — hidden Renaissance passage</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_lyo_10" onchange="psToggle(this)"><span><span class="k">Mur des Canuts</span> — giant painted-wall mural</span></label>
+</div>
+<h4>🇫🇷 Montpellier</h4>
+<div class="ps-list">
+<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_0" onchange="psToggle(this)"><span><span class="k">Place de la Comédie</span> — Fontaine des Trois Grâces + Opéra 📸</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_1" onchange="psToggle(this)"><span><span class="k">Promenade du Peyrou</span> — Arc + aqueduct at sunset ⭐ 📸</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_2" onchange="psToggle(this)"><span><span class="k">Aqueduc Saint-Clément (Les Arceaux)</span> — the long arches</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_3" onchange="psToggle(this)"><span><span class="k">Place de la Canourgue</span> — prettiest square + viewpoint</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_4" onchange="psToggle(this)"><span><span class="k">Cathédrale Saint-Pierre</span> — dramatic twin-turret porch</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_5" onchange="psToggle(this)"><span><span class="k">Rue Foch</span> — grand boulevard</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_6" onchange="psToggle(this)"><span><span class="k">Jardin des Plantes</span> — old greenhouse &amp; lily ponds</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_mtp_7" onchange="psToggle(this)"><span><span class="k">Antigone district</span> — Bofill's neoclassical architecture</span></label>
+</div>
+<h4>🇪🇸 Barcelona</h4>
+<div class="ps-list">
+<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_0" onchange="psToggle(this)"><span><span class="k">Sagrada Família — Plaça de Gaudí</span> — the reflection shot by the lake 📸</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_1" onchange="psToggle(this)"><span><span class="k">Park Güell</span> — mosaic terrace + city view</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_2" onchange="psToggle(this)"><span><span class="k">Casa Batlló</span> — modernista facade, Passeig de Gràcia</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_3" onchange="psToggle(this)"><span><span class="k">Casa Milà (La Pedrera)</span> — wavy stone rooftop</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_4" onchange="psToggle(this)"><span><span class="k">Bunkers del Carmel</span> — best sunset panorama ⭐</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_5" onchange="psToggle(this)"><span><span class="k">Pont del Bisbe (Gothic Quarter)</span> — the bishop's bridge</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_6" onchange="psToggle(this)"><span><span class="k">Plaça Reial</span> — palm-lined square</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_7" onchange="psToggle(this)"><span><span class="k">La Boqueria</span> — the famous market off La Rambla</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_8" onchange="psToggle(this)"><span><span class="k">Barceloneta beach</span> — sand + city skyline</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_9" onchange="psToggle(this)"><span><span class="k">Arc de Triomf</span> — the red-brick promenade</span></label>
+<label class="ps-item"><input type="checkbox" data-ps="ps_bcn_10" onchange="psToggle(this)"><span><span class="k">Passeig de Gràcia</span> — modernista strip, great at night</span></label>
+</div>
+</div>
+</details>
+<script>
+(function(){
+  var KEY='photoSpots_v1',st={};
+  try{st=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){st={};}
+  window.psToggle=function(cb){
+    st[cb.dataset.ps]=cb.checked;
+    localStorage.setItem(KEY,JSON.stringify(st));
+    var it=cb.closest('.ps-item');if(it)it.classList.toggle('done',cb.checked);
+  };
+  function restore(){
+    document.querySelectorAll('input[data-ps]').forEach(function(cb){
+      if(st[cb.dataset.ps]){cb.checked=true;var it=cb.closest('.ps-item');if(it)it.classList.add('done');}
+    });
+  }
+  if(document.readyState!=='loading')restore();
+  else document.addEventListener('DOMContentLoaded',restore);
+})();
+</script>
+</div>
 </div>
 </div><!-- /vision -->
 
@@ -1762,6 +1730,7 @@ pr:{hotels:943,transport:183,activities:264,food:357},
 days:[
 // PARIS (Jul 3-7 · 4 nights)
 {dt:'Jul 3',wd:'Fri',c:'paris',t:'Stroud \u2192 BHX \u2192 Arrive Paris-Beauvais (18:00 landing)',evs:[
+{tm:'🍽️',n:'Eating cheap in France (save this)',ty:'food',desc:'Meal-deal equivalent: a boulangerie \'formule\' (sandwich + drink + pastry, ~€6–9) or a jambon-beurre (~€5). Supermarkets (Monoprix, Franprix, Lidl) do sandwich + drink + fruit for ~€6 — perfect for a Seine or park picnic. 💧 Free tap water anywhere: ask for \'une carafe d\'eau\'. Grab surplus bakery/restaurant food cheap on the Too Good To Go app. Eat your big meal at lunch (formule midi €12–16). 🍷 A glass of wine in a park or by the river is fine in France. 🛡️ Watch pickpockets on the metro and at big sights; politely decline bracelet/petition scams near monuments.',pr:0},
 {tm:'11:03',n:'\u27a4 Train: Stonehouse \u2192 Birmingham International',ty:'transit',st:'booked',desc:'GWR / West Midlands Railway \u00b7 Change at Cheltenham Spa, then Birmingham New Street \u00b7 Arrives Birmingham International 12:45 \u00b7 Short covered walkway from station to airport terminal \u00b7 Ticket on Franciny\'s phone / email \u00b7 £26.21 total paid',pr:13.105},
 {tm:'13:30',n:'Arrive BHX International \u2014 2hrs 20min before flight',ty:'transit',desc:'Ryanair recommend arriving 2hrs before departure. Go straight to bag drop (Priority boarding). Then security. This window is comfortable but do not linger \u2014 Ryanair closes the gate 30min before.',pr:0},
 {tm:'15:50',n:'Ryanair FR718 Birmingham \u2192 Beauvais',ty:'activity',st:'booked',desc:'BOOKED + CHECKED IN. Res #TSE6JL. Seats 29E (Fran) + 29F (Ed). Priority + 2 cabin bags. E-ticket / boarding pass completed for Jul 3 flight — save offline in Ryanair app and take a screenshot before travel.',pr:0},
@@ -1854,6 +1823,7 @@ days:[
 {tm:'21:00',n:'Dinner + Comedie evening',ty:'food',desc:'The main square at night: street performers, lit cafes.',pr:15,prMax:25},
 ]},
 {dt:'Jul 10',wd:'Fri',c:'montpellier',t:'Montpellier → Barcelona 🧳 Checkout + Friday Evening Options',travel:true,evs:[
+{tm:'🍷',n:'Barcelona: drinking rules + scams',ty:'food',desc:'Different from France: street drinking (botellón) is BANNED and fined in Barcelona (€300+) — including on the beach. Drink in bars, terraces or your accommodation, not on the street, and ignore people selling cans of beer on the street/beach (illegal + a tourist trap). 🛡️ Pickpockets are common on La Rambla, the metro and around Sagrada Família — bag zipped and in front. 💧 Tap water is safe: ask for \'agua del grifo\'. Too Good To Go works here too for cheap eats.',pr:0},
 {tm:'08:45',n:'Breakfast + pack in Montpellier',ty:'food',desc:'Keep this morning calm. Pack chargers, tickets, passports/ID and water/snacks for the bus before leaving the hotel.',pr:8,prMax:15,opt:true},
 {tm:'09:45',n:'Checkout Premiere Classe',ty:'activity',desc:'Checkout with bags. The hotel is not central and the bus leaves from Montpellier Sabines, so do not plan sightseeing this morning.',pr:0},
 {tm:'10:00',n:'Travel to Montpellier Sabines bus station',ty:'transit',desc:'Go from Premiere Classe Montpellier Ouest / Saint-Jean-de-Védas to Montpellier Gare Routière Sabines. Allow 30-40min by tram/taxi with bags, even if maps says less.',pr:0},
