@@ -38,7 +38,7 @@ if('serviceWorker' in navigator){
    Mirrors the interactive keys to a Cloudflare Worker + KV so ticks/edits
    are shared across phone & laptop. Fails silently offline / on GitHub Pages. */
 (function(){
-  var SYNC_KEYS=['bookDone_v1','bookDetails_v2','popChecked_v1','pdState_v2','pdTrends_v1','dayNotes_v1','photoSpots_v1'];
+  var SYNC_KEYS=['bookDone_v1','bookDetails_v2','popChecked_v1','pdState_v2','pdTrends_v1','dayNotes_v1','photoSpots_v1','visionSeen_v1'];
   var API='/api/state';
   var _set=localStorage.setItem.bind(localStorage);
   var _get=localStorage.getItem.bind(localStorage);
@@ -1274,8 +1274,14 @@ togglePop=function(id){_prevToggle2(id);setTimeout(renderMaps,50);}
 <div class="tab-block" data-panel="vision">
 <!-- Vision Board -->
 <div class="vision">
+<style>
+.pol{cursor:pointer}
+.pol .img{position:relative}
+.pol.seen{outline:3px solid #27ae60;outline-offset:-3px;border-radius:8px}
+.pol.seen .img::after{content:'\2713 SEEN';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(39,174,96,.30);color:#fff;font-weight:800;font-size:1.15rem;letter-spacing:.06em;text-shadow:0 1px 5px rgba(0,0,0,.55);pointer-events:none;z-index:3}
+</style>
 <h2>Vision Board</h2>
-<p class="sub">What's waiting at each stop</p>
+<p class="sub">What's waiting at each stop — tap a tile to mark what you've seen ✓</p>
 <div class="filters" style="justify-content:center">
 <button class="fbtn active" data-vc="all" onclick="filtV('all')">All</button>
 <button class="fbtn" data-vc="paris" onclick="filtV('paris')">Paris</button>
@@ -2108,16 +2114,24 @@ return `<div class="day${bday}${todayCls}${collapsed}${hide}" data-c="${d.c}"><d
 initLazyBackgrounds(document.getElementById('days'));
 }
 
+let visSeen={};
+try{visSeen=JSON.parse(localStorage.getItem('visionSeen_v1'))||{};}catch(e){visSeen={};}
+window.visToggle=function(el){
+  var id=el.dataset.vid;if(!id)return;
+  visSeen[id]=!visSeen[id];
+  localStorage.setItem('visionSeen_v1',JSON.stringify(visSeen));
+  el.classList.toggle('seen',!!visSeen[id]);
+};
 function renderVision(){
 document.getElementById('vgrid').innerHTML=VIS.slice().sort((a,b)=>(b.r||0)-(a.r||0)).map(v=>{
 const hide=curVFilt!=='all'&&v.c!==curVFilt?' hidden':'';
-const r=v.r||0;
+const r=v.r||0;const vid=(v.c+'|'+v.n).replace(/&/g,'&amp;').replace(/"/g,'&quot;');const seenCls=visSeen[vid]?' seen':'';
 const stars=`<span class="fs">${'\u2605'.repeat(r)}</span><span class="es">${'\u2606'.repeat(3-r)}</span>`;
 const rLbl=r===3?'MUST-SEE':r===2?'WORTH IT':'BONUS';
 const itTag=v.plan
   ?`<span class="it-tag it-in">\u2713 ${v.plan}</span>`
   :`<span class="it-tag it-out">\u2717 Not in plan</span>`;
-	return `<div class="pol${hide}" data-vc="${v.c}" data-r="${r}"><div class="img lazy-bg" data-bg="${v.img}"><span class="ctag" style="background:${C[v.c].cl}">${C[v.c].n}</span><span class="rtag r${r}">${rLbl}</span>${itTag}</div><div class="cap">${v.n}</div><div class="capsub">${v.s}</div><div class="stars" title="${r}/3 stars">${stars}</div></div>`;
+	return `<div class="pol${hide}${seenCls}" data-vc="${v.c}" data-r="${r}" data-vid="${vid}" onclick="visToggle(this)"><div class="img lazy-bg" data-bg="${v.img}"><span class="ctag" style="background:${C[v.c].cl}">${C[v.c].n}</span><span class="rtag r${r}">${rLbl}</span>${itTag}</div><div class="cap">${v.n}</div><div class="capsub">${v.s}</div><div class="stars" title="${r}/3 stars">${stars}</div></div>`;
 	}).join('');
 	initLazyBackgrounds(document.getElementById('vgrid'));
 }
